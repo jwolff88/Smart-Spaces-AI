@@ -8,12 +8,13 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Sparkles, Loader2, DollarSign, Home, CheckCircle2 } from "lucide-react"
+import { Sparkles, Loader2, DollarSign, CheckCircle2 } from "lucide-react"
 
 export default function AddPropertyPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(false)
   
   // Form State
   const [formData, setFormData] = useState({
@@ -30,10 +31,9 @@ export default function AddPropertyPage() {
     suggestedPrice: 0
   })
 
-  // This function calls your new Gemini API route
+  // 1. Generate Content with AI
   const handleGenerateAI = async () => {
     setIsGenerating(true)
-    
     try {
       const response = await fetch("/api/generate-listing", {
         method: "POST",
@@ -44,31 +44,55 @@ export default function AddPropertyPage() {
       if (!response.ok) throw new Error("Failed to generate")
 
       const data = await response.json()
-      
       setAiContent({
         title: data.title,
         description: data.description,
         suggestedPrice: data.suggestedPrice
       })
-      
       setStep(3)
     } catch (error) {
       console.error(error)
-      // Fallback if API fails (shows error in UI)
       setAiContent({
         title: "Error Connecting to AI",
-        description: "Please check your internet connection or API key in .env.",
+        description: "Please check your internet connection or API key.",
         suggestedPrice: 0
       })
-      setStep(3) // Move to step 3 to show the error state so user isn't stuck
+      setStep(3)
     } finally {
       setIsGenerating(false)
     }
   }
 
-  const handlePublish = () => {
-    // In a real app, you would save to DB here
-    router.push("/host-dashboard/listings")
+  // 2. Save to Supabase DB
+  const handlePublish = async () => {
+    setIsPublishing(true)
+    try {
+      const payload = {
+        title: aiContent.title,
+        description: aiContent.description,
+        price: aiContent.suggestedPrice,
+        location: formData.address,
+        bedrooms: formData.bedrooms,
+        amenities: formData.amenities,
+        type: formData.type
+      }
+
+      const response = await fetch("/api/listings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) throw new Error("Failed to save")
+
+      // Success! Redirect to listings
+      router.push("/host-dashboard/listings")
+    } catch (error) {
+      console.error("Publish Error:", error)
+      alert("Failed to save listing. Check console.")
+    } finally {
+      setIsPublishing(false)
+    }
   }
 
   const toggleAmenity = (item: string) => {
@@ -214,9 +238,18 @@ export default function AddPropertyPage() {
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button variant="ghost" onClick={() => setStep(2)}>Edit Inputs</Button>
-            <Button size="lg" onClick={handlePublish} className="gap-2">
-              <CheckCircle2 className="h-4 w-4" />
-              Publish Listing
+            <Button size="lg" onClick={handlePublish} disabled={isPublishing} className="gap-2">
+              {isPublishing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="h-4 w-4" />
+                  Publish Listing
+                </>
+              )}
             </Button>
           </CardFooter>
         </Card>

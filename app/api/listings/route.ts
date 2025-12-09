@@ -32,8 +32,6 @@ export async function POST(req: Request) {
         price: parseFloat(price),
         location,
         hostId: user.id,
-        // We'll store extra details like amenities in the description or extend schema later
-        // For now, we map the core fields defined in your schema
         smartPricing: true, 
         maintenanceHealth: "Good",
         matchScore: 95
@@ -45,6 +43,25 @@ export async function POST(req: Request) {
     console.error("Database Error:", error)
     return NextResponse.json(
       { error: "Failed to create listing" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function GET(req: Request) {
+  try {
+    const listings = await prisma.listing.findMany({
+      // We retrieve all listings for this demo
+      orderBy: {
+        title: 'asc' // Optional: Sorts them alphabetically
+      }
+    })
+
+    return NextResponse.json(listings)
+  } catch (error) {
+    console.error("Fetch Error:", error)
+    return NextResponse.json(
+      { error: "Failed to fetch listings" },
       { status: 500 }
     )
   }

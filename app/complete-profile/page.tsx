@@ -130,7 +130,8 @@ export default function CompleteProfilePage() {
                       <Wifi className="h-5 w-5 text-muted-foreground" />
                       <div className="grid gap-0.5">
                         <Label>High-Speed Internet</Label>
-                        <p className="text-xs text-muted-foreground">Video-call ready (>100Mbps)</p>
+                        {/* FIXED: Changed '>' to '&gt;' to prevent parser error */}
+                        <p className="text-xs text-muted-foreground">Video-call ready (&gt;100Mbps)</p>
                       </div>
                     </div>
                     <Switch />

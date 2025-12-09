@@ -10,6 +10,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^3.9.1",
     "@prisma/client": "^6.19.0",
     "@radix-ui/react-accordion": "latest",
@@ -52,7 +53,6 @@
     "next": "^16.0.8",
     "next-auth": "^5.0.0-beta.15",
     "next-themes": "latest",
-    "openai": "^4.28.0",
     "react": "^19.0.0",
     "react-day-picker": "latest",
     "react-dom": "^19.0.0",

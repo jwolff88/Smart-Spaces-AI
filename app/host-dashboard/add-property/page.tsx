@@ -30,27 +30,58 @@ export default function AddPropertyPage() {
     suggestedPrice: 0
   })
 
-  const handleGenerateAI = () => {
+  // This function calls your new Gemini API route
+  const handleGenerateAI = async () => {
     setIsGenerating(true)
-    // Simulate AI API Call
-    setTimeout(() => {
-      setAiContent({
-        title: "Modern Downtown Oasis | Remote Work Ready",
-        description: "Experience the heartbeat of the city in this sun-drenched apartment designed for digital nomads. Features enterprise-grade WiFi, a dedicated standing desk workspace, and sound-insulated windows for focus. Just steps away from the best coffee shops in the district.",
-        suggestedPrice: 165
+    
+    try {
+      const response = await fetch("/api/generate-listing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       })
-      setIsGenerating(false)
+
+      if (!response.ok) throw new Error("Failed to generate")
+
+      const data = await response.json()
+      
+      setAiContent({
+        title: data.title,
+        description: data.description,
+        suggestedPrice: data.suggestedPrice
+      })
+      
       setStep(3)
-    }, 2500)
+    } catch (error) {
+      console.error(error)
+      // Fallback if API fails (shows error in UI)
+      setAiContent({
+        title: "Error Connecting to AI",
+        description: "Please check your internet connection or API key in .env.",
+        suggestedPrice: 0
+      })
+      setStep(3) // Move to step 3 to show the error state so user isn't stuck
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   const handlePublish = () => {
-    // Simulate saving to DB
+    // In a real app, you would save to DB here
     router.push("/host-dashboard/listings")
   }
 
+  const toggleAmenity = (item: string) => {
+    setFormData(prev => {
+      const amenities = prev.amenities.includes(item)
+        ? prev.amenities.filter(a => a !== item)
+        : [...prev.amenities, item]
+      return { ...prev, amenities }
+    })
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center py-10 max-w-2xl mx-auto">
+    <div className="flex flex-col items-center justify-center py-10 max-w-2xl mx-auto px-4">
       
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold">List Your Property</h1>
@@ -114,7 +145,11 @@ export default function AddPropertyPage() {
             <div className="grid grid-cols-2 gap-4">
               {["Wifi", "Kitchen", "Workspace", "Free Parking", "Gym", "Pool", "Smart Lock", "AC"].map((item) => (
                 <div key={item} className="flex items-center space-x-2">
-                  <Checkbox id={item} />
+                  <Checkbox 
+                    id={item} 
+                    checked={formData.amenities.includes(item)}
+                    onCheckedChange={() => toggleAmenity(item)}
+                  />
                   <Label htmlFor={item}>{item}</Label>
                 </div>
               ))}

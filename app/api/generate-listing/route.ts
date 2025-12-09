@@ -8,7 +8,6 @@ export async function POST(req: Request) {
     // 1. Initialize Gemini
     const apiKey = process.env.GEMINI_API_KEY
     if (!apiKey) {
-      // Fallback Mock if no key is present
       return NextResponse.json({
         title: `Modern ${type} in ${address} (Mock)`,
         description: `This is a placeholder because the GEMINI_API_KEY is missing. Add it to .env to see real AI magic! This ${bedrooms}-bed ${type} features ${amenities.join(", ")}.`,
@@ -18,9 +17,9 @@ export async function POST(req: Request) {
 
     const genAI = new GoogleGenerativeAI(apiKey)
     
-    // 2. Configure Model - Use JSON mode for reliability
+    // 2. Configure Model - UPDATED MODEL NAME HERE
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+      model: "gemini-1.5-flash-001", 
       generationConfig: { responseMimeType: "application/json" }
     })
 

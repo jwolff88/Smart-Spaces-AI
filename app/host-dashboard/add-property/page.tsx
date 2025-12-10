@@ -121,8 +121,9 @@ export default function AddPropertyPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-2">
-              <Label>Property Address</Label>
+              <Label htmlFor="address">Property Address</Label>
               <Input 
+                id="address"
                 placeholder="123 Main St, San Francisco, CA" 
                 value={formData.address}
                 onChange={(e) => setFormData({...formData, address: e.target.value})}
@@ -130,8 +131,9 @@ export default function AddPropertyPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label>Property Type</Label>
+                <Label htmlFor="property-type">Property Type</Label>
                 <select 
+                  id="property-type"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   value={formData.type}
                   onChange={(e) => setFormData({...formData, type: e.target.value})}
@@ -143,8 +145,9 @@ export default function AddPropertyPage() {
                 </select>
               </div>
               <div className="grid gap-2">
-                <Label>Bedrooms</Label>
+                <Label htmlFor="bedrooms">Bedrooms</Label>
                 <Input 
+                  id="bedrooms"
                   type="number" 
                   value={formData.bedrooms}
                   onChange={(e) => setFormData({...formData, bedrooms: e.target.value})}

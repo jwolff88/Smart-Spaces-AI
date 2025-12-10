@@ -17,11 +17,8 @@ export async function POST(req: Request) {
 
     const genAI = new GoogleGenerativeAI(apiKey)
     
-    // 2. Configure Model - UPDATED MODEL NAME HERE
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash-001", 
-      generationConfig: { responseMimeType: "application/json" }
-    })
+    // 2. Configure Model - Switch to standard 'gemini-pro' for maximum compatibility
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" })
 
     // 3. Construct the Prompt
     const prompt = `
@@ -31,7 +28,7 @@ export async function POST(req: Request) {
       - Location: ${address}
       - Amenities: ${amenities.join(", ")}
 
-      Return a JSON object with exactly these three fields:
+      Return a raw JSON object with exactly these three fields:
       1. "title": Catchy title (max 50 chars).
       2. "description": A compelling 3-sentence description emphasizing the vibe.
       3. "suggestedPrice": A number representing the nightly rate (USD).
@@ -39,10 +36,15 @@ export async function POST(req: Request) {
 
     // 4. Generate Content
     const result = await model.generateContent(prompt)
-    const responseText = result.response.text()
+    const response = await result.response
+    let text = response.text()
     
-    // 5. Parse and Return
-    const data = JSON.parse(responseText)
+    // 5. CLEANUP: gemini-pro often adds markdown code blocks (```json ... ```)
+    // We must strip these out before parsing, or it will crash.
+    text = text.replace(/```json/g, "").replace(/```/g, "").trim()
+    
+    // 6. Parse and Return
+    const data = JSON.parse(text)
     return NextResponse.json(data)
 
   } catch (error) {

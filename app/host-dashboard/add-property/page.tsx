@@ -134,6 +134,7 @@ export default function AddPropertyPage() {
                 <Label htmlFor="property-type">Property Type</Label>
                 <select 
                   id="property-type"
+                  aria-label="Property Type"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   value={formData.type}
                   onChange={(e) => setFormData({...formData, type: e.target.value})}

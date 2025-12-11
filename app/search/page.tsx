@@ -1,19 +1,15 @@
 import { db } from "@/lib/db"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { MapPin, Home, BedDouble, Wifi, ArrowLeft } from "lucide-react"
+import { MapPin, Home, BedDouble, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
-// We designate this as dynamic so it fetches fresh data on every visit
 export const dynamic = 'force-dynamic'
 
 export default async function SearchPage() {
-  // Fetch all listings from the database
   const listings = await db.listing.findMany({
-    orderBy: {
-      createdAt: 'desc'
-    }
+    orderBy: { createdAt: 'desc' }
   })
 
   return (
@@ -78,9 +74,12 @@ export default async function SearchPage() {
               </CardContent>
 
               <CardFooter className="p-4 pt-0">
-                <Button className="w-full bg-slate-900 group-hover:bg-blue-600 transition-colors">
-                  View Details
-                </Button>
+                {/* LINK ADDED HERE */}
+                <Link href={`/listings/${listing.id}`} className="w-full">
+                  <Button className="w-full bg-slate-900 group-hover:bg-blue-600 transition-colors">
+                    View Details
+                  </Button>
+                </Link>
               </CardFooter>
             </Card>
           ))}

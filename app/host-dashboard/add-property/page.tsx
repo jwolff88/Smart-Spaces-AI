@@ -1,20 +1,22 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Sparkles, Loader2, DollarSign, CheckCircle2 } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent } from "@/components/ui/card"
+import { Loader2, Sparkles, CheckCircle2, Home, ArrowLeft } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { createListing } from "@/app/actions/create-listing"
 
 export default function AddPropertyPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [isGenerating, setIsGenerating] = useState(false)
-  const [isPublishing, setIsPublishing] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   
   // Form State
   const [formData, setFormData] = useState({
@@ -24,21 +26,21 @@ export default function AddPropertyPage() {
     amenities: [] as string[]
   })
 
-  // AI Generated State
-  const [aiContent, setAiContent] = useState({
-    title: "",
-    description: "",
-    suggestedPrice: 0
-  })
+  // AI Content State
+  const [aiContent, setAiContent] = useState<{
+    title: string
+    description: string
+    suggestedPrice: number
+  } | null>(null)
 
-  // 1. Generate Content with AI
   const handleGenerateAI = async () => {
     setIsGenerating(true)
     try {
+      // Call our API route
       const response = await fetch("/api/generate-listing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
       })
 
       if (!response.ok) throw new Error("Failed to generate")
@@ -49,254 +51,197 @@ export default function AddPropertyPage() {
         description: data.description,
         suggestedPrice: data.suggestedPrice
       })
-      setStep(3)
+      setStep(2) // Move to next step
     } catch (error) {
       console.error(error)
-      setAiContent({
-        title: "Error Connecting to AI",
-        description: "Please check your internet connection or API key.",
-        suggestedPrice: 0
-      })
-      setStep(3)
+      alert("Failed to generate listing. Check console.")
     } finally {
       setIsGenerating(false)
     }
   }
 
-  // 2. Save to Database
   const handlePublish = async () => {
-    setIsPublishing(true)
-    try {
-      // Validate required fields before submitting
-      if (!aiContent.title || !aiContent.description || !formData.address) {
-        alert("Please ensure all required fields are filled: title, description, and address.")
-        setIsPublishing(false)
-        return
-      }
+    if (!aiContent) return
+    setIsSaving(true)
 
-      if (aiContent.suggestedPrice <= 0) {
-        alert("Please ensure the price is set to a valid amount.")
-        setIsPublishing(false)
-        return
-      }
+    // Prepare final data payload
+    const listingData = {
+      title: aiContent.title,
+      description: aiContent.description,
+      price: aiContent.suggestedPrice,
+      location: formData.address,
+      type: formData.type,
+      bedrooms: formData.bedrooms,
+      amenities: formData.amenities
+    }
 
-      const payload = {
-        title: aiContent.title,
-        description: aiContent.description,
-        price: aiContent.suggestedPrice,
-        location: formData.address,
-        bedrooms: formData.bedrooms,
-        amenities: formData.amenities,
-        type: formData.type
-      }
+    // Call the Server Action
+    const result = await createListing(listingData)
 
-      const response = await fetch("/api/listings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
+    setIsSaving(false)
 
-      if (!response.ok) {
-        // Try to get error message from response
-        let errorMessage = "Failed to save listing"
-        try {
-          const errorData = await response.json()
-          errorMessage = errorData.error || errorMessage
-          if (errorData.details) {
-            console.error("Error details:", errorData.details)
-          }
-        } catch (e) {
-          // If response is not JSON, use status text
-          errorMessage = response.statusText || errorMessage
-        }
-        throw new Error(errorMessage)
-      }
-
-      // Success! Redirect to listings
-      router.push("/host-dashboard/listings")
-    } catch (error) {
-      console.error("Publish Error:", error)
-      const errorMessage = error instanceof Error ? error.message : "Failed to save listing. Please try again."
-      alert(errorMessage)
-    } finally {
-      setIsPublishing(false)
+    if (result.error) {
+      alert(result.error)
+    } else {
+      // Success! Redirect to dashboard
+      router.push("/host-dashboard")
     }
   }
 
-  const toggleAmenity = (item: string) => {
-    setFormData(prev => {
-      const amenities = prev.amenities.includes(item)
-        ? prev.amenities.filter(a => a !== item)
-        : [...prev.amenities, item]
-      return { ...prev, amenities }
-    })
-  }
-
   return (
-    <div className="flex flex-col items-center justify-center py-10 max-w-2xl mx-auto px-4">
-      
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold">List Your Property</h1>
-        <p className="text-muted-foreground">Let our AI optimize your listing for maximum revenue.</p>
-      </div>
+    <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
+      <Card className="w-full max-w-3xl shadow-xl">
+        {/* Header with Back Button */}
+        <div className="p-6 border-b flex items-center gap-4">
+          <Link href="/host-dashboard">
+            <Button variant="ghost" size="icon">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold">Add New Property</h1>
+            <p className="text-gray-500">Step {step} of 2: {step === 1 ? "Property Details" : "Review AI Listing"}</p>
+          </div>
+        </div>
 
-      {/* --- STEP 1: BASIC INFO --- */}
-      {step === 1 && (
-        <Card className="w-full animate-in fade-in slide-in-from-bottom-4">
-          <CardHeader>
-            <CardTitle>The Basics</CardTitle>
-            <CardDescription>Where is your property located?</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-2">
-              <Label htmlFor="address">Property Address</Label>
-              <Input 
-                id="address"
-                placeholder="123 Main St, San Francisco, CA" 
-                value={formData.address}
-                onChange={(e) => setFormData({...formData, address: e.target.value})}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+        <CardContent className="p-8">
+          {step === 1 ? (
+            // --- STEP 1: INPUTS ---
+            <div className="space-y-6">
               <div className="grid gap-2">
-                <Label htmlFor="property-type">Property Type</Label>
-                <select 
-                  id="property-type"
-                  aria-label="Property Type"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  value={formData.type}
-                  onChange={(e) => setFormData({...formData, type: e.target.value})}
-                >
-                  <option>Apartment</option>
-                  <option>House</option>
-                  <option>Guest Suite</option>
-                  <option>Loft</option>
-                </select>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="bedrooms">Bedrooms</Label>
+                <Label>Property Address</Label>
                 <Input 
-                  id="bedrooms"
-                  type="number" 
-                  value={formData.bedrooms}
-                  onChange={(e) => setFormData({...formData, bedrooms: e.target.value})}
+                  placeholder="e.g. 123 Main St, Austin, TX" 
+                  value={formData.address}
+                  onChange={(e) => setFormData({...formData, address: e.target.value})}
                 />
               </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-end">
-            <Button onClick={() => setStep(2)}>Next: Amenities</Button>
-          </CardFooter>
-        </Card>
-      )}
 
-      {/* --- STEP 2: AMENITIES --- */}
-      {step === 2 && (
-        <Card className="w-full animate-in fade-in slide-in-from-right-4">
-          <CardHeader>
-            <CardTitle>Amenities</CardTitle>
-            <CardDescription>What makes your place special?</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              {["Wifi", "Kitchen", "Workspace", "Free Parking", "Gym", "Pool", "Smart Lock", "AC"].map((item) => (
-                <div key={item} className="flex items-center space-x-2">
-                  <Checkbox 
-                    id={item} 
-                    checked={formData.amenities.includes(item)}
-                    onCheckedChange={() => toggleAmenity(item)}
-                  />
-                  <Label htmlFor={item}>{item}</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label>Property Type</Label>
+                  <Select 
+                    value={formData.type} 
+                    onValueChange={(val) => setFormData({...formData, type: val})}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Apartment">Apartment</SelectItem>
+                      <SelectItem value="House">House</SelectItem>
+                      <SelectItem value="Condo">Condo</SelectItem>
+                      <SelectItem value="Studio">Studio</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="ghost" onClick={() => setStep(1)}>Back</Button>
-            <Button onClick={handleGenerateAI} disabled={isGenerating}>
-              {isGenerating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Optimizing with AI...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Generate Listing
-                </>
-              )}
-            </Button>
-          </CardFooter>
-        </Card>
-      )}
 
-      {/* --- STEP 3: AI REVIEW --- */}
-      {step === 3 && (
-        <Card className="w-full animate-in zoom-in-95 duration-300 border-primary/20 shadow-lg">
-          <CardHeader className="bg-primary/5 rounded-t-xl">
-            <div className="flex items-center gap-2 text-primary">
-              <Sparkles className="h-5 w-5" />
-              <CardTitle>AI Optimization Complete</CardTitle>
-            </div>
-            <CardDescription>
-              We analyzed market data to generate this high-converting listing.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6 pt-6">
-            
-            <div className="space-y-2">
-              <Label className="text-muted-foreground uppercase text-xs font-bold tracking-wider">Optimized Title</Label>
-              <Input value={aiContent.title} readOnly className="font-semibold text-lg" />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-muted-foreground uppercase text-xs font-bold tracking-wider">Compelling Description</Label>
-              <Textarea value={aiContent.description} readOnly className="h-32 leading-relaxed" />
-            </div>
-
-            <div className="flex items-center gap-4 rounded-lg border p-4 bg-green-50 dark:bg-green-900/10 dark:border-green-900">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-100">
-                <DollarSign className="h-6 w-6" />
+                <div className="grid gap-2">
+                  <Label>Bedrooms</Label>
+                  <Select 
+                    value={formData.bedrooms} 
+                    onValueChange={(val) => setFormData({...formData, bedrooms: val})}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 Bedroom</SelectItem>
+                      <SelectItem value="2">2 Bedrooms</SelectItem>
+                      <SelectItem value="3">3 Bedrooms</SelectItem>
+                      <SelectItem value="4+">4+ Bedrooms</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-green-700 dark:text-green-300">AI Suggested Price</p>
-                <p className="text-2xl font-bold text-green-800 dark:text-green-100">${aiContent.suggestedPrice} <span className="text-sm font-normal text-muted-foreground">/ night</span></p>
+
+              <div className="grid gap-2">
+                <Label>Amenities (Comma separated)</Label>
+                <Input 
+                  placeholder="Wifi, Pool, Gym, Free Parking..." 
+                  onChange={(e) => setFormData({
+                    ...formData, 
+                    amenities: e.target.value.split(',').map(s => s.trim())
+                  })}
+                />
               </div>
-              <div className="ml-auto text-xs text-muted-foreground text-right">
-                Based on 45 comparable <br/> listings in your area.
+
+              <Button 
+                size="lg" 
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                onClick={handleGenerateAI}
+                disabled={isGenerating || !formData.address}
+              >
+                {isGenerating ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Analyzing Market Data...</>
+                ) : (
+                  <><Sparkles className="mr-2 h-4 w-4" /> Generate Listing with AI</>
+                )}
+              </Button>
+            </div>
+          ) : (
+            // --- STEP 2: AI REVIEW ---
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+              <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex items-center gap-3">
+                <Sparkles className="h-5 w-5 text-blue-600" />
+                <div>
+                  <h3 className="font-semibold text-blue-900">AI Optimization Complete</h3>
+                  <p className="text-sm text-blue-700">We analyzed market data to generate this high-converting listing.</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="grid gap-2">
+                  <Label className="text-xs uppercase tracking-wide text-gray-500 font-bold">Optimized Title</Label>
+                  <Input 
+                    value={aiContent?.title} 
+                    onChange={(e) => setAiContent(prev => prev ? {...prev, title: e.target.value} : null)}
+                    className="font-medium text-lg"
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label className="text-xs uppercase tracking-wide text-gray-500 font-bold">Compelling Description</Label>
+                  <Textarea 
+                    value={aiContent?.description}
+                    onChange={(e) => setAiContent(prev => prev ? {...prev, description: e.target.value} : null)} 
+                    className="h-32 leading-relaxed"
+                  />
+                </div>
+
+                <div className="flex items-center gap-4 p-4 bg-gray-900 text-white rounded-lg">
+                  <div className="bg-green-500/20 p-2 rounded-full">
+                    <span className="text-green-400 font-bold">$</span>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400">AI Suggested Price</p>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold">${aiContent?.suggestedPrice}</span>
+                      <span className="text-sm text-gray-500">/ night</span>
+                    </div>
+                  </div>
+                  <div className="ml-auto text-right text-xs text-gray-500">
+                    Based on 45 comparable <br/> listings in your area.
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button variant="outline" onClick={() => setStep(1)} className="w-1/3">
+                  Edit Inputs
+                </Button>
+                <Button 
+                  className="w-2/3 bg-green-600 hover:bg-green-700"
+                  onClick={handlePublish}
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</>
+                  ) : (
+                     <><CheckCircle2 className="mr-2 h-4 w-4" /> Publish Listing</>
+                  )}
+                </Button>
               </div>
             </div>
-
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="ghost" onClick={() => setStep(2)}>Edit Inputs</Button>
-            <Button size="lg" onClick={handlePublish} disabled={isPublishing} className="gap-2">
-              {isPublishing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 className="h-4 w-4" />
-                  Publish Listing
-                </>
-              )}
-            </Button>
-          </CardFooter>
-        </Card>
-      )}
-
-      {/* Progress Steps */}
-      <div className="mt-8 flex gap-2">
-        {[1, 2, 3].map((i) => (
-          <div 
-            key={i}
-            className={`h-1.5 w-8 rounded-full transition-colors ${step >= i ? "bg-primary" : "bg-muted"}`} 
-          />
-        ))}
-      </div>
-
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

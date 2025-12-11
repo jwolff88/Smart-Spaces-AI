@@ -63,10 +63,23 @@ export default function AddPropertyPage() {
     }
   }
 
-  // 2. Save to Supabase DB
+  // 2. Save to Database
   const handlePublish = async () => {
     setIsPublishing(true)
     try {
+      // Validate required fields before submitting
+      if (!aiContent.title || !aiContent.description || !formData.address) {
+        alert("Please ensure all required fields are filled: title, description, and address.")
+        setIsPublishing(false)
+        return
+      }
+
+      if (aiContent.suggestedPrice <= 0) {
+        alert("Please ensure the price is set to a valid amount.")
+        setIsPublishing(false)
+        return
+      }
+
       const payload = {
         title: aiContent.title,
         description: aiContent.description,
@@ -83,13 +96,28 @@ export default function AddPropertyPage() {
         body: JSON.stringify(payload),
       })
 
-      if (!response.ok) throw new Error("Failed to save")
+      if (!response.ok) {
+        // Try to get error message from response
+        let errorMessage = "Failed to save listing"
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorMessage
+          if (errorData.details) {
+            console.error("Error details:", errorData.details)
+          }
+        } catch (e) {
+          // If response is not JSON, use status text
+          errorMessage = response.statusText || errorMessage
+        }
+        throw new Error(errorMessage)
+      }
 
       // Success! Redirect to listings
       router.push("/host-dashboard/listings")
     } catch (error) {
       console.error("Publish Error:", error)
-      alert("Failed to save listing. Check console.")
+      const errorMessage = error instanceof Error ? error.message : "Failed to save listing. Please try again."
+      alert(errorMessage)
     } finally {
       setIsPublishing(false)
     }

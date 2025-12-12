@@ -6,22 +6,23 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { address, type, bedrooms, amenities } = body
 
-    // 1. Check for the Key (We check both common names just in case)
+    // Check for the key under common names
     const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY
 
     if (!apiKey) {
-      return NextResponse.json({ error: "Gemini API Key not found in environment variables" }, { status: 500 })
+      console.error("Error: Missing Google/Gemini API Key")
+      return NextResponse.json({ error: "Server Error: API Key missing" }, { status: 500 })
     }
 
     if (!address) {
       return NextResponse.json({ error: "Address is required" }, { status: 400 })
     }
 
-    // 2. Initialize Gemini
+    // Initialize Gemini
     const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
-    // 3. Prompt
+    // Prompt
     const prompt = `
       You are an expert real estate copywriter.
       Write a listing for a ${bedrooms}-bedroom ${type} in ${address} with amenities: ${amenities?.join(", ")}.
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
     const result = await model.generateContent(prompt)
     const response = await result.response
     
-    // 4. Clean up response (Gemini sometimes adds markdown backticks)
+    // Clean up response (Gemini sometimes adds markdown backticks)
     let text = response.text()
     text = text.replace(/```json/g, "").replace(/```/g, "").trim()
 
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("Gemini Error:", error)
     return NextResponse.json(
-      { error: "AI Generation Failed" }, 
+      { error: "AI Generation Failed. Check server logs." }, 
       { status: 500 }
     )
   }

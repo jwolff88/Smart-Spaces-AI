@@ -6,29 +6,19 @@ import { Card, CardContent } from "@/components/ui/card"
 import { MapPin, BedDouble, Home, Share, ArrowLeft, Star } from "lucide-react"
 import Link from "next/link"
 
-// Define the shape of the props
 interface PageProps {
   params: Promise<{ id: string }>
 }
 
 export default async function ListingDetailsPage(props: PageProps) {
-  // 1. AWAIT THE PARAMS (The fix for Next.js 15+)
   const params = await props.params
   
-  // 2. Fetch the specific listing using the resolved ID
   const listing = await db.listing.findUnique({
-    where: {
-      id: params.id
-    },
-    include: {
-      host: true 
-    }
+    where: { id: params.id },
+    include: { host: true }
   })
 
-  // 3. Handle 404 if listing doesn't exist
-  if (!listing) {
-    return notFound()
-  }
+  if (!listing) return notFound()
 
   return (
     <div className="min-h-screen bg-white">
@@ -53,9 +43,18 @@ export default async function ListingDetailsPage(props: PageProps) {
         {/* Left Column: Photos & Info */}
         <div className="lg:col-span-2 space-y-8">
           
-          {/* Hero Image Area */}
-          <div className="aspect-video bg-gray-100 rounded-2xl relative overflow-hidden flex items-center justify-center">
-            <Home className="h-20 w-20 text-gray-300" />
+          {/* UPDATED HERO IMAGE AREA */}
+          <div className="aspect-video bg-gray-100 rounded-2xl relative overflow-hidden flex items-center justify-center group">
+            {listing.imageSrc ? (
+              <img 
+                src={listing.imageSrc} 
+                alt={listing.title} 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Home className="h-20 w-20 text-gray-300" />
+            )}
+            
             <div className="absolute bottom-4 left-4">
               <Badge className="bg-white/90 text-black hover:bg-white backdrop-blur">
                 {listing.type || "Home"}

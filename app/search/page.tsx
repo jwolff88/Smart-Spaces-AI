@@ -31,18 +31,25 @@ export default async function SearchPage() {
         </div>
       </div>
 
-      {/* Listings Grid */}
       <main className="max-w-7xl mx-auto p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          
           {listings.map((listing) => (
             <Card key={listing.id} className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-transparent hover:border-gray-200">
               
-              {/* Image Placeholder */}
+              {/* IMAGE SECTION - UPDATED */}
               <div className="aspect-[4/3] bg-gray-200 relative overflow-hidden rounded-t-xl">
-                <div className="absolute inset-0 flex items-center justify-center text-gray-400 bg-gray-100 group-hover:scale-105 transition-transform duration-500">
-                  <Home className="h-12 w-12 opacity-20" />
-                </div>
+                {listing.imageSrc ? (
+                  <img 
+                    src={listing.imageSrc} 
+                    alt={listing.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-gray-400 bg-gray-100 group-hover:scale-105 transition-transform duration-500">
+                    <Home className="h-12 w-12 opacity-20" />
+                  </div>
+                )}
+                
                 <div className="absolute top-3 right-3">
                   <Badge variant="secondary" className="font-bold bg-white/90 backdrop-blur-sm shadow-sm">
                     ${listing.price} <span className="font-normal text-xs ml-1 text-gray-500">/ night</span>
@@ -75,7 +82,6 @@ export default async function SearchPage() {
               </CardContent>
 
               <CardFooter className="p-4 pt-0">
-                {/* THE FIX: Use 'asChild' to merge the Button and Link properly */}
                 <Button asChild className="w-full bg-slate-900 group-hover:bg-blue-600 transition-colors">
                   <Link href={`/listings/${listing.id}`}>
                     View Details
@@ -85,7 +91,6 @@ export default async function SearchPage() {
             </Card>
           ))}
 
-          {/* Empty State */}
           {listings.length === 0 && (
             <div className="col-span-full text-center py-20">
               <h3 className="text-xl font-medium text-gray-900">No listings found</h3>

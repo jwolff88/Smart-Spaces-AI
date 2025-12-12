@@ -75,6 +75,7 @@ model Listing {
   type              String?
   bedrooms          String?
   amenities         String[] 
+  imageSrc          String?
   
   // AI & Smart Features
   smartPricing      Boolean  @default(true)

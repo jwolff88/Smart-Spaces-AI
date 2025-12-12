@@ -6,19 +6,22 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { address, type, bedrooms, amenities } = body
 
-    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
-      return NextResponse.json({ error: "Google AI Key not configured" }, { status: 500 })
+    // 1. Check for the Key (We check both common names just in case)
+    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY
+
+    if (!apiKey) {
+      return NextResponse.json({ error: "Gemini API Key not found in environment variables" }, { status: 500 })
     }
 
     if (!address) {
       return NextResponse.json({ error: "Address is required" }, { status: 400 })
     }
 
-    // Initialize Gemini
-    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY)
+    // 2. Initialize Gemini
+    const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
-    // Prompt
+    // 3. Prompt
     const prompt = `
       You are an expert real estate copywriter.
       Write a listing for a ${bedrooms}-bedroom ${type} in ${address} with amenities: ${amenities?.join(", ")}.
@@ -34,7 +37,7 @@ export async function POST(req: Request) {
     const result = await model.generateContent(prompt)
     const response = await result.response
     
-    // Clean up response (sometimes Gemini adds markdown backticks)
+    // 4. Clean up response (Gemini sometimes adds markdown backticks)
     let text = response.text()
     text = text.replace(/```json/g, "").replace(/```/g, "").trim()
 

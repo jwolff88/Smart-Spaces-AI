@@ -3,27 +3,29 @@ import { notFound } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { MapPin, BedDouble, Home, Wifi, Car, Calendar, Share, ArrowLeft, Star } from "lucide-react"
+import { MapPin, BedDouble, Home, Share, ArrowLeft, Star } from "lucide-react"
 import Link from "next/link"
 
+// Define the shape of the props
 interface PageProps {
-  params: {
-    id: string
-  }
+  params: Promise<{ id: string }>
 }
 
-export default async function ListingDetailsPage({ params }: PageProps) {
-  // 1. Fetch the specific listing by ID
+export default async function ListingDetailsPage(props: PageProps) {
+  // 1. AWAIT THE PARAMS (The fix for Next.js 15+)
+  const params = await props.params
+  
+  // 2. Fetch the specific listing using the resolved ID
   const listing = await db.listing.findUnique({
     where: {
       id: params.id
     },
     include: {
-      host: true // Include host details if needed
+      host: true 
     }
   })
 
-  // 2. Handle 404 if listing doesn't exist
+  // 3. Handle 404 if listing doesn't exist
   if (!listing) {
     return notFound()
   }
@@ -56,7 +58,7 @@ export default async function ListingDetailsPage({ params }: PageProps) {
             <Home className="h-20 w-20 text-gray-300" />
             <div className="absolute bottom-4 left-4">
               <Badge className="bg-white/90 text-black hover:bg-white backdrop-blur">
-                {listing.type}
+                {listing.type || "Home"}
               </Badge>
             </div>
           </div>
@@ -84,11 +86,11 @@ export default async function ListingDetailsPage({ params }: PageProps) {
           {/* Host Info */}
           <div className="flex items-center gap-4">
             <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-lg">
-              {listing.host.name?.[0] || "H"}
+              {listing.host?.name?.[0] || "H"}
             </div>
             <div>
-              <p className="font-semibold text-gray-900">Hosted by {listing.host.name || "Host"}</p>
-              <p className="text-sm text-gray-500">Joined in 2024</p>
+              <p className="font-semibold text-gray-900">Hosted by {listing.host?.name || "Host"}</p>
+              <p className="text-sm text-gray-500">Verified Host</p>
             </div>
           </div>
 
@@ -108,7 +110,7 @@ export default async function ListingDetailsPage({ params }: PageProps) {
           <div>
             <h2 className="text-xl font-semibold mb-4">What this place offers</h2>
             <div className="grid grid-cols-2 gap-4">
-              {listing.amenities.length > 0 ? (
+              {listing.amenities && listing.amenities.length > 0 ? (
                 listing.amenities.map((item, i) => (
                   <div key={i} className="flex items-center gap-3 text-gray-600">
                     <div className="h-2 w-2 bg-blue-500 rounded-full" />

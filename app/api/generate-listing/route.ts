@@ -6,50 +6,44 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { address, type, bedrooms, amenities } = body
 
-    // Check for the key under common names
+    // Check all possible names for your Gemini Key
     const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY
 
     if (!apiKey) {
-      console.error("Error: Missing Google/Gemini API Key")
-      return NextResponse.json({ error: "Server Error: API Key missing" }, { status: 500 })
-    }
-
-    if (!address) {
-      return NextResponse.json({ error: "Address is required" }, { status: 400 })
+      console.error("Server Error: Missing Gemini API Key")
+      return NextResponse.json({ error: "API Key Missing" }, { status: 500 })
     }
 
     // Initialize Gemini
     const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
-    // Prompt
     const prompt = `
-      You are an expert real estate copywriter.
-      Write a listing for a ${bedrooms}-bedroom ${type} in ${address} with amenities: ${amenities?.join(", ")}.
+      You are a real estate copywriter.
+      Write a listing for a ${bedrooms}-bedroom ${type} in ${address}.
+      Amenities: ${amenities?.join(", ")}.
       
-      Return strictly VALID JSON (no markdown formatting, no backticks) with exactly these fields:
+      Return valid JSON with these fields:
       {
-        "title": "catchy title (max 50 chars)",
-        "description": "compelling description (3 paragraphs)",
-        "suggestedPrice": 0 (number only)
+        "title": "catchy title",
+        "description": "3 paragraph description",
+        "suggestedPrice": 0
       }
     `
 
     const result = await model.generateContent(prompt)
     const response = await result.response
-    
-    // Clean up response (Gemini sometimes adds markdown backticks)
     let text = response.text()
+    
+    // Clean markdown if Gemini adds it
     text = text.replace(/```json/g, "").replace(/```/g, "").trim()
 
-    const parsedData = JSON.parse(text)
-    
-    return NextResponse.json(parsedData)
+    return NextResponse.json(JSON.parse(text))
 
   } catch (error: any) {
-    console.error("Gemini Error:", error)
+    console.error("Gemini Generation Error:", error)
     return NextResponse.json(
-      { error: "AI Generation Failed. Check server logs." }, 
+      { error: "Generation Failed. Check Vercel Logs." }, 
       { status: 500 }
     )
   }

@@ -6,7 +6,7 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { address, type, bedrooms, amenities } = body
 
-    // Check all possible names for your Gemini Key
+    // 1. Get the Key (Checks all common names)
     const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY
 
     if (!apiKey) {
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "API Key Missing" }, { status: 500 })
     }
 
-    // Initialize Gemini
+    // 2. Initialize Gemini
     const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 

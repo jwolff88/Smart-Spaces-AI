@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 export default function AddProperty() {
   const router = useRouter()
   
-  // 1. Add state for the Image URL
+  // 1. State for the Image URL and other fields
   const [imageUrl, setImageUrl] = useState("")
   const [address, setAddress] = useState("")
   const [type, setType] = useState("Apartment")
@@ -16,7 +16,7 @@ export default function AddProperty() {
   const [generatedListing, setGeneratedListing] = useState<any>(null)
   const [loading, setLoading] = useState(false)
 
-  // A. Generate Button (Calls our new "Bypass" API)
+  // 2. Generate Button (Calls your Gemini API)
   async function handleGenerate() {
     setLoading(true)
     try {
@@ -41,7 +41,7 @@ export default function AddProperty() {
     }
   }
 
-  // B. Publish Button (Saves the Image + Text to Database)
+  // 3. Publish Button (Saves the Image + Text to Database)
   async function handlePublish() {
     if (!generatedListing) return
 
@@ -50,7 +50,7 @@ export default function AddProperty() {
         method: "POST",
         body: JSON.stringify({
           address,
-          imageUrl, // <--- Sending the image to the database
+          imageUrl, // <--- This sends your image link to the database
           type,
           bedrooms: parseInt(bedrooms),
           amenities: amenities.split(",").map(a => a.trim()),
@@ -88,9 +88,10 @@ export default function AddProperty() {
             onChange={(e) => setImageUrl(e.target.value)}
           />
           <p className="text-xs text-gray-500 mt-1">
-            Tip: Go to Unsplash.com, right-click an image, choose "Copy Image Address", and paste it here.
+            <strong>Tip:</strong> Go to <a href="https://unsplash.com" target="_blank" className="text-blue-600 underline">Unsplash.com</a>, right-click an image, choose "Copy Image Address", and paste it here.
           </p>
         </div>
+        {/* ----------------------- */}
 
         <div>
           <label className="block font-medium mb-1">Address</label>
@@ -144,7 +145,7 @@ export default function AddProperty() {
           disabled={loading}
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
         >
-          {loading ? "Generating..." : "Generate Listing"}
+          {loading ? "Generating..." : "Generate Listing with AI"}
         </button>
 
         {/* PREVIEW AREA */}

@@ -51,7 +51,7 @@ export default function FeaturesPage() {
                 </div>
                 <div className="col-span-1 flex flex-col items-center justify-center gap-1 text-center text-sm font-medium">
                   <span className="flex items-center gap-1 text-green-600"><CheckCircle2 className="h-4 w-4" /> AI Intent Analysis</span>
-                  <span className="text-xs text-muted-foreground">Matches by "Remote Work", "Vibe"</span>
+                  <span className="text-xs text-muted-foreground">Matches by &quot;Remote Work&quot;, &quot;Vibe&quot;</span>
                 </div>
               </div>
 
@@ -149,8 +149,8 @@ export default function FeaturesPage() {
               </div>
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Search by Intent, Not Filters</h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Legacy filters (price, location) don't tell the whole story. 
-                Our AI understands context—finding you "quiet places for deep work" or "social hubs for networking."
+                Legacy filters (price, location) don&apos;t tell the whole story. 
+                Our AI understands context—finding you &quot;quiet places for deep work&quot; or &quot;social hubs for networking.&quot;
               </p>
               <ul className="mt-8 space-y-4">
                 <li className="flex items-start gap-3">

@@ -39,7 +39,7 @@ export function LocationMap({ title, location, coordinates }: LocationMapProps) 
           <CardContent className="p-4">
             <h4 className="font-semibold text-purple-800 dark:text-purple-200 mb-2">AI Location Score</h4>
             <div className="space-y-2 text-sm text-purple-700 dark:text-purple-300">
-              <div>🚶 Walk Score: 95/100 - Walker's Paradise</div>
+              <div>🚶 Walk Score: 95/100 - Walker&apos;s Paradise</div>
               <div>🚌 Transit Score: 88/100 - Excellent Transit</div>
               <div>🍽️ 47 restaurants within 0.5 miles</div>
               <div>☕ 12 coffee shops within 0.3 miles</div>

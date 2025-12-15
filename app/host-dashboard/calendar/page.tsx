@@ -152,7 +152,7 @@ export default function CalendarPage() {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                AI adjusted price based on "Local Tech Conference" demand signals.
+                AI adjusted price based on &quot;Local Tech Conference&quot; demand signals.
               </p>
             </div>
 

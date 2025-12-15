@@ -72,7 +72,7 @@ export default function MaintenancePage() {
                 <CardTitle>AI Prediction: HVAC Anomaly</CardTitle>
               </div>
               <CardDescription>
-                Detected at "Sunny Mission Condo" • High Confidence (85%)
+                Detected at &quot;Sunny Mission Condo&quot; • High Confidence (85%)
               </CardDescription>
             </CardHeader>
             <CardContent>

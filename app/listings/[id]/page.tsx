@@ -1,5 +1,6 @@
 import { db } from "@/lib/db"
 import { notFound } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -46,10 +47,11 @@ export default async function ListingDetailsPage(props: PageProps) {
           {/* UPDATED HERO IMAGE AREA */}
           <div className="aspect-video bg-gray-100 rounded-2xl relative overflow-hidden flex items-center justify-center group">
             {listing.imageSrc ? (
-              <img 
+              <Image 
                 src={listing.imageSrc} 
-                alt={listing.title} 
-                className="w-full h-full object-cover"
+                alt={listing.title || "Listing Image"}
+                fill
+                className="object-cover"
               />
             ) : (
               <Home className="h-20 w-20 text-gray-300" />
@@ -155,7 +157,7 @@ export default async function ListingDetailsPage(props: PageProps) {
                 </Button>
 
                 <div className="text-center text-xs text-gray-400">
-                  You won't be charged yet
+                  You won&apos;t be charged yet
                 </div>
 
                 <div className="space-y-3 pt-2">

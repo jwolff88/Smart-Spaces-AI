@@ -34,7 +34,7 @@ export default function CompleteProfilePage() {
           <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
             <Sparkles className="h-5 w-5" />
           </div>
-          <CardTitle className="text-2xl">Let's personalize your stay</CardTitle>
+          <CardTitle className="text-2xl">Let&apos;s personalize your stay</CardTitle>
           <CardDescription>
             Our AI uses these details to filter out 99% of irrelevant listings and find your perfect match.
           </CardDescription>
@@ -123,7 +123,7 @@ export default function CompleteProfilePage() {
           {step === 2 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
               <div className="space-y-4">
-                <Label className="text-base">What's non-negotiable for you?</Label>
+                <Label className="text-base">What&apos;s non-negotiable for you?</Label>
                 <div className="grid gap-4">
                   <div className="flex items-center justify-between rounded-lg border p-4">
                     <div className="flex items-center gap-3">
@@ -168,7 +168,7 @@ export default function CompleteProfilePage() {
                <div className="rounded-md bg-primary/5 p-4 text-sm text-primary">
                  <p className="font-medium">AI Insight:</p>
                  <p className="mt-1 opacity-90">
-                   Based on your "Remote Work" intent, we will prioritize quiet neighborhoods and properties with verified WiFi speeds.
+                   Based on your &quot;Remote Work&quot; intent, we will prioritize quiet neighborhoods and properties with verified WiFi speeds.
                  </p>
                </div>
              </div>

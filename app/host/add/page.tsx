@@ -1,7 +1,6 @@
-"use client"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 
 export default function AddProperty() {
   const router = useRouter()
@@ -88,7 +87,7 @@ export default function AddProperty() {
             onChange={(e) => setImageUrl(e.target.value)}
           />
           <p className="text-xs text-gray-500 mt-1">
-            <strong>Tip:</strong> Go to <a href="https://unsplash.com" target="_blank" className="text-blue-600 underline">Unsplash.com</a>, right-click an image, choose "Copy Image Address", and paste it here.
+            <strong>Tip:</strong> Go to <a href="https://unsplash.com" target="_blank" className="text-blue-600 underline">Unsplash.com</a>, right-click an image, choose &quot;Copy Image Address&quot;, and paste it here.
           </p>
         </div>
         {/* ----------------------- */}
@@ -155,9 +154,11 @@ export default function AddProperty() {
             
             {/* Image Preview */}
             {imageUrl && (
-              <img 
+              <Image 
                 src={imageUrl} 
-                alt="Preview" 
+                alt="Preview"
+                width={600}
+                height={400}
                 className="w-full h-48 object-cover rounded mb-4" 
               />
             )}

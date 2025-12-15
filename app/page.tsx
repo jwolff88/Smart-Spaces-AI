@@ -44,7 +44,7 @@ export default function LandingPage() {
         
         <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
           Experience AI-optimized listings, seamless bookings, and smart pricing. 
-          Whether you're hosting or traveling, we handle the complexity.
+          Whether you&apos;re hosting or traveling, we handle the complexity.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md mx-auto">
@@ -57,7 +57,7 @@ export default function LandingPage() {
           <Link href="/host-dashboard" className="flex-1">
             <Button size="lg" variant="outline" className="w-full h-12 text-base border-slate-700 text-slate-200 hover:bg-slate-800 hover:text-white">
               <Building2 className="mr-2 h-5 w-5" />
-              I'm a Host
+              I&apos;m a Host
             </Button>
           </Link>
         </div>

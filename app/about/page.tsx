@@ -18,7 +18,7 @@ export default function AboutPage() {
             <span className="text-primary">Intelligent Rental Infrastructure</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            Travel behavior has evolved. Legacy platforms haven't. 
+            Travel behavior has evolved. Legacy platforms haven&apos;t. 
             We exist to replace manual spreadsheets and static filters with automation and predictive intelligence.
           </p>
         </div>

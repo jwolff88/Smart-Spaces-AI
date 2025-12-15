@@ -1,37 +1,37 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { AdminLogin } from "@/components/admin-login"
 import { AdminDashboard } from "@/components/admin-dashboard"
 
-export default function AdminPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
+type AuthStatus = "loading" | "authenticated" | "unauthenticated"
 
+export default function AdminPage() {
+  const [authStatus, setAuthStatus] = useState<AuthStatus>("loading")
+
+   
   useEffect(() => {
-    // Check if user is already authenticated
-    const authStatus = localStorage.getItem("admin_authenticated")
-    if (authStatus === "true") {
-      setIsAuthenticated(true)
+    const storedAuth = localStorage.getItem("admin_authenticated")
+    if (storedAuth === "true") {
+      setAuthStatus("authenticated")
+    } else {
+      setAuthStatus("unauthenticated")
     }
-    setIsLoading(false)
   }, [])
 
   const handleLogin = (success: boolean) => {
     if (success) {
-      setIsAuthenticated(true)
+      setAuthStatus("authenticated")
       localStorage.setItem("admin_authenticated", "true")
     }
   }
 
   const handleLogout = () => {
-    setIsAuthenticated(false)
+    setAuthStatus("unauthenticated")
     localStorage.removeItem("admin_authenticated")
   }
 
-  if (isLoading) {
+  if (authStatus === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -41,7 +41,11 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {!isAuthenticated ? <AdminLogin onLogin={handleLogin} /> : <AdminDashboard onLogout={handleLogout} />}
+      {authStatus !== "authenticated" ? (
+        <AdminLogin onLogin={handleLogin} />
+      ) : (
+        <AdminDashboard onLogout={handleLogout} />
+      )}
     </div>
   )
 }

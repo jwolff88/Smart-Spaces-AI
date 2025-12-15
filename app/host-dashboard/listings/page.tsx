@@ -73,7 +73,7 @@ export default function ListingsPage() {
         ) : listings.length === 0 ? (
           <div className="col-span-full text-center py-20 text-muted-foreground">
             <p>No properties found.</p>
-            <p className="text-sm">Click "Add New" to list your first space.</p>
+            <p className="text-sm">Click &quot;Add New&quot; to list your first space.</p>
           </div>
         ) : (
           listings.map((property) => (

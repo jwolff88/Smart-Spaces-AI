@@ -20,7 +20,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-xl font-semibold mb-3">1. Acceptance of Terms</h2>
           <p className="text-muted-foreground leading-relaxed">
-            By accessing or using Smart Spaces AI ("the Platform"), you agree to be bound by these Terms of Service. 
+            By accessing or using Smart Spaces AI (&quot;the Platform&quot;), you agree to be bound by these Terms of Service. 
             If you disagree with any part of the terms, you may not access the service.
           </p>
         </section>

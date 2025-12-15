@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-
+import Image from "next/image"
 import { useState } from "react"
 import { Save, Upload, MapPin, DollarSign, Home, Wifi, Car, Coffee, Tv, Waves } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -384,9 +384,11 @@ export function AddPropertyForm() {
                 <div className="grid gap-2 md:grid-cols-4">
                   {images.map((image, index) => (
                     <div key={index} className="relative">
-                      <img
-                        src={URL.createObjectURL(image) || "/placeholder.svg"}
+                      <Image
+                        src={URL.createObjectURL(image)}
                         alt={`Upload ${index + 1}`}
+                        width={128}
+                        height={96}
                         className="w-full h-24 object-cover rounded"
                       />
                       <Button

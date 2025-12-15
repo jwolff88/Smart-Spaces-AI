@@ -121,7 +121,7 @@ export function BookingWidget({ price, originalPrice, rating, reviewCount }: Boo
           Reserve
         </Button>
 
-        <p className="text-center text-sm text-muted-foreground">You won't be charged yet</p>
+        <p className="text-center text-sm text-muted-foreground">You won&apos;t be charged yet</p>
 
         {/* Price Breakdown */}
         <div className="space-y-2">

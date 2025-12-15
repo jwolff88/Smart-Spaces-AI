@@ -61,7 +61,7 @@ export default function GuestDashboard() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Price Drop Alert: The "Ocean View Loft" you saved has dropped by 15% for your selected dates.
+                Price Drop Alert: The &quot;Ocean View Loft&quot; you saved has dropped by 15% for your selected dates.
               </p>
             </CardContent>
             <CardFooter>

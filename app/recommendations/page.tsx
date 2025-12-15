@@ -66,7 +66,7 @@ export default function RecommendationsPage() {
 
       <main className="container px-4 py-8">
         <div className="mb-8 space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Top 3 Matches for "Remote Work"</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Top 3 Matches for &quot;Remote Work&quot;</h1>
           <p className="text-muted-foreground">
             AI analyzed 42 properties and found these fit your workflow best.
           </p>

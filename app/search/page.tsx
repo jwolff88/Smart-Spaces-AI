@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { MapPin, Home, BedDouble, ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 export const dynamic = 'force-dynamic'
 
@@ -39,10 +40,11 @@ export default async function SearchPage() {
               {/* IMAGE SECTION - UPDATED */}
               <div className="aspect-[4/3] bg-gray-200 relative overflow-hidden rounded-t-xl">
                 {listing.imageSrc ? (
-                  <img 
+                  <Image 
                     src={listing.imageSrc} 
-                    alt={listing.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    alt={listing.title || "Listing Image"}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-gray-400 bg-gray-100 group-hover:scale-105 transition-transform duration-500">

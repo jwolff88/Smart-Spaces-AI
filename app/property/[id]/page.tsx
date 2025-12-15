@@ -204,7 +204,7 @@ export default async function PropertyDetailsPage({
             <div className="px-6 pb-4 text-center">
               <p className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
                 <Info className="h-3 w-3" />
-                You won't be charged yet
+                You won&apos;t be charged yet
               </p>
             </div>
           </Card>

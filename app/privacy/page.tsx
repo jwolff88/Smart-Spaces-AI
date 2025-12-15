@@ -35,7 +35,7 @@ export default function PrivacyPage() {
             We use your data to power the Smart Spaces AI infrastructure:
           </p>
           <ul className="list-disc pl-6 text-muted-foreground space-y-2 mt-2">
-            <li><strong>Matching Engine:</strong> To personalize search results based on your intent (e.g., "Remote Work").</li>
+            <li><strong>Matching Engine:</strong> To personalize search results based on your intent (e.g., &quot;Remote Work&quot;).</li>
             <li><strong>Dynamic Pricing:</strong> To analyze market demand and suggest optimal rates.</li>
             <li><strong>Predictive Maintenance:</strong> To analyze sensor data and predict equipment failures before they occur.</li>
           </ul>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { ChevronLeft, ChevronRight, Grid3X3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
@@ -25,18 +26,20 @@ export function ImageGallery({ images }: ImageGalleryProps) {
       {/* Main Image Grid */}
       <div className="grid grid-cols-4 gap-2 h-[400px] rounded-lg overflow-hidden">
         <div className="col-span-2 row-span-2 relative">
-          <img
+          <Image
             src={images[0] || "/placeholder.svg"}
             alt="Property main view"
-            className="w-full h-full object-cover cursor-pointer hover:brightness-90 transition-all"
+            fill
+            className="object-cover cursor-pointer hover:brightness-90 transition-all"
           />
         </div>
         {images.slice(1, 5).map((image, index) => (
           <div key={index} className="relative">
-            <img
+            <Image
               src={image || "/placeholder.svg"}
               alt={`Property view ${index + 2}`}
-              className="w-full h-full object-cover cursor-pointer hover:brightness-90 transition-all"
+              fill
+              className="object-cover cursor-pointer hover:brightness-90 transition-all"
             />
             {index === 3 && images.length > 5 && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -48,11 +51,12 @@ export function ImageGallery({ images }: ImageGalleryProps) {
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
-                    <div className="relative">
-                      <img
+                    <div className="relative h-[70vh]">
+                      <Image
                         src={images[currentIndex] || "/placeholder.svg"}
                         alt={`Property view ${currentIndex + 1}`}
-                        className="w-full h-[70vh] object-cover rounded-lg"
+                        fill
+                        className="object-cover rounded-lg"
                       />
                       <Button
                         variant="outline"
@@ -75,16 +79,18 @@ export function ImageGallery({ images }: ImageGalleryProps) {
                       </div>
                     </div>
                     <div className="grid grid-cols-6 gap-2 mt-4 max-h-20 overflow-y-auto">
-                      {images.map((image, index) => (
-                        <img
-                          key={index}
-                          src={image || "/placeholder.svg"}
-                          alt={`Thumbnail ${index + 1}`}
-                          className={`w-full h-16 object-cover rounded cursor-pointer ${
-                            index === currentIndex ? "ring-2 ring-primary" : "hover:opacity-80"
-                          }`}
-                          onClick={() => setCurrentIndex(index)}
-                        />
+                      {images.map((img, idx) => (
+                        <div key={idx} className="relative w-full h-16">
+                          <Image
+                            src={img || "/placeholder.svg"}
+                            alt={`Thumbnail ${idx + 1}`}
+                            fill
+                            className={`object-cover rounded cursor-pointer ${
+                              idx === currentIndex ? "ring-2 ring-primary" : "hover:opacity-80"
+                            }`}
+                            onClick={() => setCurrentIndex(idx)}
+                          />
+                        </div>
                       ))}
                     </div>
                   </DialogContent>

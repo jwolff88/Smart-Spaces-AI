@@ -16,15 +16,16 @@ model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
-  password      String?   
+  password      String?
   emailVerified DateTime?
   image         String?
-  role          String    @default("host")
-  
+  role          String    @default("guest") // guest or host
+
   accounts      Account[]
   sessions      Session[]
-  listings      Listing[]
-  
+  listings      Listing[]  // Properties owned (for hosts)
+  bookings      Booking[]  // Reservations made (for guests)
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -74,9 +75,12 @@ model Listing {
   location          String
   type              String?
   bedrooms          String?
-  amenities         String[] 
-  imageSrc          String?
-  
+  bathrooms         String?
+  maxGuests         Int      @default(4)
+  amenities         String[]
+  images            String[] // Array of image URLs
+  imageSrc          String?  // Primary/cover image (legacy support)
+
   // AI & Smart Features
   smartPricing      Boolean  @default(true)
   maintenanceHealth String   @default("Good")
@@ -85,7 +89,52 @@ model Listing {
   // Relations
   hostId            String
   host              User     @relation(fields: [hostId], references: [id], onDelete: Cascade)
-  
+  bookings          Booking[]
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+// --- BOOKING & PAYMENT MODELS ---
+
+model Booking {
+  id              String   @id @default(cuid())
+  checkIn         DateTime
+  checkOut        DateTime
+  guests          Int      @default(1)
+  totalPrice      Float
+  serviceFee      Float    // Platform commission (10%)
+  status          String   @default("pending") // pending, confirmed, cancelled, completed
+
+  // Relations
+  guestId         String
+  guest           User     @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  listingId       String
+  listing         Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  payment         Payment?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([guestId])
+  @@index([listingId])
+  @@index([status])
+}
+
+model Payment {
+  id                String   @id @default(cuid())
+  amount            Float
+  currency          String   @default("usd")
+  status            String   @default("pending") // pending, succeeded, failed, refunded
+  stripePaymentId   String?  @unique // Stripe payment intent ID
+  stripeSessionId   String?  // Stripe checkout session ID
+
+  // Relations
+  bookingId         String   @unique
+  booking           Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([status])
 }

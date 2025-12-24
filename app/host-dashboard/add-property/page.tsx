@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
-import { Loader2, Sparkles, CheckCircle2, Home, ArrowLeft } from "lucide-react"
+import { Loader2, Sparkles, CheckCircle2, ArrowLeft, Upload, X, ImageIcon } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createListing } from "@/app/actions/create-listing"
@@ -17,7 +18,9 @@ export default function AddPropertyPage() {
   const [step, setStep] = useState(1)
   const [isGenerating, setIsGenerating] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   // Form State
   const [formData, setFormData] = useState({
     address: "",
@@ -26,12 +29,58 @@ export default function AddPropertyPage() {
     amenities: [] as string[]
   })
 
+  // Images State
+  const [images, setImages] = useState<string[]>([])
+
   // AI Content State
   const [aiContent, setAiContent] = useState<{
     title: string
     description: string
     suggestedPrice: number
   } | null>(null)
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    setIsUploading(true)
+    const newImages: string[] = []
+
+    for (const file of Array.from(files)) {
+      try {
+        const formData = new FormData()
+        formData.append("file", file)
+
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        })
+
+        if (!response.ok) {
+          const error = await response.json()
+          console.error("Upload failed:", error)
+          continue
+        }
+
+        const data = await response.json()
+        newImages.push(data.url)
+      } catch (error) {
+        console.error("Upload error:", error)
+      }
+    }
+
+    setImages((prev) => [...prev, ...newImages])
+    setIsUploading(false)
+
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
+  }
+
+  const removeImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index))
+  }
 
   const handleGenerateAI = async () => {
     setIsGenerating(true)
@@ -72,7 +121,9 @@ export default function AddPropertyPage() {
       location: formData.address,
       type: formData.type,
       bedrooms: formData.bedrooms,
-      amenities: formData.amenities
+      amenities: formData.amenities,
+      images: images,
+      imageSrc: images[0] || null, // Primary image
     }
 
     // Call the Server Action
@@ -153,13 +204,71 @@ export default function AddPropertyPage() {
 
               <div className="grid gap-2">
                 <Label>Amenities (Comma separated)</Label>
-                <Input 
-                  placeholder="Wifi, Pool, Gym, Free Parking..." 
+                <Input
+                  placeholder="Wifi, Pool, Gym, Free Parking..."
                   onChange={(e) => setFormData({
-                    ...formData, 
+                    ...formData,
                     amenities: e.target.value.split(',').map(s => s.trim())
                   })}
                 />
+              </div>
+
+              {/* Image Upload */}
+              <div className="grid gap-2">
+                <Label>Property Images</Label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <label htmlFor="image-upload" className="cursor-pointer">
+                    {isUploading ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+                        <span className="text-sm text-gray-500">Uploading...</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <Upload className="h-8 w-8 text-gray-400" />
+                        <span className="text-sm text-gray-500">Click to upload images</span>
+                        <span className="text-xs text-gray-400">JPG, PNG, WebP up to 10MB</span>
+                      </div>
+                    )}
+                  </label>
+                </div>
+
+                {/* Image Previews */}
+                {images.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    {images.map((url, index) => (
+                      <div key={index} className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
+                        <Image
+                          src={url}
+                          alt={`Property image ${index + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                        {index === 0 && (
+                          <span className="absolute bottom-1 left-1 bg-blue-500 text-white text-xs px-2 py-0.5 rounded">
+                            Cover
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <Button 

@@ -13,12 +13,14 @@ interface ListingData {
   type: string
   bedrooms: string
   amenities: string[]
+  images?: string[]
+  imageSrc?: string | null
 }
 
 export async function createListing(data: ListingData) {
   // 1. Get current user session
   const session = await auth()
-  
+
   if (!session?.user?.id) {
     return { error: "You must be logged in to create a listing" }
   }
@@ -34,6 +36,8 @@ export async function createListing(data: ListingData) {
         type: data.type,
         bedrooms: data.bedrooms,
         amenities: data.amenities || [],
+        images: data.images || [],
+        imageSrc: data.imageSrc || null,
         hostId: session.user.id, // Links listing to the logged-in user
       }
     })

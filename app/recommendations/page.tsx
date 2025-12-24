@@ -59,7 +59,7 @@ export default function RecommendationsPage() {
             Refine Criteria
           </Link>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Smart Spaces AI</span>
+            <span className="text-sm font-medium">Smart Spaces</span>
           </div>
         </div>
       </header>

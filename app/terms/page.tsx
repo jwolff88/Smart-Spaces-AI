@@ -20,7 +20,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-xl font-semibold mb-3">1. Acceptance of Terms</h2>
           <p className="text-muted-foreground leading-relaxed">
-            By accessing or using Smart Spaces AI (&quot;the Platform&quot;), you agree to be bound by these Terms of Service. 
+            By accessing or using Smart Spaces (&quot;the Platform&quot;), you agree to be bound by these Terms of Service. 
             If you disagree with any part of the terms, you may not access the service.
           </p>
         </section>
@@ -46,7 +46,7 @@ export default function TermsPage() {
           <h2 className="text-xl font-semibold mb-3">4. Host Responsibilities</h2>
           <p className="text-muted-foreground leading-relaxed">
             Hosts are solely responsible for setting their listing availability, honoring bookings, and maintaining the safety of their properties. 
-            Smart Spaces AI acts as an infrastructure layer and is not a party to the rental agreement between Host and Guest.
+            Smart Spaces acts as an infrastructure layer and is not a party to the rental agreement between Host and Guest.
           </p>
         </section>
 

@@ -32,7 +32,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-xl font-semibold mb-3">2. How We Use Your Information</h2>
           <p className="text-muted-foreground leading-relaxed">
-            We use your data to power the Smart Spaces AI infrastructure:
+            We use your data to power the Smart Spaces infrastructure:
           </p>
           <ul className="list-disc pl-6 text-muted-foreground space-y-2 mt-2">
             <li><strong>Matching Engine:</strong> To personalize search results based on your intent (e.g., &quot;Remote Work&quot;).</li>

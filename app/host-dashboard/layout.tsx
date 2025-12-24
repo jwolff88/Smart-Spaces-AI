@@ -26,7 +26,7 @@ export default function HostLayout({
           {/* Logo Area */}
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
-              <span className="">Smart Spaces AI</span>
+              <span className="">Smart Spaces</span>
               <span className="text-xs font-normal text-muted-foreground bg-primary/10 text-primary px-2 py-0.5 rounded-full">Host</span>
             </Link>
             <Button variant="outline" size="icon" className="ml-auto h-8 w-8">

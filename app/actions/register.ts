@@ -7,6 +7,7 @@ export const registerUser = async (formData: FormData) => {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
   const name = formData.get("name") as string
+  const role = formData.get("role") as string || "guest" // "host" or "traveler" -> stored as "host" or "guest"
 
   if (!email || !password) {
     return { error: "Missing fields" }
@@ -24,12 +25,16 @@ export const registerUser = async (formData: FormData) => {
   // Hash password
   const hashedPassword = await bcrypt.hash(password, 10)
 
+  // Map "traveler" to "guest" for database storage
+  const dbRole = role === "host" ? "host" : "guest"
+
   // Create user
   await db.user.create({
     data: {
       email,
       name,
       password: hashedPassword,
+      role: dbRole,
     }
   })
 

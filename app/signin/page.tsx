@@ -21,7 +21,7 @@ export default function SignInPage() {
         <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground">
           <Building2 className="h-6 w-6" />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight">Smart Spaces AI</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Smart Spaces</h1>
         <p className="text-sm text-muted-foreground">Intelligent Rental Infrastructure</p>
       </div>
 

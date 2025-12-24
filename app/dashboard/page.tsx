@@ -15,7 +15,7 @@ export default function DashboardPage() {
               <div className="h-8 w-8 rounded bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-sm">🏡</span>
               </div>
-              <span className="text-xl font-bold">Smart Spaces AI</span>
+              <span className="text-xl font-bold">Smart Spaces</span>
             </Link>
             <div className="flex items-center gap-4">
               <Link href="/settings">

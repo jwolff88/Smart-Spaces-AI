@@ -2,15 +2,59 @@ import { db } from "@/lib/db"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { MapPin, Home, BedDouble, ArrowLeft } from "lucide-react"
+import { MapPin, Home, BedDouble, ArrowLeft, Search, SlidersHorizontal } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { SearchFilters } from "./search-filters"
 
 export const dynamic = 'force-dynamic'
 
-export default async function SearchPage() {
+interface SearchParams {
+  location?: string
+  type?: string
+  minPrice?: string
+  maxPrice?: string
+  bedrooms?: string
+}
+
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>
+}) {
+  const params = await searchParams
+
+  // Build filter conditions
+  const where: Record<string, unknown> = {}
+
+  if (params.location) {
+    where.location = {
+      contains: params.location,
+      mode: "insensitive",
+    }
+  }
+
+  if (params.type && params.type !== "all") {
+    where.type = params.type
+  }
+
+  if (params.minPrice || params.maxPrice) {
+    where.price = {}
+    if (params.minPrice) {
+      (where.price as Record<string, number>).gte = parseFloat(params.minPrice)
+    }
+    if (params.maxPrice) {
+      (where.price as Record<string, number>).lte = parseFloat(params.maxPrice)
+    }
+  }
+
+  if (params.bedrooms && params.bedrooms !== "any") {
+    where.bedrooms = params.bedrooms
+  }
+
   const listings = await db.listing.findMany({
-    orderBy: { createdAt: 'desc' }
+    where,
+    orderBy: { createdAt: "desc" },
   })
 
   return (
@@ -32,7 +76,25 @@ export default async function SearchPage() {
         </div>
       </div>
 
+      {/* Search Filters */}
+      <div className="bg-white border-b py-4">
+        <div className="max-w-7xl mx-auto px-6">
+          <SearchFilters
+            initialLocation={params.location}
+            initialType={params.type}
+            initialMinPrice={params.minPrice}
+            initialMaxPrice={params.maxPrice}
+            initialBedrooms={params.bedrooms}
+          />
+        </div>
+      </div>
+
       <main className="max-w-7xl mx-auto p-6">
+        {/* Results count */}
+        <div className="mb-4 text-sm text-gray-500">
+          {listings.length} {listings.length === 1 ? "property" : "properties"} found
+          {params.location && ` in "${params.location}"`}
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {listings.map((listing) => (
             <Card key={listing.id} className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-transparent hover:border-gray-200">

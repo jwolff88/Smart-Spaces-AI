@@ -21,7 +21,7 @@ export default function FeaturesPage() {
             <span className="text-primary-foreground text-blue-400">Not Just Listings.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300">
-            Traditional platforms (Airbnb, Vrbo) are static catalogs. Smart Spaces AI is a predictive infrastructure layer that automates operations and matches guests by intent.
+            Traditional platforms (Airbnb, Vrbo) are static catalogs. Smart Spaces is a predictive infrastructure layer that automates operations and matches guests by intent.
           </p>
         </div>
       </section>
@@ -36,7 +36,7 @@ export default function FeaturesPage() {
               <div className="grid grid-cols-3 border-b bg-muted/50 p-4 text-sm font-medium text-muted-foreground">
                 <div className="col-span-1">Feature</div>
                 <div className="col-span-1 text-center text-slate-500">Legacy Platforms</div>
-                <div className="col-span-1 text-center font-bold text-primary">Smart Spaces AI</div>
+                <div className="col-span-1 text-center font-bold text-primary">Smart Spaces</div>
               </div>
 
               {/* Row 1 */}

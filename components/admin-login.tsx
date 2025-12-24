@@ -29,7 +29,7 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
     // Simulate authentication delay
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    if (username === "admin" && password === "Draven1488") {
+    if (username === "DravenWolff" && password === "Misfitwolff") {
       onLogin(true)
     } else {
       setError("Invalid username or password")
@@ -47,7 +47,7 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
             <Shield className="h-6 w-6 text-primary" />
           </div>
           <CardTitle className="text-2xl font-bold">Admin Portal</CardTitle>
-          <CardDescription>Sign in to access the Anacra admin dashboard</CardDescription>
+          <CardDescription>Sign in to access the Smart Spaces admin dashboard</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -106,11 +106,6 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            <p>Demo Credentials:</p>
-            <p>Username: admin</p>
-            <p>Password: Draven1488</p>
-          </div>
         </CardContent>
       </Card>
     </div>

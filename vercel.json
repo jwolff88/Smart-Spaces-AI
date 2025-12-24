@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "prisma generate && next build",
+  "regions": ["iad1"],
+  "functions": {
+    "app/api/webhooks/stripe/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/generate-listing/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/checkout/route.ts": {
+      "maxDuration": 30
+    }
+  }
+}

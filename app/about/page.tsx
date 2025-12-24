@@ -29,7 +29,7 @@ export default function AboutPage() {
         <div className="container px-4 md:px-6">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div className="space-y-6">
-              <h2 className="text-3xl font-bold">Why Smart Spaces AI?</h2>
+              <h2 className="text-3xl font-bold">Why Smart Spaces?</h2>
               <p className="text-lg text-muted-foreground">
                 For decades, the vacation rental market has relied on two things: static listing directories and manual host labor.
               </p>

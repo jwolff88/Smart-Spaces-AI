@@ -12,7 +12,7 @@ export default function PricingPage() {
       <header className="flex h-16 items-center justify-between border-b px-6">
         <Link href="/" className="flex items-center gap-2 font-bold">
           <Sparkles className="h-5 w-5 text-primary" />
-          Smart Spaces AI
+          Smart Spaces
         </Link>
         <nav className="hidden gap-6 md:flex">
           <Link href="/about" className="text-sm font-medium hover:text-primary">About</Link>

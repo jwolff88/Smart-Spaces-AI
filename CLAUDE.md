@@ -24,7 +24,7 @@ Smart Spaces is a vacation rental platform MVP built with Next.js 16. It uses AI
 - **Payments**: Stripe Checkout with webhooks
 - **Images**: Cloudinary for image uploads
 - **UI**: shadcn/ui components (Radix UI + Tailwind CSS)
-- **AI**: OpenAI API (gpt-3.5-turbo) for listing generation
+- **AI**: Google Gemini API (gemini-1.5-flash) for listing generation
 
 ### Key Files
 - `auth.ts` - NextAuth configuration with Prisma adapter and credentials provider
@@ -58,7 +58,7 @@ See `.env.example` for all required variables:
 - `DATABASE_URL` - PostgreSQL connection string (Supabase)
 - `AUTH_SECRET` - NextAuth secret key
 - `NEXT_PUBLIC_APP_URL` - App URL for redirects
-- `OPENAI_API_KEY` - For AI listing generation
+- `GEMINI_API_KEY` - For AI listing generation (Google Gemini)
 - `STRIPE_SECRET_KEY` - Stripe secret key
 - `STRIPE_WEBHOOK_SECRET` - Stripe webhook signing secret
 - `CLOUDINARY_CLOUD_NAME` - Cloudinary cloud name

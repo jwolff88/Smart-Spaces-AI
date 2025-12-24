@@ -1,21 +1,19 @@
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// OpenAI API configuration
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const OPENAI_MODEL = "gpt-3.5-turbo"; // Cost-effective chat model
+// Initialize Gemini
+const genAI = process.env.GEMINI_API_KEY
+  ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+  : null;
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { address, type, bedrooms, amenities } = body;
 
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.GEMINI_API_KEY || !genAI) {
       return NextResponse.json(
-        { error: "OpenAI API key (OPENAI_API_KEY) not configured" },
+        { error: "Gemini API key (GEMINI_API_KEY) not configured" },
         { status: 500 }
       );
     }
@@ -30,18 +28,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // Construct the prompt for the OpenAI chat model
-    const promptMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
-      [
-        {
-          role: "system",
-          content:
-            "You are an expert real estate copywriter. Your task is to generate compelling listing details in JSON format.",
-        },
-        {
-          role: "user",
-          content: `
-Given the following details about a vacation rental property, generate a compelling and attractive listing.
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `You are an expert real estate copywriter. Generate a compelling vacation rental listing.
 
 Property Details:
 - Location/Address: ${address}
@@ -49,34 +38,29 @@ Property Details:
 - Bedrooms: ${bedrooms}
 - Key Amenities: ${amenities.join(", ")}
 
-Generate three pieces of information in a specific JSON format:
+Generate three pieces of information:
 1. A "title" for the listing (under 60 characters).
 2. A "description" (40–60 words) that is friendly and inviting. Mention the location and a key amenity.
 3. A "suggestedPrice" (number only). Suggest a reasonable nightly price for a ${type} with ${bedrooms} bedrooms in ${address}. Use a whole number.
 
-IMPORTANT:
-Respond with ONLY a valid JSON object with the keys:
+IMPORTANT: Respond with ONLY a valid JSON object with the keys:
 "title", "description", and "suggestedPrice".
-Do not include any other text or markdown.
-`,
-        },
-      ];
+Do not include any other text, markdown, or code blocks.
+Example: {"title": "...", "description": "...", "suggestedPrice": 150}`;
 
-    // Call the OpenAI Chat Completions API
-    const openaiResponse = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      messages: promptMessages,
-      temperature: 0.7,
-      max_tokens: 300,
-      response_format: { type: "json_object" },
-    });
-
-    const generatedContent =
-      openaiResponse.choices[0].message.content;
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    let generatedContent = response.text();
 
     if (!generatedContent) {
-      throw new Error("OpenAI did not return any content.");
+      throw new Error("Gemini did not return any content.");
     }
+
+    // Clean up the response - remove markdown code blocks if present
+    generatedContent = generatedContent
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
 
     const aiResponse = JSON.parse(generatedContent);
 
@@ -91,27 +75,18 @@ Do not include any other text or markdown.
 
     return NextResponse.json(aiResponse);
   } catch (error: any) {
-    console.error(
-      "AI generation failed:",
-      error.message || error
-    );
-    console.error(
-      "Full error details:",
-      error.response?.data || error
-    );
+    console.error("AI generation failed:", error.message || error);
 
     let errorMessage = "Failed to generate AI listing.";
 
-    if (error instanceof OpenAI.APIError) {
-      errorMessage += ` OpenAI API Error: ${error.status} - ${error.message}`;
-    } else if (error.message?.includes("JSON.parse")) {
+    if (error.message?.includes("JSON.parse")) {
       errorMessage +=
-        " AI generated invalid JSON. Please refine the prompt or try again.";
+        " AI generated invalid JSON. Please try again.";
     }
 
     return NextResponse.json(
       { error: errorMessage },
-      { status: error.status || 500 }
+      { status: 500 }
     );
   }
 }

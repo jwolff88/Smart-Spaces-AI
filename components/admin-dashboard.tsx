@@ -133,27 +133,36 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-900 text-white">
       {/* Header */}
-      <header className="border-b bg-white">
+      <header className="border-b border-slate-700 bg-slate-800">
         <div className="flex h-16 items-center justify-between px-6">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded bg-primary flex items-center justify-center">
-                <Home className="h-4 w-4 text-primary-foreground" />
+              <div className="h-8 w-8 rounded bg-blue-600 flex items-center justify-center">
+                <Home className="h-4 w-4 text-white" />
               </div>
-              <h1 className="text-xl font-semibold">Smart Spaces Admin</h1>
+              <h1 className="text-xl font-semibold text-white">Smart Spaces Admin</h1>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm" onClick={refreshAll} disabled={loading}>
+            <Button
+              size="sm"
+              onClick={refreshAll}
+              disabled={loading}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
               Refresh
             </Button>
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
+            <Badge className="bg-green-600 text-white border-0">
               System Online
             </Badge>
-            <Button variant="outline" size="sm" onClick={onLogout} className="gap-2 bg-transparent">
+            <Button
+              size="sm"
+              onClick={onLogout}
+              className="gap-2 bg-red-600 hover:bg-red-700 text-white"
+            >
               <LogOut className="h-4 w-4" />
               Logout
             </Button>
@@ -163,35 +172,47 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className="w-64 border-r bg-white min-h-[calc(100vh-4rem)]">
+        <aside className="w-64 border-r border-slate-700 bg-slate-800 min-h-[calc(100vh-4rem)]">
           <nav className="p-4 space-y-2">
             <Button
-              variant={activeTab === "overview" ? "default" : "ghost"}
-              className="w-full justify-start gap-2"
+              className={`w-full justify-start gap-2 ${
+                activeTab === "overview"
+                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  : "bg-slate-700 hover:bg-slate-600 text-slate-200"
+              }`}
               onClick={() => setActiveTab("overview")}
             >
               <BarChart3 className="h-4 w-4" />
               Overview
             </Button>
             <Button
-              variant={activeTab === "users" ? "default" : "ghost"}
-              className="w-full justify-start gap-2"
+              className={`w-full justify-start gap-2 ${
+                activeTab === "users"
+                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  : "bg-slate-700 hover:bg-slate-600 text-slate-200"
+              }`}
               onClick={() => setActiveTab("users")}
             >
               <Users className="h-4 w-4" />
               Users
             </Button>
             <Button
-              variant={activeTab === "listings" ? "default" : "ghost"}
-              className="w-full justify-start gap-2"
+              className={`w-full justify-start gap-2 ${
+                activeTab === "listings"
+                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  : "bg-slate-700 hover:bg-slate-600 text-slate-200"
+              }`}
               onClick={() => setActiveTab("listings")}
             >
               <Building className="h-4 w-4" />
               Listings
             </Button>
             <Button
-              variant={activeTab === "bookings" ? "default" : "ghost"}
-              className="w-full justify-start gap-2"
+              className={`w-full justify-start gap-2 ${
+                activeTab === "bookings"
+                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  : "bg-slate-700 hover:bg-slate-600 text-slate-200"
+              }`}
               onClick={() => setActiveTab("bookings")}
             >
               <Calendar className="h-4 w-4" />
@@ -201,58 +222,58 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 bg-slate-900">
           {activeTab === "overview" && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold">Dashboard Overview</h2>
-                <p className="text-muted-foreground">Welcome to Smart Spaces Admin Panel</p>
+                <h2 className="text-2xl font-bold text-white">Dashboard Overview</h2>
+                <p className="text-slate-400">Welcome to Smart Spaces Admin Panel</p>
               </div>
 
               {/* Stats Grid */}
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
+                <Card className="bg-slate-800 border-slate-700">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-slate-200">Total Users</CardTitle>
+                    <Users className="h-4 w-4 text-blue-400" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats?.users.total || 0}</div>
-                    <p className="text-xs text-muted-foreground">
+                    <div className="text-2xl font-bold text-white">{stats?.users.total || 0}</div>
+                    <p className="text-xs text-slate-400">
                       {stats?.users.hosts || 0} hosts, {stats?.users.guests || 0} guests
                     </p>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="bg-slate-800 border-slate-700">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Active Listings</CardTitle>
-                    <Building className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-slate-200">Active Listings</CardTitle>
+                    <Building className="h-4 w-4 text-green-400" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats?.listings.total || 0}</div>
-                    <p className="text-xs text-muted-foreground">Properties listed</p>
+                    <div className="text-2xl font-bold text-white">{stats?.listings.total || 0}</div>
+                    <p className="text-xs text-slate-400">Properties listed</p>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="bg-slate-800 border-slate-700">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-slate-200">Total Bookings</CardTitle>
+                    <Calendar className="h-4 w-4 text-purple-400" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats?.bookings.total || 0}</div>
-                    <p className="text-xs text-muted-foreground">
+                    <div className="text-2xl font-bold text-white">{stats?.bookings.total || 0}</div>
+                    <p className="text-xs text-slate-400">
                       {stats?.bookings.pending || 0} pending, {stats?.bookings.confirmed || 0} confirmed
                     </p>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="bg-slate-800 border-slate-700">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Platform Revenue</CardTitle>
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-slate-200">Platform Revenue</CardTitle>
+                    <DollarSign className="h-4 w-4 text-yellow-400" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">${(stats?.revenue.platform || 0).toFixed(2)}</div>
-                    <p className="text-xs text-muted-foreground">
+                    <div className="text-2xl font-bold text-white">${(stats?.revenue.platform || 0).toFixed(2)}</div>
+                    <p className="text-xs text-slate-400">
                       Total: ${(stats?.revenue.total || 0).toFixed(2)}
                     </p>
                   </CardContent>
@@ -261,10 +282,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
               {/* Recent Activity */}
               <div className="grid gap-4 md:grid-cols-2">
-                <Card>
+                <Card className="bg-slate-800 border-slate-700">
                   <CardHeader>
-                    <CardTitle>Recent Users</CardTitle>
-                    <CardDescription>Latest user registrations</CardDescription>
+                    <CardTitle className="text-white">Recent Users</CardTitle>
+                    <CardDescription className="text-slate-400">Latest user registrations</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {stats?.recentUsers && stats.recentUsers.length > 0 ? (
@@ -272,24 +293,24 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         {stats.recentUsers.map((user) => (
                           <div key={user.id} className="flex items-center justify-between text-sm">
                             <div>
-                              <p className="font-medium">{user.name || user.email}</p>
-                              <p className="text-muted-foreground text-xs">{user.email}</p>
+                              <p className="font-medium text-white">{user.name || user.email}</p>
+                              <p className="text-slate-400 text-xs">{user.email}</p>
                             </div>
-                            <Badge variant={user.role === "host" ? "default" : "secondary"}>
+                            <Badge className={user.role === "host" ? "bg-blue-600 text-white" : "bg-slate-600 text-white"}>
                               {user.role}
                             </Badge>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-muted-foreground text-center py-4">No users yet</p>
+                      <p className="text-slate-400 text-center py-4">No users yet</p>
                     )}
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="bg-slate-800 border-slate-700">
                   <CardHeader>
-                    <CardTitle>Recent Bookings</CardTitle>
-                    <CardDescription>Latest booking activity</CardDescription>
+                    <CardTitle className="text-white">Recent Bookings</CardTitle>
+                    <CardDescription className="text-slate-400">Latest booking activity</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {stats?.recentBookings && stats.recentBookings.length > 0 ? (
@@ -297,22 +318,21 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         {stats.recentBookings.map((booking) => (
                           <div key={booking.id} className="flex items-center justify-between text-sm">
                             <div>
-                              <p className="font-medium">{booking.listing.title}</p>
-                              <p className="text-muted-foreground text-xs">
+                              <p className="font-medium text-white">{booking.listing.title}</p>
+                              <p className="text-slate-400 text-xs">
                                 {booking.guest.name || booking.guest.email}
                               </p>
                             </div>
                             <div className="text-right">
-                              <p className="font-medium">${booking.totalPrice.toFixed(2)}</p>
+                              <p className="font-medium text-white">${booking.totalPrice.toFixed(2)}</p>
                               <Badge
-                                variant={
+                                className={
                                   booking.status === "confirmed"
-                                    ? "default"
+                                    ? "bg-green-600 text-white"
                                     : booking.status === "pending"
-                                    ? "secondary"
-                                    : "destructive"
+                                    ? "bg-yellow-600 text-white"
+                                    : "bg-red-600 text-white"
                                 }
-                                className="text-xs"
                               >
                                 {booking.status}
                               </Badge>
@@ -321,7 +341,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-muted-foreground text-center py-4">No bookings yet</p>
+                      <p className="text-slate-400 text-center py-4">No bookings yet</p>
                     )}
                   </CardContent>
                 </Card>
@@ -331,39 +351,39 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
           {activeTab === "users" && (
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold">Users Management</h2>
-              <Card>
+              <h2 className="text-2xl font-bold text-white">Users Management</h2>
+              <Card className="bg-slate-800 border-slate-700">
                 <CardContent className="pt-6">
                   {users.length > 0 ? (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b">
-                            <th className="text-left p-2">Name</th>
-                            <th className="text-left p-2">Email</th>
-                            <th className="text-left p-2">Role</th>
-                            <th className="text-left p-2">Listings</th>
-                            <th className="text-left p-2">Bookings</th>
-                            <th className="text-left p-2">Actions</th>
+                          <tr className="border-b border-slate-600">
+                            <th className="text-left p-2 text-slate-300">Name</th>
+                            <th className="text-left p-2 text-slate-300">Email</th>
+                            <th className="text-left p-2 text-slate-300">Role</th>
+                            <th className="text-left p-2 text-slate-300">Listings</th>
+                            <th className="text-left p-2 text-slate-300">Bookings</th>
+                            <th className="text-left p-2 text-slate-300">Actions</th>
                           </tr>
                         </thead>
                         <tbody>
                           {users.map((user) => (
-                            <tr key={user.id} className="border-b">
-                              <td className="p-2">{user.name || "-"}</td>
-                              <td className="p-2">{user.email}</td>
+                            <tr key={user.id} className="border-b border-slate-700">
+                              <td className="p-2 text-white">{user.name || "-"}</td>
+                              <td className="p-2 text-slate-300">{user.email}</td>
                               <td className="p-2">
-                                <Badge variant={user.role === "host" ? "default" : "secondary"}>
+                                <Badge className={user.role === "host" ? "bg-blue-600 text-white" : "bg-slate-600 text-white"}>
                                   {user.role}
                                 </Badge>
                               </td>
-                              <td className="p-2">{user._count?.listings || 0}</td>
-                              <td className="p-2">{user._count?.bookings || 0}</td>
+                              <td className="p-2 text-white">{user._count?.listings || 0}</td>
+                              <td className="p-2 text-white">{user._count?.bookings || 0}</td>
                               <td className="p-2">
                                 <Button
-                                  variant="destructive"
                                   size="sm"
                                   onClick={() => deleteUser(user.id)}
+                                  className="bg-red-600 hover:bg-red-700 text-white"
                                 >
                                   Delete
                                 </Button>
@@ -374,7 +394,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       </table>
                     </div>
                   ) : (
-                    <p className="text-center text-muted-foreground py-8">No users found</p>
+                    <p className="text-center text-slate-400 py-8">No users found</p>
                   )}
                 </CardContent>
               </Card>
@@ -383,35 +403,35 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
           {activeTab === "listings" && (
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold">Listings Management</h2>
-              <Card>
+              <h2 className="text-2xl font-bold text-white">Listings Management</h2>
+              <Card className="bg-slate-800 border-slate-700">
                 <CardContent className="pt-6">
                   {listings.length > 0 ? (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b">
-                            <th className="text-left p-2">Title</th>
-                            <th className="text-left p-2">Location</th>
-                            <th className="text-left p-2">Host</th>
-                            <th className="text-left p-2">Price</th>
-                            <th className="text-left p-2">Bookings</th>
-                            <th className="text-left p-2">Actions</th>
+                          <tr className="border-b border-slate-600">
+                            <th className="text-left p-2 text-slate-300">Title</th>
+                            <th className="text-left p-2 text-slate-300">Location</th>
+                            <th className="text-left p-2 text-slate-300">Host</th>
+                            <th className="text-left p-2 text-slate-300">Price</th>
+                            <th className="text-left p-2 text-slate-300">Bookings</th>
+                            <th className="text-left p-2 text-slate-300">Actions</th>
                           </tr>
                         </thead>
                         <tbody>
                           {listings.map((listing) => (
-                            <tr key={listing.id} className="border-b">
-                              <td className="p-2 max-w-[200px] truncate">{listing.title}</td>
-                              <td className="p-2">{listing.location}</td>
-                              <td className="p-2">{listing.host?.name || listing.host?.email}</td>
-                              <td className="p-2">${listing.price}/night</td>
-                              <td className="p-2">{listing._count?.bookings || 0}</td>
+                            <tr key={listing.id} className="border-b border-slate-700">
+                              <td className="p-2 max-w-[200px] truncate text-white">{listing.title}</td>
+                              <td className="p-2 text-slate-300">{listing.location}</td>
+                              <td className="p-2 text-slate-300">{listing.host?.name || listing.host?.email}</td>
+                              <td className="p-2 text-green-400 font-medium">${listing.price}/night</td>
+                              <td className="p-2 text-white">{listing._count?.bookings || 0}</td>
                               <td className="p-2">
                                 <Button
-                                  variant="destructive"
                                   size="sm"
                                   onClick={() => deleteListing(listing.id)}
+                                  className="bg-red-600 hover:bg-red-700 text-white"
                                 >
                                   Delete
                                 </Button>
@@ -422,7 +442,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       </table>
                     </div>
                   ) : (
-                    <p className="text-center text-muted-foreground py-8">No listings found</p>
+                    <p className="text-center text-slate-400 py-8">No listings found</p>
                   )}
                 </CardContent>
               </Card>
@@ -431,40 +451,40 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
           {activeTab === "bookings" && (
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold">Bookings Management</h2>
-              <Card>
+              <h2 className="text-2xl font-bold text-white">Bookings Management</h2>
+              <Card className="bg-slate-800 border-slate-700">
                 <CardContent className="pt-6">
                   {bookings.length > 0 ? (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b">
-                            <th className="text-left p-2">Listing</th>
-                            <th className="text-left p-2">Guest</th>
-                            <th className="text-left p-2">Dates</th>
-                            <th className="text-left p-2">Total</th>
-                            <th className="text-left p-2">Status</th>
-                            <th className="text-left p-2">Actions</th>
+                          <tr className="border-b border-slate-600">
+                            <th className="text-left p-2 text-slate-300">Listing</th>
+                            <th className="text-left p-2 text-slate-300">Guest</th>
+                            <th className="text-left p-2 text-slate-300">Dates</th>
+                            <th className="text-left p-2 text-slate-300">Total</th>
+                            <th className="text-left p-2 text-slate-300">Status</th>
+                            <th className="text-left p-2 text-slate-300">Actions</th>
                           </tr>
                         </thead>
                         <tbody>
                           {bookings.map((booking) => (
-                            <tr key={booking.id} className="border-b">
-                              <td className="p-2 max-w-[150px] truncate">{booking.listing?.title}</td>
-                              <td className="p-2">{booking.guest?.name || booking.guest?.email}</td>
-                              <td className="p-2 text-xs">
+                            <tr key={booking.id} className="border-b border-slate-700">
+                              <td className="p-2 max-w-[150px] truncate text-white">{booking.listing?.title}</td>
+                              <td className="p-2 text-slate-300">{booking.guest?.name || booking.guest?.email}</td>
+                              <td className="p-2 text-xs text-slate-400">
                                 {new Date(booking.checkIn).toLocaleDateString()} -{" "}
                                 {new Date(booking.checkOut).toLocaleDateString()}
                               </td>
-                              <td className="p-2">${booking.totalPrice.toFixed(2)}</td>
+                              <td className="p-2 text-green-400 font-medium">${booking.totalPrice.toFixed(2)}</td>
                               <td className="p-2">
                                 <Badge
-                                  variant={
+                                  className={
                                     booking.status === "confirmed"
-                                      ? "default"
+                                      ? "bg-green-600 text-white"
                                       : booking.status === "pending"
-                                      ? "secondary"
-                                      : "destructive"
+                                      ? "bg-yellow-600 text-white"
+                                      : "bg-red-600 text-white"
                                   }
                                 >
                                   {booking.status}
@@ -474,26 +494,26 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                 <div className="flex gap-2">
                                   {booking.status === "pending" && (
                                     <Button
-                                      variant="default"
                                       size="sm"
                                       onClick={() => updateBookingStatus(booking.id, "confirmed")}
+                                      className="bg-green-600 hover:bg-green-700 text-white"
                                     >
                                       Confirm
                                     </Button>
                                   )}
                                   {booking.status !== "cancelled" && (
                                     <Button
-                                      variant="outline"
                                       size="sm"
                                       onClick={() => updateBookingStatus(booking.id, "cancelled")}
+                                      className="bg-yellow-600 hover:bg-yellow-700 text-white"
                                     >
                                       Cancel
                                     </Button>
                                   )}
                                   <Button
-                                    variant="destructive"
                                     size="sm"
                                     onClick={() => deleteBooking(booking.id)}
+                                    className="bg-red-600 hover:bg-red-700 text-white"
                                   >
                                     Delete
                                   </Button>
@@ -505,7 +525,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       </table>
                     </div>
                   ) : (
-                    <p className="text-center text-muted-foreground py-8">No bookings found</p>
+                    <p className="text-center text-slate-400 py-8">No bookings found</p>
                   )}
                 </CardContent>
               </Card>

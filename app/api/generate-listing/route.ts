@@ -79,9 +79,14 @@ Example: {"title": "...", "description": "...", "suggestedPrice": 150}`;
 
     let errorMessage = "Failed to generate AI listing.";
 
-    if (error.message?.includes("JSON.parse")) {
-      errorMessage +=
-        " AI generated invalid JSON. Please try again.";
+    if (error.message?.includes("API_KEY")) {
+      errorMessage = "Gemini API key is invalid or expired. Please check your GEMINI_API_KEY.";
+    } else if (error.message?.includes("JSON.parse")) {
+      errorMessage += " AI generated invalid JSON. Please try again.";
+    } else if (error.message?.includes("quota") || error.message?.includes("rate")) {
+      errorMessage = "API rate limit reached. Please try again in a moment.";
+    } else if (error.message) {
+      errorMessage += ` Error: ${error.message}`;
     }
 
     return NextResponse.json(

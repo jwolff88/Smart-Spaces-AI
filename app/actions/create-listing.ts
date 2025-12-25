@@ -15,6 +15,12 @@ interface ListingData {
   amenities: string[]
   images?: string[]
   imageSrc?: string | null
+  // AI Matching Attributes
+  vibes?: string[]
+  workFriendly?: boolean
+  workAmenities?: string[]
+  wifiSpeed?: number | null
+  idealFor?: string[]
 }
 
 export async function createListing(data: ListingData) {
@@ -32,6 +38,8 @@ export async function createListing(data: ListingData) {
         title: data.title,
         description: data.description,
         price: data.price,
+        basePrice: data.price, // Store original price for dynamic pricing
+        currentPrice: data.price, // Initially same as base
         location: data.location,
         type: data.type,
         bedrooms: data.bedrooms,
@@ -39,6 +47,12 @@ export async function createListing(data: ListingData) {
         images: data.images || [],
         imageSrc: data.imageSrc || null,
         hostId: session.user.id, // Links listing to the logged-in user
+        // AI Matching Attributes
+        vibes: data.vibes || [],
+        workFriendly: data.workFriendly || false,
+        workAmenities: data.workAmenities || [],
+        wifiSpeed: data.wifiSpeed || null,
+        idealFor: data.idealFor || [],
       }
     })
 

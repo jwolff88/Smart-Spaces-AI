@@ -21,13 +21,44 @@ model User {
   image         String?
   role          String    @default("guest") // guest or host
 
-  accounts      Account[]
-  sessions      Session[]
-  listings      Listing[]  // Properties owned (for hosts)
-  bookings      Booking[]  // Reservations made (for guests)
+  accounts         Account[]
+  sessions         Session[]
+  listings         Listing[]  // Properties owned (for hosts)
+  bookings         Booking[]  // Reservations made (for guests)
+  travelerProfile  TravelerProfile? // AI matching preferences
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+// --- TRAVELER AI MATCHING PROFILE ---
+
+model TravelerProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Travel Intent (primary reason for travel)
+  travelIntent    String?  // remote_work, vacation, honeymoon, family, business, adventure, budget
+
+  // Preferences
+  preferredVibes  String[] // quiet, social, luxury, cozy, modern, rustic, urban, nature
+  workNeeds       String[] // fast_wifi, dedicated_desk, monitor, ergonomic_chair, meeting_space
+  mustHaveAmenities String[] // pool, gym, kitchen, parking, pet_friendly, washer, ac, heating
+
+  // Budget and Style
+  budgetRange     String?  // budget, moderate, luxury
+  preferredTypes  String[] // apartment, house, condo, villa, studio
+
+  // Travel Patterns
+  typicalStayLength String? // short (1-3), medium (4-7), long (8-30), extended (30+)
+  travelFrequency   String? // occasional, monthly, frequent
+
+  // Location Preferences
+  preferredLocations String[] // city, beach, mountain, countryside, downtown
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Account {
@@ -71,7 +102,7 @@ model Listing {
   id                String   @id @default(cuid())
   title             String
   description       String
-  price             Float
+  price             Float    // Base price per night
   location          String
   type              String?
   bedrooms          String?
@@ -86,13 +117,43 @@ model Listing {
   maintenanceHealth String   @default("Good")
   matchScore        Int      @default(95)
 
+  // AI Matching Attributes
+  vibes             String[] // quiet, social, luxury, cozy, modern, rustic, urban, nature
+  workFriendly      Boolean  @default(false)
+  workAmenities     String[] // fast_wifi, dedicated_desk, monitor, ergonomic_chair
+  wifiSpeed         Int?     // Mbps
+  idealFor          String[] // remote_work, vacation, honeymoon, family, business, adventure
+
+  // Dynamic Pricing
+  basePrice         Float?   // Original base price
+  currentPrice      Float?   // AI-adjusted current price
+  demandScore       Int      @default(50) // 0-100, affects pricing
+  seasonalMultiplier Float   @default(1.0)
+
   // Relations
   hostId            String
   host              User     @relation(fields: [hostId], references: [id], onDelete: Cascade)
   bookings          Booking[]
+  pricingHistory    PricingHistory[]
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+// --- DYNAMIC PRICING HISTORY ---
+
+model PricingHistory {
+  id          String   @id @default(cuid())
+  listingId   String
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  price       Float
+  reason      String   // demand, seasonal, event, manual, ai_optimization
+  demandScore Int?
+
+  createdAt   DateTime @default(now())
+
+  @@index([listingId])
 }
 
 // --- BOOKING & PAYMENT MODELS ---

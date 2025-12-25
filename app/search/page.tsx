@@ -1,13 +1,88 @@
 import { db } from "@/lib/db"
+import { auth } from "@/auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { MapPin, Home, BedDouble, ArrowLeft, Search, SlidersHorizontal } from "lucide-react"
+import { MapPin, Home, BedDouble, ArrowLeft, Sparkles, Briefcase, Wifi, Heart } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { SearchFilters } from "./search-filters"
 
 export const dynamic = 'force-dynamic'
+
+// Match score calculation (duplicated from API for server-side use)
+function calculateMatchScore(profile: any, listing: any): { score: number; reasons: string[] } {
+  if (!profile) return { score: 85, reasons: ["Popular choice"] }
+
+  let score = 0
+  const reasons: string[] = []
+
+  // Travel Intent Match (25 points)
+  if (profile.travelIntent && listing.idealFor?.includes(profile.travelIntent)) {
+    score += 25
+    reasons.push(`Perfect for ${profile.travelIntent.replace("_", " ")}`)
+  } else if (profile.travelIntent === "remote_work" && listing.workFriendly) {
+    score += 20
+    reasons.push("Work-friendly space")
+  }
+
+  // Vibe Match (20 points)
+  if (profile.preferredVibes?.length > 0 && listing.vibes?.length > 0) {
+    const vibeMatches = profile.preferredVibes.filter((v: string) => listing.vibes?.includes(v))
+    score += Math.min(20, (vibeMatches.length / profile.preferredVibes.length) * 20)
+    if (vibeMatches.length > 0) {
+      reasons.push(`Matches your vibe: ${vibeMatches.slice(0, 2).join(", ")}`)
+    }
+  }
+
+  // Work Amenities (15 points for remote workers)
+  if (profile.travelIntent === "remote_work" && profile.workNeeds?.length > 0) {
+    const workMatches = profile.workNeeds.filter((w: string) => listing.workAmenities?.includes(w))
+    score += Math.min(15, (workMatches.length / profile.workNeeds.length) * 15)
+    if (listing.wifiSpeed && listing.wifiSpeed >= 50) {
+      score += 5
+      reasons.push(`Fast WiFi: ${listing.wifiSpeed} Mbps`)
+    }
+  } else {
+    score += 15
+  }
+
+  // Amenities Match (20 points)
+  if (profile.mustHaveAmenities?.length > 0 && listing.amenities?.length > 0) {
+    const amenityMatches = profile.mustHaveAmenities.filter((a: string) =>
+      listing.amenities?.some((la: string) => la.toLowerCase().includes(a.toLowerCase()))
+    )
+    score += Math.min(20, (amenityMatches.length / profile.mustHaveAmenities.length) * 20)
+    if (amenityMatches.length > 0) {
+      reasons.push(`Has ${amenityMatches.length}/${profile.mustHaveAmenities.length} must-haves`)
+    }
+  }
+
+  // Budget Match (10 points)
+  if (profile.budgetRange) {
+    const price = listing.currentPrice || listing.price
+    const budgetMatch =
+      (profile.budgetRange === "budget" && price < 100) ||
+      (profile.budgetRange === "moderate" && price >= 100 && price <= 250) ||
+      (profile.budgetRange === "luxury" && price > 250)
+    if (budgetMatch) {
+      score += 10
+      reasons.push("Within budget")
+    }
+  }
+
+  // Property Type Match (10 points)
+  if (profile.preferredTypes?.length > 0) {
+    const typeMatch = profile.preferredTypes.some((t: string) =>
+      listing.type?.toLowerCase().includes(t.toLowerCase())
+    )
+    if (typeMatch) {
+      score += 10
+    }
+  }
+
+  return { score: Math.round(Math.min(100, score)), reasons }
+}
 
 interface SearchParams {
   location?: string
@@ -23,6 +98,15 @@ export default async function SearchPage({
   searchParams: Promise<SearchParams>
 }) {
   const params = await searchParams
+  const session = await auth()
+
+  // Fetch traveler profile if logged in
+  let travelerProfile = null
+  if (session?.user?.id) {
+    travelerProfile = await db.travelerProfile.findUnique({
+      where: { userId: session.user.id },
+    })
+  }
 
   // Build filter conditions
   const where: Record<string, unknown> = {}
@@ -52,10 +136,16 @@ export default async function SearchPage({
     where.bedrooms = params.bedrooms
   }
 
-  const listings = await db.listing.findMany({
+  const rawListings = await db.listing.findMany({
     where,
     orderBy: { createdAt: "desc" },
   })
+
+  // Calculate match scores and sort by score
+  const listings = rawListings.map((listing) => {
+    const { score, reasons } = calculateMatchScore(travelerProfile, listing)
+    return { ...listing, matchScore: score, matchReasons: reasons }
+  }).sort((a, b) => b.matchScore - a.matchScore)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -89,11 +179,48 @@ export default async function SearchPage({
         </div>
       </div>
 
+      {/* Smart Matching Banner */}
+      {session?.user && !travelerProfile && (
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3">
+          <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Sparkles className="h-5 w-5" />
+              <span className="text-sm font-medium">
+                Complete your travel profile for personalized matches
+              </span>
+            </div>
+            <Link href="/onboarding">
+              <Button size="sm" variant="secondary" className="bg-white text-blue-600 hover:bg-blue-50">
+                Set Up Profile
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Active Matching Indicator */}
+      {travelerProfile && (
+        <div className="bg-green-50 border-b border-green-100 py-2">
+          <div className="max-w-7xl mx-auto px-6 flex items-center gap-2 text-green-700 text-sm">
+            <Sparkles className="h-4 w-4" />
+            <span>
+              AI Matching Active - Showing best matches for{" "}
+              <strong className="font-medium">{travelerProfile.travelIntent?.replace("_", " ") || "your preferences"}</strong>
+            </span>
+          </div>
+        </div>
+      )}
+
       <main className="max-w-7xl mx-auto p-6">
         {/* Results count */}
-        <div className="mb-4 text-sm text-gray-500">
-          {listings.length} {listings.length === 1 ? "property" : "properties"} found
-          {params.location && ` in "${params.location}"`}
+        <div className="mb-4 flex items-center justify-between">
+          <span className="text-sm text-gray-500">
+            {listings.length} {listings.length === 1 ? "property" : "properties"} found
+            {params.location && ` in "${params.location}"`}
+          </span>
+          {travelerProfile && (
+            <span className="text-xs text-gray-400">Sorted by match score</span>
+          )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {listings.map((listing) => (
@@ -102,8 +229,8 @@ export default async function SearchPage({
               {/* IMAGE SECTION - UPDATED */}
               <div className="aspect-[4/3] bg-gray-200 relative overflow-hidden rounded-t-xl">
                 {listing.imageSrc ? (
-                  <Image 
-                    src={listing.imageSrc} 
+                  <Image
+                    src={listing.imageSrc}
                     alt={listing.title || "Listing Image"}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -113,10 +240,26 @@ export default async function SearchPage({
                     <Home className="h-12 w-12 opacity-20" />
                   </div>
                 )}
-                
+
+                {/* Match Score Badge */}
+                <div className="absolute top-3 left-3">
+                  <Badge
+                    className={`font-bold backdrop-blur-sm shadow-sm ${
+                      listing.matchScore >= 90
+                        ? "bg-green-500 text-white"
+                        : listing.matchScore >= 75
+                        ? "bg-blue-500 text-white"
+                        : "bg-white/90 text-gray-700"
+                    }`}
+                  >
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    {listing.matchScore}% Match
+                  </Badge>
+                </div>
+
                 <div className="absolute top-3 right-3">
                   <Badge variant="secondary" className="font-bold bg-white/90 backdrop-blur-sm shadow-sm">
-                    ${listing.price} <span className="font-normal text-xs ml-1 text-gray-500">/ night</span>
+                    ${listing.currentPrice || listing.price} <span className="font-normal text-xs ml-1 text-gray-500">/ night</span>
                   </Badge>
                 </div>
               </div>
@@ -133,7 +276,7 @@ export default async function SearchPage({
                   <span className="line-clamp-1">{listing.location}</span>
                 </div>
 
-                <div className="flex gap-3 text-xs text-gray-500">
+                <div className="flex flex-wrap gap-2 text-xs text-gray-500">
                   <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md">
                     <BedDouble className="h-3 w-3" />
                     {listing.bedrooms} Beds
@@ -142,7 +285,28 @@ export default async function SearchPage({
                     <Home className="h-3 w-3" />
                     {listing.type}
                   </div>
+                  {listing.workFriendly && (
+                    <div className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-md">
+                      <Briefcase className="h-3 w-3" />
+                      Work-Friendly
+                    </div>
+                  )}
+                  {listing.wifiSpeed && listing.wifiSpeed >= 50 && (
+                    <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-md">
+                      <Wifi className="h-3 w-3" />
+                      {listing.wifiSpeed}Mbps
+                    </div>
+                  )}
                 </div>
+
+                {/* Match Reasons */}
+                {listing.matchReasons && listing.matchReasons.length > 0 && listing.matchScore >= 70 && (
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <p className="text-xs text-gray-500 line-clamp-2">
+                      {listing.matchReasons.slice(0, 2).join(" • ")}
+                    </p>
+                  </div>
+                )}
               </CardContent>
 
               <CardFooter className="p-4 pt-0">

@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
-import { Loader2, Sparkles, CheckCircle2, ArrowLeft, Upload, X, ImageIcon } from "lucide-react"
+import { Loader2, Sparkles, CheckCircle2, ArrowLeft, Upload, X, ImageIcon, Briefcase, Wifi, Heart, Users, Mountain, Plane, Coffee } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createListing } from "@/app/actions/create-listing"
@@ -26,8 +27,50 @@ export default function AddPropertyPage() {
     address: "",
     type: "Apartment",
     bedrooms: "1",
-    amenities: [] as string[]
+    amenities: [] as string[],
+    // AI Matching Attributes
+    vibes: [] as string[],
+    workFriendly: false,
+    workAmenities: [] as string[],
+    wifiSpeed: "",
+    idealFor: [] as string[],
   })
+
+  const VIBES = [
+    { id: "quiet", label: "Quiet & Peaceful" },
+    { id: "social", label: "Social & Lively" },
+    { id: "luxury", label: "Luxury" },
+    { id: "cozy", label: "Cozy & Homey" },
+    { id: "modern", label: "Modern & Sleek" },
+    { id: "rustic", label: "Rustic & Charming" },
+    { id: "urban", label: "Urban & Central" },
+    { id: "nature", label: "Close to Nature" },
+  ]
+
+  const IDEAL_FOR = [
+    { id: "remote_work", label: "Remote Work", icon: Briefcase },
+    { id: "vacation", label: "Vacation", icon: Plane },
+    { id: "honeymoon", label: "Honeymoon", icon: Heart },
+    { id: "family", label: "Family Trip", icon: Users },
+    { id: "adventure", label: "Adventure", icon: Mountain },
+  ]
+
+  const WORK_AMENITIES = [
+    { id: "fast_wifi", label: "Fast WiFi" },
+    { id: "dedicated_desk", label: "Dedicated Desk" },
+    { id: "monitor", label: "External Monitor" },
+    { id: "ergonomic_chair", label: "Ergonomic Chair" },
+    { id: "meeting_space", label: "Meeting Space" },
+  ]
+
+  const toggleArrayItem = (key: keyof typeof formData, item: string) => {
+    const current = formData[key] as string[]
+    if (current.includes(item)) {
+      setFormData({ ...formData, [key]: current.filter(i => i !== item) })
+    } else {
+      setFormData({ ...formData, [key]: [...current, item] })
+    }
+  }
 
   // Images State
   const [images, setImages] = useState<string[]>([])
@@ -124,6 +167,12 @@ export default function AddPropertyPage() {
       amenities: formData.amenities,
       images: images,
       imageSrc: images[0] || null, // Primary image
+      // AI Matching Attributes
+      vibes: formData.vibes,
+      workFriendly: formData.workFriendly,
+      workAmenities: formData.workAmenities,
+      wifiSpeed: formData.wifiSpeed ? parseInt(formData.wifiSpeed) : null,
+      idealFor: formData.idealFor,
     }
 
     // Call the Server Action
@@ -211,6 +260,106 @@ export default function AddPropertyPage() {
                     amenities: e.target.value.split(',').map(s => s.trim())
                   })}
                 />
+              </div>
+
+              {/* AI Matching Section */}
+              <div className="border-t pt-6 mt-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Sparkles className="h-5 w-5 text-blue-600" />
+                  <h3 className="font-semibold">AI Matching Attributes</h3>
+                  <span className="text-xs text-gray-500">(Help travelers find your property)</span>
+                </div>
+
+                {/* Property Vibes */}
+                <div className="grid gap-2 mb-4">
+                  <Label>Property Vibes (Select all that apply)</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {VIBES.map((vibe) => (
+                      <button
+                        key={vibe.id}
+                        type="button"
+                        onClick={() => toggleArrayItem("vibes", vibe.id)}
+                        className={`px-3 py-1.5 rounded-full text-sm transition-all ${
+                          formData.vibes.includes(vibe.id)
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {vibe.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Ideal For */}
+                <div className="grid gap-2 mb-4">
+                  <Label>Ideal For (Select all that apply)</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {IDEAL_FOR.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => toggleArrayItem("idealFor", item.id)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all ${
+                          formData.idealFor.includes(item.id)
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        <item.icon className="h-3.5 w-3.5" />
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Work-Friendly Toggle */}
+                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg mb-4">
+                  <div className="flex items-center gap-3">
+                    <Briefcase className="h-5 w-5 text-blue-600" />
+                    <div>
+                      <p className="font-medium">Work-Friendly Space</p>
+                      <p className="text-xs text-gray-500">Great for remote workers and digital nomads</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={formData.workFriendly}
+                    onCheckedChange={(checked) => setFormData({ ...formData, workFriendly: checked })}
+                  />
+                </div>
+
+                {/* Work Amenities (shown if work-friendly) */}
+                {formData.workFriendly && (
+                  <div className="grid gap-2 mb-4 ml-4 border-l-2 border-blue-200 pl-4">
+                    <Label className="text-sm">Work Amenities Available</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {WORK_AMENITIES.map((amenity) => (
+                        <button
+                          key={amenity.id}
+                          type="button"
+                          onClick={() => toggleArrayItem("workAmenities", amenity.id)}
+                          className={`px-3 py-1.5 rounded-full text-sm transition-all ${
+                            formData.workAmenities.includes(amenity.id)
+                              ? "bg-blue-600 text-white"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          }`}
+                        >
+                          {amenity.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Wifi className="h-4 w-4 text-gray-500" />
+                      <Input
+                        placeholder="WiFi Speed (Mbps)"
+                        type="number"
+                        className="w-40"
+                        value={formData.wifiSpeed}
+                        onChange={(e) => setFormData({ ...formData, wifiSpeed: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Image Upload */}

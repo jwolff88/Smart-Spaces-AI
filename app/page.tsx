@@ -1,15 +1,15 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Building2, Plane, UserPlus, Sparkles } from "lucide-react"
+import { Building2, Plane, UserPlus, Sparkles, Brain, DollarSign, Heart } from "lucide-react"
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col text-white">
 
       {/* Navbar */}
-      <header className="px-6 h-16 flex items-center justify-center border-b border-white/10 bg-slate-950/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="font-bold text-xl flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-blue-500" />
+      <header className="px-6 h-20 flex items-center justify-center border-b border-white/10 bg-slate-950/50 backdrop-blur-sm sticky top-0 z-10">
+        <div className="font-bold text-3xl flex items-center gap-3">
+          <Sparkles className="h-8 w-8 text-blue-500" />
           Smart Spaces
         </div>
       </header>
@@ -18,19 +18,19 @@ export default function LandingPage() {
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4 py-20">
         <div className="bg-blue-900/30 text-blue-300 border border-blue-500/30 px-4 py-1.5 rounded-full text-sm font-medium mb-6 inline-flex items-center gap-2">
           <Sparkles className="h-4 w-4" />
-          The Future of Rental Infrastructure
+          AI-Powered Vacation Rentals
         </div>
 
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 max-w-4xl text-white">
-          Intelligent hosting for <br className="hidden md:block" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">
-            modern travelers.
+          Your Perfect Stay.<br className="hidden md:block" />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+            Found by AI.
           </span>
         </h1>
 
         <p className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-          Experience AI-optimized listings, seamless bookings, and smart pricing.
-          Whether you&apos;re hosting or traveling, we handle the complexity.
+          Tell us how you travel. We&apos;ll match you with spaces that actually fit your vibe.
+          <span className="block mt-2 text-slate-300 font-medium">No more endless scrolling. Just perfect matches.</span>
         </p>
 
         {/* 3 Main Buttons */}
@@ -57,26 +57,26 @@ export default function LandingPage() {
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-3 gap-8 mt-24 max-w-5xl text-left">
-          <div className="bg-slate-900/50 p-6 rounded-2xl border border-white/10 hover:border-blue-500/50 transition-all">
-            <div className="h-10 w-10 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
-              <Sparkles className="h-5 w-5 text-blue-400" />
+          <div className="bg-slate-900/50 p-6 rounded-2xl border border-white/10 hover:border-purple-500/50 transition-all">
+            <div className="h-10 w-10 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
+              <Heart className="h-5 w-5 text-purple-400" />
             </div>
-            <h3 className="font-bold text-lg mb-2 text-white">AI-Powered Listings</h3>
-            <p className="text-slate-400">Our AI writes high-converting descriptions and optimizes your pricing automatically.</p>
+            <h3 className="font-bold text-lg mb-2 text-white">AI Matching</h3>
+            <p className="text-slate-400">Tell us your vibe &mdash; remote work, honeymoon, family trip &mdash; and we&apos;ll show you spaces with match scores tailored to you.</p>
           </div>
           <div className="bg-slate-900/50 p-6 rounded-2xl border border-white/10 hover:border-green-500/50 transition-all">
             <div className="h-10 w-10 bg-green-500/20 rounded-lg flex items-center justify-center mb-4">
-              <Building2 className="h-5 w-5 text-green-400" />
+              <DollarSign className="h-5 w-5 text-green-400" />
             </div>
-            <h3 className="font-bold text-lg mb-2 text-white">Host Dashboard</h3>
-            <p className="text-slate-400">Manage your properties, track bookings, and see your earnings in one place.</p>
+            <h3 className="font-bold text-lg mb-2 text-white">Smart Pricing</h3>
+            <p className="text-slate-400">Hosts get AI-powered price suggestions based on demand, season, and occupancy. Maximize earnings automatically.</p>
           </div>
-          <div className="bg-slate-900/50 p-6 rounded-2xl border border-white/10 hover:border-purple-500/50 transition-all">
-            <div className="h-10 w-10 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
-              <Plane className="h-5 w-5 text-purple-400" />
+          <div className="bg-slate-900/50 p-6 rounded-2xl border border-white/10 hover:border-blue-500/50 transition-all">
+            <div className="h-10 w-10 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
+              <Brain className="h-5 w-5 text-blue-400" />
             </div>
-            <h3 className="font-bold text-lg mb-2 text-white">Traveler Experience</h3>
-            <p className="text-slate-400">Find the perfect stay with smart search and book with confidence.</p>
+            <h3 className="font-bold text-lg mb-2 text-white">AI-Generated Listings</h3>
+            <p className="text-slate-400">Hosts just enter an address &mdash; our AI writes compelling titles, descriptions, and suggests optimal pricing.</p>
           </div>
         </div>
       </main>
@@ -84,7 +84,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="py-8 text-center text-slate-500 text-sm border-t border-white/10">
         <p className="mb-2">Founder and CEO: <span className="text-slate-300">Jason Wolff</span></p>
-        <p>© 2024 Smart Spaces. All rights reserved.</p>
+        <p>© 2025 Smart Spaces. All rights reserved.</p>
       </footer>
     </div>
   )

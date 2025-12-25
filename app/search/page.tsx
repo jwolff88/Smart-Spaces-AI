@@ -3,7 +3,7 @@ import { auth } from "@/auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { MapPin, Home, BedDouble, ArrowLeft, Sparkles, Briefcase, Wifi, Heart } from "lucide-react"
+import { MapPin, Home, BedDouble, ArrowLeft, Sparkles, Briefcase, Wifi, Heart, User, Settings } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { SearchFilters } from "./search-filters"
@@ -160,9 +160,28 @@ export default async function SearchPage({
             </Link>
             <h1 className="font-bold text-xl">Explore Stays</h1>
           </div>
-          <Link href="/login">
-            <Button variant="outline">Sign In</Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            {session?.user ? (
+              <>
+                <Link href="/onboarding">
+                  <Button variant="ghost" size="sm" className="text-gray-600">
+                    <Settings className="h-4 w-4 mr-1" />
+                    Preferences
+                  </Button>
+                </Link>
+                <Link href="/guest-dashboard">
+                  <Button variant="outline" size="sm">
+                    <User className="h-4 w-4 mr-1" />
+                    {session.user.name || "Dashboard"}
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <Link href="/login?role=traveler">
+                <Button variant="outline">Sign In</Button>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 

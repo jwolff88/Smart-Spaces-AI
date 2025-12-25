@@ -22,15 +22,14 @@ export default function LandingPage() {
         </div>
 
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 max-w-4xl text-white">
-          Your Perfect Stay.<br className="hidden md:block" />
+          Smarter Stays.<br className="hidden md:block" />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
-            Found by AI.
+            Intelligent Living.
           </span>
         </h1>
 
         <p className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-          Tell us how you travel. We&apos;ll match you with spaces that actually fit your vibe.
-          <span className="block mt-2 text-slate-300 font-medium">No more endless scrolling. Just perfect matches.</span>
+          Where Smart Travel Meets Smart Hosting.
         </p>
 
         {/* 3 Main Buttons */}

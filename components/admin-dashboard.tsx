@@ -51,6 +51,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     try {
       const res = await fetch("/api/admin/stats")
       const data = await res.json()
+      if (data.error) {
+        console.error("Stats API error:", data.error)
+        return
+      }
       setStats(data)
     } catch (error) {
       console.error("Failed to fetch stats:", error)

@@ -82,8 +82,9 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-8 text-center text-slate-600 text-sm border-t border-white/10">
-        © 2024 Smart Spaces. All rights reserved.
+      <footer className="py-8 text-center text-slate-500 text-sm border-t border-white/10">
+        <p className="mb-2">Founder and CEO: <span className="text-slate-300">Jason Wolff</span></p>
+        <p>© 2024 Smart Spaces. All rights reserved.</p>
       </footer>
     </div>
   )

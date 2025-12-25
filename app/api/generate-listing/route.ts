@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Anthropic from "@anthropic-ai/sdk";
 
-// Initialize Gemini
-const genAI = process.env.GEMINI_API_KEY
-  ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+// Initialize Claude
+const anthropic = process.env.ANTHROPIC_API_KEY
+  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   : null;
 
 export async function POST(req: Request) {
@@ -11,9 +11,9 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { address, type, bedrooms, amenities } = body;
 
-    if (!process.env.GEMINI_API_KEY || !genAI) {
+    if (!process.env.ANTHROPIC_API_KEY || !anthropic) {
       return NextResponse.json(
-        { error: "Gemini API key (GEMINI_API_KEY) not configured" },
+        { error: "Claude API key (ANTHROPIC_API_KEY) not configured" },
         { status: 500 }
       );
     }
@@ -28,9 +28,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    const prompt = `You are an expert real estate copywriter. Generate a compelling vacation rental listing.
+    const prompt = `You are an expert real estate copywriter specializing in vacation rentals. Generate a compelling listing that converts browsers into bookers.
 
 Property Details:
 - Location/Address: ${address}
@@ -38,23 +36,31 @@ Property Details:
 - Bedrooms: ${bedrooms}
 - Key Amenities: ${amenities.join(", ")}
 
-Generate three pieces of information:
-1. A "title" for the listing (under 60 characters).
-2. A "description" (40–60 words) that is friendly and inviting. Mention the location and a key amenity.
-3. A "suggestedPrice" (number only). Suggest a reasonable nightly price for a ${type} with ${bedrooms} bedrooms in ${address}. Use a whole number.
+Generate a JSON object with exactly these three fields:
+1. "title": A catchy, memorable title (under 60 characters) that highlights the best feature or location
+2. "description": A warm, inviting description (40-60 words) that paints a picture of the experience. Mention the location and key amenities naturally.
+3. "suggestedPrice": A reasonable nightly price as a number (no $ sign). Base it on the property type, bedrooms, and location.
 
-IMPORTANT: Respond with ONLY a valid JSON object with the keys:
-"title", "description", and "suggestedPrice".
-Do not include any other text, markdown, or code blocks.
-Example: {"title": "...", "description": "...", "suggestedPrice": 150}`;
+Respond with ONLY the JSON object, no other text:`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let generatedContent = response.text();
+    const message = await anthropic.messages.create({
+      model: "claude-3-haiku-20240307",
+      max_tokens: 500,
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+    });
 
-    if (!generatedContent) {
-      throw new Error("Gemini did not return any content.");
+    // Extract text from response
+    const textContent = message.content.find((block) => block.type === "text");
+    if (!textContent || textContent.type !== "text") {
+      throw new Error("Claude did not return text content.");
     }
+
+    let generatedContent = textContent.text.trim();
 
     // Clean up the response - remove markdown code blocks if present
     generatedContent = generatedContent
@@ -79,11 +85,11 @@ Example: {"title": "...", "description": "...", "suggestedPrice": 150}`;
 
     let errorMessage = "Failed to generate AI listing.";
 
-    if (error.message?.includes("API_KEY")) {
-      errorMessage = "Gemini API key is invalid or expired. Please check your GEMINI_API_KEY.";
+    if (error.message?.includes("API_KEY") || error.message?.includes("401")) {
+      errorMessage = "Claude API key is invalid or expired. Please check your ANTHROPIC_API_KEY.";
     } else if (error.message?.includes("JSON.parse")) {
       errorMessage += " AI generated invalid JSON. Please try again.";
-    } else if (error.message?.includes("quota") || error.message?.includes("rate")) {
+    } else if (error.message?.includes("rate") || error.status === 429) {
       errorMessage = "API rate limit reached. Please try again in a moment.";
     } else if (error.message) {
       errorMessage += ` Error: ${error.message}`;

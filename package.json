@@ -66,6 +66,7 @@
     "react-hook-form": "latest",
     "react-resizable-panels": "latest",
     "recharts": "latest",
+    "resend": "^6.6.0",
     "sonner": "latest",
     "stripe": "^20.1.0",
     "tailwind-merge": "^2.5.5",

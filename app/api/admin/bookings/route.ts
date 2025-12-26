@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { sendBookingStatusUpdate } from "@/lib/email"
 
 export async function GET() {
   try {
@@ -30,7 +31,22 @@ export async function PATCH(request: Request) {
     const updatedBooking = await db.booking.update({
       where: { id },
       data: { status },
+      include: {
+        guest: { select: { name: true, email: true } },
+        listing: { select: { title: true } },
+      },
     })
+
+    // Send status update email to guest (non-blocking)
+    if (updatedBooking.guest?.email) {
+      sendBookingStatusUpdate(
+        updatedBooking.guest.email,
+        updatedBooking.guest.name || "Guest",
+        status,
+        updatedBooking.listing?.title || "Your booking",
+        updatedBooking.id
+      ).catch((err) => console.error("Email send error:", err))
+    }
 
     return NextResponse.json(updatedBooking)
   } catch (error) {

@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { db } from "@/lib/db"
+import {
+  sendBookingConfirmationToGuest,
+  sendNewBookingToHost,
+} from "@/lib/email"
 
 // GET /api/bookings - Get user's bookings (as guest or host)
 export async function GET(req: Request) {
@@ -96,10 +100,20 @@ export async function POST(req: Request) {
       )
     }
 
-    // Get listing details
+    // Get listing details with host info
     const listing = await db.listing.findUnique({
       where: { id: listingId },
-      select: { id: true, price: true, hostId: true, maxGuests: true, title: true },
+      select: {
+        id: true,
+        price: true,
+        hostId: true,
+        maxGuests: true,
+        title: true,
+        location: true,
+        host: {
+          select: { name: true, email: true },
+        },
+      },
     })
 
     if (!listing) {
@@ -184,6 +198,12 @@ export async function POST(req: Request) {
     const serviceFee = Math.round(subtotal * 0.1 * 100) / 100 // 10% platform fee
     const totalPrice = Math.round((subtotal + serviceFee) * 100) / 100
 
+    // Get guest info
+    const guest = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true, email: true },
+    })
+
     // Create booking
     const booking = await db.booking.create({
       data: {
@@ -200,6 +220,27 @@ export async function POST(req: Request) {
         listing: { select: { id: true, title: true, location: true, price: true } },
       },
     })
+
+    // Send confirmation emails (non-blocking)
+    const emailData = {
+      guestName: guest?.name || "Guest",
+      guestEmail: guest?.email || "",
+      hostName: listing.host?.name || "Host",
+      hostEmail: listing.host?.email || "",
+      listingTitle: listing.title,
+      listingLocation: listing.location,
+      checkIn: checkInDate,
+      checkOut: checkOutDate,
+      guests: guestCount,
+      totalPrice,
+      bookingId: booking.id,
+    }
+
+    // Send emails in background (don't await)
+    Promise.all([
+      sendBookingConfirmationToGuest(emailData),
+      sendNewBookingToHost(emailData),
+    ]).catch((err) => console.error("Email send error:", err))
 
     return NextResponse.json({
       booking,

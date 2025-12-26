@@ -25,6 +25,7 @@ model User {
   sessions         Session[]
   listings         Listing[]  // Properties owned (for hosts)
   bookings         Booking[]  // Reservations made (for guests)
+  reviews          Review[]   // Reviews written (for guests)
   travelerProfile  TravelerProfile? // AI matching preferences
 
   createdAt     DateTime  @default(now())
@@ -134,6 +135,7 @@ model Listing {
   hostId            String
   host              User     @relation(fields: [hostId], references: [id], onDelete: Cascade)
   bookings          Booking[]
+  reviews           Review[]
   pricingHistory    PricingHistory[]
 
   createdAt         DateTime @default(now())
@@ -173,6 +175,7 @@ model Booking {
   listingId       String
   listing         Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
   payment         Payment?
+  review          Review?
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -180,6 +183,36 @@ model Booking {
   @@index([guestId])
   @@index([listingId])
   @@index([status])
+}
+
+// --- REVIEWS & RATINGS ---
+
+model Review {
+  id          String   @id @default(cuid())
+  rating      Int      // 1-5 stars
+  comment     String?  @db.Text
+
+  // Individual ratings
+  cleanliness Int?     // 1-5
+  accuracy    Int?     // 1-5
+  checkIn     Int?     // 1-5
+  communication Int?   // 1-5
+  location    Int?     // 1-5
+  value       Int?     // 1-5
+
+  // Relations
+  bookingId   String   @unique
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  listingId   String
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  guestId     String
+  guest       User     @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([listingId])
+  @@index([guestId])
 }
 
 model Payment {

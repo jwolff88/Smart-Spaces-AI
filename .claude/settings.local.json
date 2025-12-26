@@ -15,7 +15,10 @@
       "Bash(curl:*)",
       "Bash(npx tsc:*)",
       "Bash(git restore:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(powershell:*)",
+      "WebFetch(domain:smart-spaces-ai.vercel.app)",
+      "Bash(ping:*)"
     ]
   }
 }

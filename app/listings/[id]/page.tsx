@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { MapPin, BedDouble, Home, Share, ArrowLeft, Star, Users } from "lucide-react"
 import Link from "next/link"
 import { BookingForm } from "@/components/booking-form"
+import { ReviewsDisplay } from "@/components/reviews-display"
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -128,6 +129,14 @@ export default async function ListingDetailsPage(props: PageProps) {
                 <p className="text-gray-500 italic">No specific amenities listed.</p>
               )}
             </div>
+          </div>
+
+          <div className="h-px bg-gray-100" />
+
+          {/* Reviews Section */}
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Guest Reviews</h2>
+            <ReviewsDisplay listingId={listing.id} />
           </div>
         </div>
 

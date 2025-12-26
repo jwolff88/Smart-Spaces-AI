@@ -15,7 +15,9 @@ import {
   MessageSquare,
   LogOut,
   Home,
+  Star,
 } from "lucide-react"
+import { ReviewButton } from "./review-button"
 
 function formatDate(date: Date) {
   return date.toLocaleDateString("en-US", {
@@ -50,7 +52,7 @@ export default async function GuestDashboard() {
     redirect("/login")
   }
 
-  // Fetch user's bookings
+  // Fetch user's bookings with reviews
   const bookings = await db.booking.findMany({
     where: { guestId: session.user.id },
     include: {
@@ -64,6 +66,7 @@ export default async function GuestDashboard() {
           host: { select: { name: true } },
         },
       },
+      review: true,
     },
     orderBy: { checkIn: "desc" },
   })
@@ -252,14 +255,27 @@ export default async function GuestDashboard() {
                 ) : (
                   pastBookings.map((booking) => {
                     const nights = getNights(booking.checkIn, booking.checkOut)
+                    const imageUrl = booking.listing.images?.[0] || booking.listing.imageSrc
+                    const canReview = !booking.review && booking.status !== "cancelled"
 
                     return (
                       <div
                         key={booking.id}
-                        className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center opacity-75"
+                        className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center"
                       >
                         <div className="h-24 w-24 rounded-md bg-slate-200 sm:h-20 sm:w-20 relative overflow-hidden flex-shrink-0">
-                          <Home className="h-8 w-8 text-gray-400 absolute inset-0 m-auto" />
+                          {imageUrl ? (
+                            <Image
+                              src={imageUrl}
+                              alt={booking.listing.title}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center h-full">
+                              <Home className="h-8 w-8 text-gray-400" />
+                            </div>
+                          )}
                         </div>
                         <div className="grid gap-1 flex-1">
                           <h3 className="font-semibold">{booking.listing.title}</h3>
@@ -271,9 +287,26 @@ export default async function GuestDashboard() {
                             <Calendar className="h-3 w-3" />
                             {formatDate(booking.checkIn)} - {formatDate(booking.checkOut)} ({nights} nights)
                           </div>
+                          {booking.review && (
+                            <div className="flex items-center gap-1 text-sm text-yellow-600">
+                              <Star className="h-3 w-3 fill-yellow-500" />
+                              <span>You rated this {booking.review.rating}/5</span>
+                            </div>
+                          )}
                         </div>
                         <div className="flex flex-col gap-2 sm:items-end">
                           {getStatusBadge(booking.status)}
+                          {canReview ? (
+                            <ReviewButton
+                              bookingId={booking.id}
+                              listingTitle={booking.listing.title}
+                            />
+                          ) : booking.review ? (
+                            <Badge variant="outline" className="text-green-600 border-green-600">
+                              <Star className="h-3 w-3 mr-1 fill-green-600" />
+                              Reviewed
+                            </Badge>
+                          ) : null}
                         </div>
                       </div>
                     )

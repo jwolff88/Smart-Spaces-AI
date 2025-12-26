@@ -158,6 +158,24 @@ export async function POST(req: Request) {
       )
     }
 
+    // Check for blocked dates
+    const blockedDate = await db.blockedDate.findFirst({
+      where: {
+        listingId,
+        date: {
+          gte: checkInDate,
+          lt: checkOutDate,
+        },
+      },
+    })
+
+    if (blockedDate) {
+      return NextResponse.json(
+        { error: "Some dates in your selection are blocked by the host" },
+        { status: 409 }
+      )
+    }
+
     // Calculate pricing
     const nights = Math.ceil(
       (checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)

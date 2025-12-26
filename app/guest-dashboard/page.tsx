@@ -94,6 +94,9 @@ export default async function GuestDashboard() {
           <Link href="#" className="text-primary font-semibold">
             Trips
           </Link>
+          <Link href="/messages" className="text-muted-foreground hover:text-foreground">
+            Messages
+          </Link>
           <Link href="/settings" className="text-muted-foreground hover:text-foreground">
             Settings
           </Link>

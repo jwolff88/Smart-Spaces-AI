@@ -27,6 +27,8 @@ model User {
   bookings         Booking[]  // Reservations made (for guests)
   reviews          Review[]   // Reviews written (for guests)
   travelerProfile  TravelerProfile? // AI matching preferences
+  conversations    ConversationParticipant[] // Messaging
+  messages         Message[]  // Messages sent
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -231,4 +233,56 @@ model Payment {
   updatedAt         DateTime @updatedAt
 
   @@index([status])
+}
+
+// --- MESSAGING ---
+
+model Conversation {
+  id            String   @id @default(cuid())
+
+  // Optional: link to a specific listing/booking for context
+  listingId     String?
+  bookingId     String?
+
+  participants  ConversationParticipant[]
+  messages      Message[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([listingId])
+}
+
+model ConversationParticipant {
+  id              String   @id @default(cuid())
+
+  conversationId  String
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Track read status
+  lastReadAt      DateTime?
+
+  createdAt       DateTime @default(now())
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id              String   @id @default(cuid())
+  content         String   @db.Text
+
+  conversationId  String
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  senderId        String
+  sender          User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
 }

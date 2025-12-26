@@ -1,13 +1,13 @@
 import { redirect } from "next/navigation"
 import { auth } from "@/auth"
-import { HostInboxClient } from "./inbox-client"
+import { MessagesClient } from "./messages-client"
 
-export default async function InboxPage() {
+export default async function MessagesPage() {
   const session = await auth()
 
   if (!session?.user) {
     redirect("/login")
   }
 
-  return <HostInboxClient userId={session.user.id!} />
+  return <MessagesClient userId={session.user.id!} />
 }

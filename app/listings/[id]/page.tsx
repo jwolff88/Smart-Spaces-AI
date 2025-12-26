@@ -8,6 +8,7 @@ import { MapPin, BedDouble, Home, Share, ArrowLeft, Star, Users } from "lucide-r
 import Link from "next/link"
 import { BookingForm } from "@/components/booking-form"
 import { ReviewsDisplay } from "@/components/reviews-display"
+import { ContactHostButton } from "@/components/contact-host-button"
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -142,11 +143,18 @@ export default async function ListingDetailsPage(props: PageProps) {
 
         {/* Right Column: Booking Card (Sticky) */}
         <div className="relative">
-          <div className="sticky top-24">
+          <div className="sticky top-24 space-y-4">
             <BookingForm
               listingId={listing.id}
               price={listing.price}
               maxGuests={listing.maxGuests}
+              isAuthenticated={!!session?.user}
+            />
+            <ContactHostButton
+              hostId={listing.hostId}
+              hostName={listing.host?.name || "Host"}
+              listingId={listing.id}
+              listingTitle={listing.title}
               isAuthenticated={!!session?.user}
             />
           </div>

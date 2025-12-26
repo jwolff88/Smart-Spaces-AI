@@ -89,8 +89,8 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     try {
       const params = new URLSearchParams()
       if (userSearch) params.set("search", userSearch)
-      if (userRoleFilter) params.set("role", userRoleFilter)
-      if (userStatusFilter) params.set("status", userStatusFilter)
+      if (userRoleFilter && userRoleFilter !== "all") params.set("role", userRoleFilter)
+      if (userStatusFilter && userStatusFilter !== "all") params.set("status", userStatusFilter)
 
       const res = await fetch(`/api/admin/users?${params}`)
       const data = await res.json()
@@ -104,7 +104,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     try {
       const params = new URLSearchParams()
       if (listingSearch) params.set("search", listingSearch)
-      if (listingStatusFilter) params.set("status", listingStatusFilter)
+      if (listingStatusFilter && listingStatusFilter !== "all") params.set("status", listingStatusFilter)
 
       const res = await fetch(`/api/admin/listings?${params}`)
       const data = await res.json()
@@ -118,7 +118,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
     try {
       const res = await fetch("/api/admin/bookings")
       const data = await res.json()
-      const filtered = bookingStatusFilter
+      const filtered = bookingStatusFilter && bookingStatusFilter !== "all"
         ? data.filter((b: any) => b.status === bookingStatusFilter)
         : data
       setBookings(Array.isArray(filtered) ? filtered : [])

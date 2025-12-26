@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { MobileNav } from "@/components/mobile-nav"
 import {
   Calendar,
   MapPin,
@@ -82,23 +83,29 @@ export default async function GuestDashboard() {
   return (
     <div className="min-h-screen bg-muted/40">
       {/* --- TOP NAVIGATION --- */}
-      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-6 shadow-sm">
+      <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6 shadow-sm">
+        {/* Mobile Menu */}
+        <MobileNav variant="guest" userName={session.user.name || undefined} />
+
+        {/* Logo */}
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <Sparkles className="h-5 w-5 text-primary" />
           <span className="hidden sm:inline">Smart Spaces</span>
         </Link>
-        <nav className="ml-auto flex items-center gap-4 text-sm font-medium">
-          <Link href="/search" className="text-muted-foreground hover:text-foreground">
+
+        {/* Desktop Navigation */}
+        <nav className="ml-auto hidden md:flex items-center gap-6 text-sm font-medium">
+          <Link href="/search" className="text-muted-foreground hover:text-foreground transition-colors">
             Explore
           </Link>
-          <Link href="#" className="text-primary font-semibold">
+          <Link href="/guest-dashboard" className="text-primary font-semibold">
             Trips
           </Link>
-          <Link href="/messages" className="text-muted-foreground hover:text-foreground">
+          <Link href="/messages" className="text-muted-foreground hover:text-foreground transition-colors">
             Messages
           </Link>
-          <Link href="/settings" className="text-muted-foreground hover:text-foreground">
-            Settings
+          <Link href="/onboarding" className="text-muted-foreground hover:text-foreground transition-colors">
+            Preferences
           </Link>
           <form
             action={async () => {
@@ -106,11 +113,25 @@ export default async function GuestDashboard() {
               await signOut()
             }}
           >
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" type="submit">
+            <Button variant="ghost" size="sm" className="gap-2" type="submit">
               <LogOut className="h-4 w-4" />
+              <span className="hidden lg:inline">Sign Out</span>
             </Button>
           </form>
         </nav>
+
+        {/* Mobile Sign Out */}
+        <form
+          className="md:hidden ml-auto"
+          action={async () => {
+            "use server"
+            await signOut()
+          }}
+        >
+          <Button variant="ghost" size="icon" className="h-9 w-9" type="submit">
+            <LogOut className="h-4 w-4" />
+          </Button>
+        </form>
       </header>
 
       <main className="container grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-8 md:gap-8">

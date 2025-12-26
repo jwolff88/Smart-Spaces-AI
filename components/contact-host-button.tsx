@@ -19,6 +19,7 @@ interface ContactHostButtonProps {
   listingId: string
   listingTitle: string
   isAuthenticated: boolean
+  variant?: "default" | "mobile"
 }
 
 export function ContactHostButton({
@@ -27,6 +28,7 @@ export function ContactHostButton({
   listingId,
   listingTitle,
   isAuthenticated,
+  variant = "default",
 }: ContactHostButtonProps) {
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState("")
@@ -67,15 +69,18 @@ export function ContactHostButton({
     }
   }
 
+  const isMobile = variant === "mobile"
+
   if (!isAuthenticated) {
     return (
       <Button
         variant="outline"
-        className="w-full border-slate-600 text-slate-300 hover:bg-slate-700"
+        size={isMobile ? "icon" : "default"}
+        className={isMobile ? "h-10 w-10" : "w-full border-slate-600 text-slate-300 hover:bg-slate-700"}
         onClick={() => router.push("/login")}
       >
-        <MessageSquare className="h-4 w-4 mr-2" />
-        Sign in to contact host
+        <MessageSquare className="h-4 w-4" />
+        {!isMobile && <span className="ml-2">Sign in to contact host</span>}
       </Button>
     )
   }
@@ -85,10 +90,11 @@ export function ContactHostButton({
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="w-full border-slate-600 text-slate-300 hover:bg-slate-700"
+          size={isMobile ? "icon" : "default"}
+          className={isMobile ? "h-10 w-10" : "w-full border-slate-600 text-slate-300 hover:bg-slate-700"}
         >
-          <MessageSquare className="h-4 w-4 mr-2" />
-          Contact {hostName || "Host"}
+          <MessageSquare className="h-4 w-4" />
+          {!isMobile && <span className="ml-2">Contact {hostName || "Host"}</span>}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-slate-800 border-slate-700">

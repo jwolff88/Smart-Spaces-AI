@@ -20,6 +20,8 @@ model User {
   emailVerified DateTime?
   image         String?
   role          String    @default("guest") // guest or host
+  isActive      Boolean   @default(true)    // For admin to suspend users
+  isAdmin       Boolean   @default(false)   // Admin privileges
 
   accounts         Account[]
   sessions         Session[]
@@ -114,6 +116,10 @@ model Listing {
   amenities         String[]
   images            String[] // Array of image URLs
   imageSrc          String?  // Primary/cover image (legacy support)
+
+  // Admin moderation
+  status            String   @default("active") // active, suspended, pending_review
+  isFeatured        Boolean  @default(false)    // Featured on homepage
 
   // AI & Smart Features
   smartPricing      Boolean  @default(true)

@@ -7,8 +7,18 @@ import { MapPin, Home, BedDouble, ArrowLeft, Sparkles, Briefcase, Wifi, Heart, U
 import Link from "next/link"
 import Image from "next/image"
 import { SearchFilters } from "./search-filters"
+import { Metadata } from "next"
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: "Search Vacation Rentals",
+  description: "Find your perfect vacation rental with AI-powered matching. Filter by location, price, amenities, and more. Work-friendly spaces available.",
+  openGraph: {
+    title: "Search Vacation Rentals | Smart Spaces",
+    description: "Find your perfect vacation rental with AI-powered matching.",
+  },
+}
 
 // Match score calculation (duplicated from API for server-side use)
 function calculateMatchScore(profile: any, listing: any): { score: number; reasons: string[] } {
@@ -90,6 +100,8 @@ interface SearchParams {
   minPrice?: string
   maxPrice?: string
   bedrooms?: string
+  amenities?: string
+  workFriendly?: string
 }
 
 export default async function SearchPage({
@@ -108,8 +120,10 @@ export default async function SearchPage({
     })
   }
 
-  // Build filter conditions
-  const where: Record<string, unknown> = {}
+  // Build filter conditions - only show active listings
+  const where: Record<string, unknown> = {
+    status: "active",
+  }
 
   if (params.location) {
     where.location = {
@@ -134,6 +148,21 @@ export default async function SearchPage({
 
   if (params.bedrooms && params.bedrooms !== "any") {
     where.bedrooms = params.bedrooms
+  }
+
+  // Filter by work-friendly
+  if (params.workFriendly === "true") {
+    where.workFriendly = true
+  }
+
+  // Filter by amenities (case-insensitive partial match)
+  if (params.amenities) {
+    const requestedAmenities = params.amenities.split(",")
+    where.AND = requestedAmenities.map(amenity => ({
+      amenities: {
+        hasSome: [amenity]
+      }
+    }))
   }
 
   const rawListings = await db.listing.findMany({
@@ -194,6 +223,8 @@ export default async function SearchPage({
             initialMinPrice={params.minPrice}
             initialMaxPrice={params.maxPrice}
             initialBedrooms={params.bedrooms}
+            initialAmenities={params.amenities}
+            initialWorkFriendly={params.workFriendly}
           />
         </div>
       </div>

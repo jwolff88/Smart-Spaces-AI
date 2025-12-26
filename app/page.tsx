@@ -1,9 +1,38 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Building2, Plane, UserPlus, Sparkles, Brain, DollarSign, Heart } from "lucide-react"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Smart Spaces | AI-Powered Vacation Rentals",
+  description: "Where Smart Travel Meets Smart Hosting. Find your perfect stay with AI-powered matching, smart pricing, and seamless booking.",
+}
+
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://smart-spaces-ai.vercel.app"
+
+// Organization structured data
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Smart Spaces",
+  description: "AI-Powered Vacation Rental Platform",
+  url: siteUrl,
+  logo: `${siteUrl}/logo.png`,
+  sameAs: [],
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer service",
+    availableLanguage: "English",
+  },
+}
 
 export default function LandingPage() {
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col text-white">
 
       {/* Navbar */}
@@ -86,5 +115,6 @@ export default function LandingPage() {
         <p>© 2025 Smart Spaces. All rights reserved.</p>
       </footer>
     </div>
+    </>
   )
 }

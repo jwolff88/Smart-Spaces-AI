@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { MobileNav } from "@/components/mobile-nav"
 import {
   LayoutDashboard,
   Home,
@@ -9,7 +10,8 @@ import {
   Settings,
   LogOut,
   Bell,
-  BarChart3
+  BarChart3,
+  Sparkles
 } from "lucide-react"
 
 export default function HostLayout({
@@ -19,15 +21,16 @@ export default function HostLayout({
 }) {
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      
-      {/* --- SIDEBAR --- */}
+
+      {/* --- SIDEBAR (Desktop) --- */}
       <div className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
-          
+
           {/* Logo Area */}
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
-              <span className="">Smart Spaces</span>
+              <Sparkles className="h-5 w-5 text-primary" />
+              <span>Smart Spaces</span>
               <span className="text-xs font-normal text-muted-foreground bg-primary/10 text-primary px-2 py-0.5 rounded-full">Host</span>
             </Link>
             <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
@@ -111,11 +114,16 @@ export default function HostLayout({
 
       {/* --- MAIN CONTENT AREA --- */}
       <div className="flex flex-col">
-        {/* Mobile Header (visible only on small screens) */}
-        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:hidden">
-          <Link href="#" className="font-semibold">
-            Smart Spaces Host
-          </Link>
+        {/* Mobile Header */}
+        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 md:hidden">
+          <MobileNav variant="host" />
+          <div className="flex items-center gap-2 font-semibold flex-1">
+            <Sparkles className="h-5 w-5 text-primary" />
+            Smart Spaces
+          </div>
+          <Button variant="outline" size="icon" className="h-9 w-9">
+            <Bell className="h-4 w-4" />
+          </Button>
         </header>
 
         {/* Dynamic Page Content */}

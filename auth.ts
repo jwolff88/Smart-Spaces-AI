@@ -2,12 +2,25 @@ import NextAuth from "next-auth"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { db } from "@/lib/db"
 import Credentials from "next-auth/providers/credentials"
+import Google from "next-auth/providers/google"
+import GitHub from "next-auth/providers/github"
 import bcrypt from "bcryptjs"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
+  pages: {
+    signIn: "/login",
+  },
   providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
+    GitHub({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    }),
     Credentials({
       name: "Credentials",
       credentials: {
@@ -20,7 +33,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         const email = credentials.email as string
-        
+
         // Find user in DB
         const user = await db.user.findUnique({
           where: { email },

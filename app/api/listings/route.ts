@@ -96,13 +96,43 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const listings = await prisma.listing.findMany({
-      // We retrieve all listings for this demo
+      where: {
+        status: "active", // Only show active listings to the public
+      },
       orderBy: {
-        title: 'asc' // Optional: Sorts them alphabetically
+        createdAt: 'desc'
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        price: true,
+        location: true,
+        type: true,
+        bedrooms: true,
+        bathrooms: true,
+        maxGuests: true,
+        amenities: true,
+        imageSrc: true,
+        images: true,
+        isFeatured: true,
+        workFriendly: true,
+        wifiSpeed: true,
+        currentPrice: true,
+        matchScore: true,
+        createdAt: true,
+        host: {
+          select: { name: true }
+        }
       }
     })
 
-    return NextResponse.json(listings)
+    // Add cache headers for better performance
+    return NextResponse.json(listings, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
+    })
   } catch (error) {
     console.error("Fetch Error:", error)
     return NextResponse.json(

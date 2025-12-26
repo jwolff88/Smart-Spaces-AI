@@ -19,6 +19,7 @@ import {
   Star,
 } from "lucide-react"
 import { ReviewButton } from "./review-button"
+import { CancelBookingButton } from "./cancel-booking-button"
 
 function formatDate(date: Date) {
   return date.toLocaleDateString("en-US", {
@@ -249,6 +250,12 @@ export default async function GuestDashboard() {
                                 View Listing
                               </Button>
                             </Link>
+                            {booking.status !== "cancelled" && (
+                              <CancelBookingButton
+                                bookingId={booking.id}
+                                listingTitle={booking.listing.title}
+                              />
+                            )}
                           </div>
                         </div>
                       </div>

@@ -6,7 +6,24 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Search, Plus, MoreVertical, Home, Loader2, RefreshCw } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { Search, Plus, MoreVertical, Home, Loader2, RefreshCw, Trash2, Eye } from "lucide-react"
 
 // Define the shape of our Listing based on the Prisma Schema
 interface Listing {
@@ -21,6 +38,8 @@ interface Listing {
 export default function ListingsPage() {
   const [listings, setListings] = useState<Listing[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const fetchListings = async () => {
     setIsLoading(true)
@@ -34,6 +53,26 @@ export default function ListingsPage() {
       console.error("Failed to load listings", error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!deleteId) return
+    setIsDeleting(true)
+    try {
+      const res = await fetch(`/api/listings/${deleteId}`, { method: "DELETE" })
+      if (res.ok) {
+        setListings(listings.filter((l) => l.id !== deleteId))
+      } else {
+        const data = await res.json()
+        alert(data.error || "Failed to delete listing")
+      }
+    } catch (error) {
+      console.error("Failed to delete listing", error)
+      alert("Failed to delete listing")
+    } finally {
+      setIsDeleting(false)
+      setDeleteId(null)
     }
   }
 
@@ -97,9 +136,29 @@ export default function ListingsPage() {
                   <CardTitle className="text-base line-clamp-1" title={property.title}>
                     {property.title}
                   </CardTitle>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 -mt-2">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 -mt-2">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <Link href={`/listings/${property.id}`}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Listing
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-destructive focus:text-destructive"
+                        onClick={() => setDeleteId(property.id)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete Listing
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 <div className="text-sm text-muted-foreground">{property.location}</div>
               </CardHeader>
@@ -114,13 +173,38 @@ export default function ListingsPage() {
                 </div>
               </CardContent>
               <CardFooter className="p-2 border-t bg-muted/20">
-                 <Button variant="ghost" size="sm" className="w-full text-xs">View Details</Button>
+                <Button variant="ghost" size="sm" className="w-full text-xs" asChild>
+                  <Link href={`/listings/${property.id}`}>View Details</Link>
+                </Button>
               </CardFooter>
             </Card>
           ))
         )}
 
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Listing</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this listing? This action cannot be undone.
+              All associated data will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

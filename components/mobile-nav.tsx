@@ -13,12 +13,10 @@ import {
 } from "@/components/ui/sheet"
 import {
   Menu,
-  X,
   Home,
   Search,
   Calendar,
   MessageSquare,
-  Settings,
   LogOut,
   LayoutDashboard,
   Building,
@@ -54,7 +52,7 @@ const guestNavItems: NavItem[] = [
   { href: "/search", label: "Explore", icon: Search },
   { href: "/guest-dashboard", label: "My Trips", icon: Calendar },
   { href: "/messages", label: "Messages", icon: MessageSquare },
-  { href: "/onboarding", label: "Preferences", icon: Settings },
+  { href: "/onboarding", label: "Preferences", icon: User },
 ]
 
 const publicNavItems: NavItem[] = [
@@ -137,30 +135,18 @@ export function MobileNav({ variant, userName, onSignOut }: MobileNavProps) {
           })}
         </nav>
 
-        {(variant === "host" || variant === "guest") && (
+        {(variant === "host" || variant === "guest") && onSignOut && (
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-background">
-            <div className="flex flex-col gap-2">
-              <Link
-                href="/settings"
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-              >
-                <Settings className="h-5 w-5" />
-                Settings
-              </Link>
-              {onSignOut && (
-                <button
-                  onClick={() => {
-                    setOpen(false)
-                    onSignOut()
-                  }}
-                  className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 w-full text-left"
-                >
-                  <LogOut className="h-5 w-5" />
-                  Sign Out
-                </button>
-              )}
-            </div>
+            <button
+              onClick={() => {
+                setOpen(false)
+                onSignOut()
+              }}
+              className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 w-full text-left"
+            >
+              <LogOut className="h-5 w-5" />
+              Sign Out
+            </button>
           </div>
         )}
       </SheetContent>

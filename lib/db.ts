@@ -4,8 +4,13 @@ declare global {
   var prisma: PrismaClient | undefined
 }
 
-export const db = globalThis.prisma || new PrismaClient()
-
-if (process.env.NODE_ENV !== "production") {
-  globalThis.prisma = db
+const prismaClientSingleton = () => {
+  return new PrismaClient({
+    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+  })
 }
+
+export const db = globalThis.prisma ?? prismaClientSingleton()
+
+// Cache in both dev and production to prevent connection leaks
+globalThis.prisma = db

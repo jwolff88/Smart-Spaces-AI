@@ -41,16 +41,54 @@ import {
   Clock,
   Trash2,
   Loader2,
-  Flame,
   Shield,
   Home,
   Sparkles,
-  Wind
+  Wind,
+  Brain,
+  TrendingUp,
+  DollarSign,
+  RefreshCw,
+  Lightbulb,
+  Activity
 } from "lucide-react"
 
 interface Listing {
   id: string
   title: string
+}
+
+interface AIAnalysis {
+  healthScore: number
+  riskLevel: string
+  estimatedAnnualSavings?: number
+  summary: string
+  urgentItems: Array<{
+    item: string
+    listing: string
+    reason: string
+    recommendation: string
+    estimatedCost?: number
+  }>
+  predictions: Array<{
+    item: string
+    listing: string
+    prediction: string
+    confidence: string
+    timeframe: string
+    preventiveAction: string
+  }>
+  optimizations: Array<{
+    category: string
+    insight: string
+    recommendation: string
+    potentialSavings?: number
+  }>
+  usageImpact?: {
+    summary: string
+    highWearItems: string[]
+    recommendations: string[]
+  }
 }
 
 interface MaintenanceLog {
@@ -157,6 +195,29 @@ export default function MaintenancePage() {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  // AI Analysis
+  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null)
+  const [isLoadingAI, setIsLoadingAI] = useState(false)
+  const [showAIPanel, setShowAIPanel] = useState(true)
+
+  const fetchAIAnalysis = async () => {
+    setIsLoadingAI(true)
+    try {
+      const url = selectedListing === "all"
+        ? "/api/ai/maintenance"
+        : `/api/ai/maintenance?listingId=${selectedListing}`
+      const res = await fetch(url)
+      if (res.ok) {
+        const data = await res.json()
+        setAiAnalysis(data.analysis)
+      }
+    } catch (error) {
+      console.error("Failed to fetch AI analysis", error)
+    } finally {
+      setIsLoadingAI(false)
+    }
+  }
+
   const fetchData = async () => {
     setIsLoading(true)
     try {
@@ -179,7 +240,18 @@ export default function MaintenancePage() {
 
   useEffect(() => {
     fetchData()
+    // Only fetch AI analysis if we have items
+    if (items.length > 0) {
+      fetchAIAnalysis()
+    }
   }, [selectedListing])
+
+  // Fetch AI analysis when items change
+  useEffect(() => {
+    if (items.length > 0 && !aiAnalysis && !isLoadingAI) {
+      fetchAIAnalysis()
+    }
+  }, [items])
 
   const handleAddItem = async () => {
     if (!newItem.listingId || !newItem.name || !newItem.category) return
@@ -424,6 +496,199 @@ export default function MaintenancePage() {
           </Dialog>
         </div>
       </div>
+
+      {/* AI Insights Panel */}
+      {showAIPanel && (
+        <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Brain className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">AI Predictive Insights</CardTitle>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={fetchAIAnalysis}
+                  disabled={isLoadingAI || items.length === 0}
+                >
+                  <RefreshCw className={`h-4 w-4 ${isLoadingAI ? "animate-spin" : ""}`} />
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isLoadingAI ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <span className="ml-2 text-muted-foreground">Analyzing maintenance patterns...</span>
+              </div>
+            ) : items.length === 0 ? (
+              <p className="text-muted-foreground text-sm py-4">
+                Add maintenance items to get AI-powered predictions and insights.
+              </p>
+            ) : aiAnalysis ? (
+              <div className="space-y-6">
+                {/* Health Score & Summary */}
+                <div className="grid gap-4 md:grid-cols-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`h-16 w-16 rounded-full flex items-center justify-center text-2xl font-bold ${
+                      aiAnalysis.healthScore >= 80 ? "bg-green-100 text-green-700" :
+                      aiAnalysis.healthScore >= 60 ? "bg-amber-100 text-amber-700" :
+                      "bg-red-100 text-red-700"
+                    }`}>
+                      {aiAnalysis.healthScore}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Health Score</p>
+                      <p className="text-xs text-muted-foreground capitalize">
+                        {aiAnalysis.riskLevel} risk
+                      </p>
+                    </div>
+                  </div>
+                  {aiAnalysis.estimatedAnnualSavings && aiAnalysis.estimatedAnnualSavings > 0 && (
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                        <DollarSign className="h-6 w-6 text-green-700" />
+                      </div>
+                      <div>
+                        <p className="text-lg font-bold text-green-700">
+                          ${aiAnalysis.estimatedAnnualSavings.toLocaleString()}
+                        </p>
+                        <p className="text-xs text-muted-foreground">Est. Annual Savings</p>
+                      </div>
+                    </div>
+                  )}
+                  <div className="md:col-span-2">
+                    <p className="text-sm text-muted-foreground">{aiAnalysis.summary}</p>
+                  </div>
+                </div>
+
+                {/* Urgent Items */}
+                {aiAnalysis.urgentItems && aiAnalysis.urgentItems.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold flex items-center gap-2 mb-3">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      Urgent Attention Required
+                    </h4>
+                    <div className="grid gap-2">
+                      {aiAnalysis.urgentItems.map((item, i) => (
+                        <div key={i} className="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-100">
+                          <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{item.item} - {item.listing}</p>
+                            <p className="text-xs text-muted-foreground">{item.reason}</p>
+                            <p className="text-xs text-red-700 mt-1">{item.recommendation}</p>
+                          </div>
+                          {item.estimatedCost && (
+                            <Badge variant="outline" className="text-red-700">
+                              ~${item.estimatedCost}
+                            </Badge>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Predictions */}
+                {aiAnalysis.predictions && aiAnalysis.predictions.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold flex items-center gap-2 mb-3">
+                      <Activity className="h-4 w-4 text-primary" />
+                      Predictive Alerts
+                    </h4>
+                    <div className="grid gap-2 md:grid-cols-2">
+                      {aiAnalysis.predictions.map((pred, i) => (
+                        <div key={i} className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                          <div className="flex items-start justify-between">
+                            <p className="text-sm font-medium">{pred.item}</p>
+                            <Badge variant="outline" className={
+                              pred.confidence === "high" ? "text-red-600 border-red-200" :
+                              pred.confidence === "medium" ? "text-amber-600 border-amber-200" :
+                              "text-gray-600"
+                            }>
+                              {pred.confidence} confidence
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">{pred.listing}</p>
+                          <p className="text-xs mt-2">{pred.prediction}</p>
+                          <p className="text-xs text-blue-700 mt-1">
+                            <strong>Action:</strong> {pred.preventiveAction}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Timeframe: {pred.timeframe}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Optimizations */}
+                {aiAnalysis.optimizations && aiAnalysis.optimizations.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold flex items-center gap-2 mb-3">
+                      <Lightbulb className="h-4 w-4 text-amber-500" />
+                      Optimization Suggestions
+                    </h4>
+                    <div className="grid gap-2">
+                      {aiAnalysis.optimizations.map((opt, i) => (
+                        <div key={i} className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
+                          <TrendingUp className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{opt.category}</p>
+                            <p className="text-xs text-muted-foreground">{opt.insight}</p>
+                            <p className="text-xs text-amber-700 mt-1">{opt.recommendation}</p>
+                          </div>
+                          {opt.potentialSavings && (
+                            <Badge variant="outline" className="text-green-700">
+                              Save ~${opt.potentialSavings}
+                            </Badge>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Usage Impact */}
+                {aiAnalysis.usageImpact && (
+                  <div>
+                    <h4 className="text-sm font-semibold flex items-center gap-2 mb-3">
+                      <Activity className="h-4 w-4 text-purple-500" />
+                      Usage Pattern Impact
+                    </h4>
+                    <div className="p-3 bg-purple-50 rounded-lg border border-purple-100">
+                      <p className="text-sm">{aiAnalysis.usageImpact.summary}</p>
+                      {aiAnalysis.usageImpact.highWearItems && aiAnalysis.usageImpact.highWearItems.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-xs font-medium text-purple-700">High wear items:</p>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {aiAnalysis.usageImpact.highWearItems.map((item, i) => (
+                              <Badge key={i} variant="outline" className="text-purple-700 text-xs">
+                                {item}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-4">
+                <Button onClick={fetchAIAnalysis} disabled={isLoadingAI}>
+                  <Brain className="h-4 w-4 mr-2" />
+                  Analyze Maintenance Data
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3">

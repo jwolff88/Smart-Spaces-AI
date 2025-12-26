@@ -7,8 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Bell, Shield, User, Sparkles, ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { auth } from "@/auth"
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const session = await auth()
+  const userName = session?.user?.name || ""
+  const userEmail = session?.user?.email || ""
   return (
     <div className="container max-w-4xl py-10">
       
@@ -52,11 +56,11 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">Display Name</Label>
-                <Input id="name" defaultValue="Alex Johnson" />
+                <Input id="name" defaultValue={userName} placeholder="Your name" />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" defaultValue="alex@example.com" />
+                <Input id="email" defaultValue={userEmail} placeholder="your@email.com" readOnly className="bg-muted" />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="bio">Bio</Label>

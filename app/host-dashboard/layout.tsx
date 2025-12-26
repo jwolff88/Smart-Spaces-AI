@@ -62,9 +62,6 @@ export default function HostLayout({
               >
                 <MessageSquare className="h-4 w-4" />
                 Inbox
-                <span className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
-                  3
-                </span>
               </Link>
               <Link
                 href="/host-dashboard/calendar"

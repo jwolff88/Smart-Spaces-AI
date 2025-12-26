@@ -107,11 +107,9 @@ export default async function ListingDetailsPage(props: PageProps) {
       {/* Navbar */}
       <div className="border-b sticky top-0 bg-white z-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <Link href="/search">
-            <Button variant="ghost" size="sm" className="gap-2 -ml-2">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Back to Search</span>
-            </Button>
+          <Link href="/search" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors -ml-2 px-2 py-1.5 rounded-md hover:bg-gray-100">
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">Back to Search</span>
           </Link>
           <div className="flex gap-2">
             <Button variant="outline" size="icon" className="h-9 w-9">

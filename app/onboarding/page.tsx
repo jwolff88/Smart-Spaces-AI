@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Sparkles, Briefcase, Heart, Users, Plane, Mountain, DollarSign, Home, Wifi, ChevronRight, ChevronLeft, Check } from "lucide-react"
+import { Sparkles, Briefcase, Heart, Users, Plane, Mountain, DollarSign, Home, Wifi, ChevronRight, ChevronLeft, Check, X } from "lucide-react"
+import Link from "next/link"
 
 const TRAVEL_INTENTS = [
   { id: "remote_work", label: "Remote Work", icon: Briefcase, description: "I need a productive workspace" },
@@ -142,7 +143,15 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl bg-slate-900/80 border-slate-700">
+      <Card className="w-full max-w-2xl bg-slate-900/80 border-slate-700 relative">
+        {/* Close/Back button */}
+        <Link
+          href="/guest-dashboard"
+          className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors p-2 rounded-full hover:bg-slate-800"
+        >
+          <X className="h-5 w-5" />
+          <span className="sr-only">Close</span>
+        </Link>
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Sparkles className="h-6 w-6 text-blue-400" />

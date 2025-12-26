@@ -146,6 +146,7 @@ model Listing {
   reviews           Review[]
   pricingHistory    PricingHistory[]
   blockedDates      BlockedDate[]
+  maintenanceItems  MaintenanceItem[]
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -257,6 +258,59 @@ model Payment {
   updatedAt         DateTime @updatedAt
 
   @@index([status])
+}
+
+// --- MAINTENANCE TRACKING ---
+
+model MaintenanceItem {
+  id              String   @id @default(cuid())
+
+  // What item is being tracked
+  name            String   // "HVAC Filter", "Smoke Detector Batteries", etc.
+  category        String   // hvac, safety, appliance, cleaning, exterior
+
+  // Location/details
+  location        String?  // "Living Room", "Kitchen", "All Bedrooms"
+  quantity        Int      @default(1) // Number of items (e.g., 3 smoke detectors)
+  notes           String?  @db.Text
+
+  // Maintenance schedule
+  lastServiceDate DateTime?
+  nextServiceDate DateTime?
+  intervalDays    Int?     // How often to service (e.g., 90 days for HVAC filter)
+
+  // Status
+  status          String   @default("good") // good, due_soon, overdue, needs_attention
+
+  // Relations
+  listingId       String
+  listing         Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  logs            MaintenanceLog[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([listingId])
+  @@index([status])
+}
+
+model MaintenanceLog {
+  id                String   @id @default(cuid())
+
+  // What was done
+  action            String   // replaced, inspected, repaired, cleaned
+  notes             String?  @db.Text
+  cost              Float?   // Cost if any
+  performedBy       String?  // "Self", "ABC HVAC Company", etc.
+
+  // Relations
+  maintenanceItemId String
+  maintenanceItem   MaintenanceItem @relation(fields: [maintenanceItemId], references: [id], onDelete: Cascade)
+
+  performedAt       DateTime @default(now())
+  createdAt         DateTime @default(now())
+
+  @@index([maintenanceItemId])
 }
 
 // --- MESSAGING ---

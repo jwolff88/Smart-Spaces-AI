@@ -17,8 +17,6 @@ interface BookingFormProps {
   isAuthenticated: boolean
 }
 
-const SERVICE_FEE_PERCENT = 10
-
 export function BookingForm({
   listingId,
   price,
@@ -42,8 +40,7 @@ export function BookingForm({
       : 0
 
   const subtotal = price * nights
-  const serviceFee = Math.round(subtotal * (SERVICE_FEE_PERCENT / 100) * 100) / 100
-  const total = Math.round((subtotal + serviceFee) * 100) / 100
+  const total = subtotal // No service fee
 
   // Minimum check-in date is today
   const today = new Date().toISOString().split("T")[0]
@@ -249,10 +246,6 @@ export function BookingForm({
                 ${price} x {nights} night{nights > 1 ? "s" : ""}
               </span>
               <span>${subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm text-gray-600">
-              <span className="underline">Service fee ({SERVICE_FEE_PERCENT}%)</span>
-              <span>${serviceFee.toFixed(2)}</span>
             </div>
             <Separator className="my-2" />
             <div className="flex justify-between font-bold text-gray-900">

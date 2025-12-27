@@ -11,12 +11,12 @@ export const stripe = process.env.STRIPE_SECRET_KEY
     })
   : null
 
-export const PLATFORM_FEE_PERCENT = 10 // 10% platform commission
+export const PLATFORM_FEE_PERCENT = 0 // No fee for now - free to use
 
 export function calculatePricing(pricePerNight: number, nights: number) {
   const subtotal = pricePerNight * nights
-  const serviceFee = Math.round(subtotal * (PLATFORM_FEE_PERCENT / 100) * 100) / 100
-  const totalPrice = Math.round((subtotal + serviceFee) * 100) / 100
+  const serviceFee = 0 // No service fee charged to travelers
+  const totalPrice = subtotal
 
   return {
     nights,

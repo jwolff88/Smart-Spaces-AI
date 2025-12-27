@@ -106,17 +106,6 @@ export async function POST(req: Request) {
           },
           quantity: nights,
         },
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: "Service Fee",
-              description: "Platform service fee",
-            },
-            unit_amount: Math.round(booking.serviceFee * 100), // cents
-          },
-          quantity: 1,
-        },
       ],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/booking/success?session_id={CHECKOUT_SESSION_ID}&booking_id=${booking.id}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/booking/cancel?booking_id=${booking.id}`,

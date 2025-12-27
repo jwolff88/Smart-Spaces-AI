@@ -195,8 +195,8 @@ export async function POST(req: Request) {
       (checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)
     )
     const subtotal = listing.price * nights
-    const serviceFee = Math.round(subtotal * 0.1 * 100) / 100 // 10% platform fee
-    const totalPrice = Math.round((subtotal + serviceFee) * 100) / 100
+    const serviceFee = 0 // No service fee - free to use
+    const totalPrice = subtotal
 
     // Get guest info
     const guest = await db.user.findUnique({

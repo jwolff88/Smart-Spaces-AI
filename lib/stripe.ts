@@ -11,12 +11,17 @@ export const stripe = process.env.STRIPE_SECRET_KEY
     })
   : null
 
-export const PLATFORM_FEE_PERCENT = 0 // No fee for now - free to use
+// Platform takes 10% from hosts (not charged to guests)
+export const PLATFORM_FEE_PERCENT = 10
 
 export function calculatePricing(pricePerNight: number, nights: number) {
   const subtotal = pricePerNight * nights
-  const serviceFee = 0 // No service fee charged to travelers
+  const serviceFee = 0 // No service fee charged to travelers - we take from hosts
   const totalPrice = subtotal
+
+  // Calculate platform fee (taken from host's share)
+  const platformFee = Math.round(subtotal * (PLATFORM_FEE_PERCENT / 100) * 100) / 100
+  const hostPayout = subtotal - platformFee
 
   return {
     nights,
@@ -24,7 +29,10 @@ export function calculatePricing(pricePerNight: number, nights: number) {
     subtotal,
     serviceFee,
     totalPrice,
+    platformFee, // Amount we keep
+    hostPayout,  // Amount host receives
     // Stripe expects amounts in cents
     totalPriceCents: Math.round(totalPrice * 100),
+    platformFeeCents: Math.round(platformFee * 100),
   }
 }

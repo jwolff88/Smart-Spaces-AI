@@ -23,6 +23,11 @@ model User {
   isActive      Boolean   @default(true)    // For admin to suspend users
   isAdmin       Boolean   @default(false)   // Admin privileges
 
+  // Stripe Connect for host payouts
+  stripeAccountId       String?   // Stripe Connect account ID
+  stripeAccountStatus   String?   // pending, active, restricted
+  stripeOnboardingComplete Boolean @default(false)
+
   accounts         Account[]
   sessions         Session[]
   listings         Listing[]  // Properties owned (for hosts)

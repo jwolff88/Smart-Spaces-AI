@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { db } from "@/lib/db"
-import { stripe, calculatePricing } from "@/lib/stripe"
+import { stripe, calculatePricing, PLATFORM_FEE_PERCENT } from "@/lib/stripe"
 
 // POST /api/checkout - Create Stripe checkout session for a booking
 export async function POST(req: Request) {
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
       )
     }
 
-    // Get booking with listing details
+    // Get booking with listing and host details
     const booking = await db.booking.findUnique({
       where: { id: bookingId },
       include: {
@@ -41,6 +41,13 @@ export async function POST(req: Request) {
             price: true,
             imageSrc: true,
             images: true,
+            host: {
+              select: {
+                id: true,
+                stripeAccountId: true,
+                stripeOnboardingComplete: true,
+              },
+            },
           },
         },
         payment: true,
@@ -82,8 +89,12 @@ export async function POST(req: Request) {
     // Get image for checkout
     const imageUrl = booking.listing.images?.[0] || booking.listing.imageSrc || undefined
 
-    // Create Stripe Checkout Session
-    const checkoutSession = await stripe.checkout.sessions.create({
+    // Check if host has connected their Stripe account
+    const hostStripeAccountId = booking.listing.host?.stripeAccountId
+    const hostOnboardingComplete = booking.listing.host?.stripeOnboardingComplete
+
+    // Build checkout session options
+    const checkoutOptions: Parameters<typeof stripe.checkout.sessions.create>[0] = {
       payment_method_types: ["card"],
       mode: "payment",
       customer_email: session.user.email || undefined,
@@ -92,6 +103,7 @@ export async function POST(req: Request) {
         bookingId: booking.id,
         listingId: booking.listing.id,
         guestId: session.user.id,
+        hostId: booking.listing.host?.id || "",
       },
       line_items: [
         {
@@ -109,7 +121,25 @@ export async function POST(req: Request) {
       ],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/booking/success?session_id={CHECKOUT_SESSION_ID}&booking_id=${booking.id}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/booking/cancel?booking_id=${booking.id}`,
-    })
+    }
+
+    // If host has connected Stripe, use Connect to split payments
+    if (hostStripeAccountId && hostOnboardingComplete) {
+      // Calculate platform fee (10% of total)
+      const applicationFeeAmount = Math.round(pricing.totalPriceCents * (PLATFORM_FEE_PERCENT / 100))
+
+      checkoutOptions.payment_intent_data = {
+        // This automatically transfers funds to the host minus our fee
+        application_fee_amount: applicationFeeAmount,
+        transfer_data: {
+          destination: hostStripeAccountId,
+        },
+      }
+    }
+    // If host hasn't connected, payment goes to platform (manual payout later)
+
+    // Create Stripe Checkout Session
+    const checkoutSession = await stripe.checkout.sessions.create(checkoutOptions)
 
     // Create or update payment record
     if (booking.payment) {

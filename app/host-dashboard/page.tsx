@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Home, LogOut, Calendar, DollarSign, Users, Clock } from "lucide-react"
+import { StripeConnectCard } from "@/components/stripe-connect-card"
 
 function formatDate(date: Date) {
   return date.toLocaleDateString("en-US", {
@@ -30,7 +31,14 @@ function getStatusBadge(status: string) {
   }
 }
 
-export default async function DashboardPage() {
+interface PageProps {
+  searchParams: Promise<{ connect?: string }>
+}
+
+export default async function DashboardPage({ searchParams }: PageProps) {
+  const params = await searchParams
+  const connectStatus = params.connect as "success" | "refresh" | undefined
+
   const session = await auth()
 
   if (!session?.user) {
@@ -97,6 +105,9 @@ export default async function DashboardPage() {
           </Link>
         </div>
       </div>
+
+      {/* Stripe Connect Card */}
+      <StripeConnectCard initialStatus={connectStatus} />
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4">

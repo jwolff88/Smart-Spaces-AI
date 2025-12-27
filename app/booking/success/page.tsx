@@ -23,6 +23,7 @@ interface BookingDetails {
 function BookingSuccessContent() {
   const searchParams = useSearchParams()
   const bookingId = searchParams.get("booking_id")
+  const isDemo = searchParams.get("demo") === "true"
   const [booking, setBooking] = useState<BookingDetails | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -61,8 +62,13 @@ function BookingSuccessContent() {
           <CardTitle className="text-2xl text-green-600">
             Booking Confirmed!
           </CardTitle>
+          {isDemo && (
+            <div className="inline-block bg-purple-100 text-purple-700 text-xs font-medium px-2 py-1 rounded mt-2">
+              Demo Mode - No payment required
+            </div>
+          )}
           <p className="text-muted-foreground mt-2">
-            Your reservation has been successfully processed.
+            Your reservation has been successfully {isDemo ? "created" : "processed"}.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -97,7 +103,7 @@ function BookingSuccessContent() {
 
               <div className="border-t pt-4">
                 <div className="flex justify-between">
-                  <span className="font-medium">Total Paid</span>
+                  <span className="font-medium">{isDemo ? "Total" : "Total Paid"}</span>
                   <span className="font-bold text-lg">
                     ${booking.totalPrice.toFixed(2)}
                   </span>

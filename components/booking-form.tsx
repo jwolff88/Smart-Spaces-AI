@@ -73,7 +73,7 @@ export function BookingForm({
     setLoading(true)
 
     try {
-      // Step 1: Create booking
+      // Create booking
       const bookingRes = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -91,27 +91,19 @@ export function BookingForm({
         throw new Error(bookingData.error || "Failed to create booking")
       }
 
-      // Step 2: Create checkout session
-      const checkoutRes = await fetch("/api/checkout", {
-        method: "POST",
+      // Demo mode: Skip payment and confirm booking directly
+      const confirmRes = await fetch(`/api/bookings/${bookingData.booking.id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bookingId: bookingData.booking.id,
-        }),
+        body: JSON.stringify({ status: "confirmed" }),
       })
 
-      const checkoutData = await checkoutRes.json()
-
-      if (!checkoutRes.ok) {
-        throw new Error(checkoutData.error || "Failed to create checkout")
+      if (!confirmRes.ok) {
+        console.warn("Could not auto-confirm booking")
       }
 
-      // Step 3: Redirect to Stripe
-      if (checkoutData.checkoutUrl) {
-        window.location.href = checkoutData.checkoutUrl
-      } else {
-        throw new Error("No checkout URL returned")
-      }
+      // Redirect to success page
+      router.push(`/booking/success?booking_id=${bookingData.booking.id}&demo=true`)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")
       setLoading(false)

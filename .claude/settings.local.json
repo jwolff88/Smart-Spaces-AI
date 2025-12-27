@@ -18,7 +18,8 @@
       "Bash(git commit:*)",
       "Bash(powershell:*)",
       "WebFetch(domain:smart-spaces-ai.vercel.app)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(npm run seed:*)"
     ]
   }
 }

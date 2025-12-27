@@ -223,6 +223,207 @@ async function main() {
       },
     })
     console.log("Created demo review")
+
+    // Create maintenance items
+    const maintenanceItems = [
+      {
+        id: "demo-maint-1",
+        name: "HVAC Filter",
+        category: "hvac",
+        location: "Main Unit",
+        quantity: 1,
+        notes: "Replace every 90 days for optimal air quality",
+        lastServiceDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000), // 60 days ago
+        nextServiceDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        intervalDays: 90,
+        status: "good",
+      },
+      {
+        id: "demo-maint-2",
+        name: "Smoke Detector Batteries",
+        category: "safety",
+        location: "All Rooms",
+        quantity: 4,
+        notes: "Test monthly, replace batteries annually",
+        lastServiceDate: new Date(Date.now() - 300 * 24 * 60 * 60 * 1000), // 300 days ago
+        nextServiceDate: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000), // 35 days overdue
+        intervalDays: 365,
+        status: "overdue",
+      },
+      {
+        id: "demo-maint-3",
+        name: "Pool Pump Inspection",
+        category: "appliance",
+        location: "Pool Equipment Room",
+        quantity: 1,
+        notes: "Annual professional inspection recommended",
+        lastServiceDate: new Date(Date.now() - 170 * 24 * 60 * 60 * 1000), // 170 days ago
+        nextServiceDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
+        intervalDays: 180,
+        status: "due_soon",
+      },
+      {
+        id: "demo-maint-4",
+        name: "Deep Cleaning",
+        category: "cleaning",
+        location: "Entire Property",
+        quantity: 1,
+        notes: "Professional deep clean including carpets and upholstery",
+        lastServiceDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000), // 25 days ago
+        nextServiceDate: new Date(Date.now() + 65 * 24 * 60 * 60 * 1000), // 65 days from now
+        intervalDays: 90,
+        status: "good",
+      },
+      {
+        id: "demo-maint-5",
+        name: "Exterior Paint Touch-up",
+        category: "exterior",
+        location: "Front Deck & Railings",
+        quantity: 1,
+        notes: "Check for weather damage and touch up as needed",
+        lastServiceDate: null,
+        nextServiceDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
+        intervalDays: 365,
+        status: "due_soon",
+      },
+    ]
+
+    for (const item of maintenanceItems) {
+      await prisma.maintenanceItem.upsert({
+        where: { id: item.id },
+        update: item,
+        create: {
+          ...item,
+          listingId: listing.id,
+        },
+      })
+    }
+    console.log("Created demo maintenance items")
+
+    // Create maintenance logs for some items
+    await prisma.maintenanceLog.upsert({
+      where: { id: "demo-log-1" },
+      update: {},
+      create: {
+        id: "demo-log-1",
+        action: "replaced",
+        notes: "Replaced with MERV-13 filter for better air quality",
+        cost: 45.00,
+        performedBy: "Self",
+        maintenanceItemId: "demo-maint-1",
+        performedAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+      },
+    })
+
+    await prisma.maintenanceLog.upsert({
+      where: { id: "demo-log-2" },
+      update: {},
+      create: {
+        id: "demo-log-2",
+        action: "inspected",
+        notes: "All detectors functioning properly",
+        cost: 0,
+        performedBy: "Self",
+        maintenanceItemId: "demo-maint-2",
+        performedAt: new Date(Date.now() - 300 * 24 * 60 * 60 * 1000),
+      },
+    })
+    console.log("Created demo maintenance logs")
+
+    // Create a conversation between host and guest
+    const conversation = await prisma.conversation.upsert({
+      where: { id: "demo-conversation-1" },
+      update: {},
+      create: {
+        id: "demo-conversation-1",
+        listingId: listing.id,
+        bookingId: "demo-booking-1",
+      },
+    })
+
+    // Add participants
+    await prisma.conversationParticipant.upsert({
+      where: {
+        conversationId_userId: {
+          conversationId: conversation.id,
+          userId: demoHost.id,
+        },
+      },
+      update: {},
+      create: {
+        conversationId: conversation.id,
+        userId: demoHost.id,
+        lastReadAt: new Date(),
+      },
+    })
+
+    await prisma.conversationParticipant.upsert({
+      where: {
+        conversationId_userId: {
+          conversationId: conversation.id,
+          userId: demoGuest.id,
+        },
+      },
+      update: {},
+      create: {
+        conversationId: conversation.id,
+        userId: demoGuest.id,
+        lastReadAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+      },
+    })
+    console.log("Created demo conversation")
+
+    // Create messages
+    const messages = [
+      {
+        id: "demo-msg-1",
+        content: "Hi Sarah! I just booked your beautiful beach house for next week. We're so excited! Is there anything we should know before arriving?",
+        senderId: demoGuest.id,
+        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+      },
+      {
+        id: "demo-msg-2",
+        content: "Hi Alex! Welcome, and thank you for booking! 🌊 The house is all ready for you. A few tips:\n\n• Check-in is at 3 PM - I'll send you the door code the day before\n• Beach towels and chairs are in the garage\n• The best sunset views are from the back deck!\n\nLet me know if you have any questions!",
+        senderId: demoHost.id,
+        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000), // 3 days ago + 2 hours
+      },
+      {
+        id: "demo-msg-3",
+        content: "That's so helpful, thank you! One quick question - is the WiFi fast enough for video calls? I might need to take a work call or two.",
+        senderId: demoGuest.id,
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+      },
+      {
+        id: "demo-msg-4",
+        content: "Absolutely! We have 200 Mbps fiber internet, perfect for video calls. There's also a dedicated desk in the upstairs loft with a great ocean view - perfect for working! 💻",
+        senderId: demoHost.id,
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 30 * 60 * 1000), // 2 days ago + 30 min
+      },
+      {
+        id: "demo-msg-5",
+        content: "Perfect! Can't wait to check in. See you soon!",
+        senderId: demoGuest.id,
+        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+      },
+      {
+        id: "demo-msg-6",
+        content: "Here's your door code: 4829 🔑\n\nThe lockbox is on the left side of the front door. Have a wonderful stay! Text me if you need anything at all.",
+        senderId: demoHost.id,
+        createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
+      },
+    ]
+
+    for (const msg of messages) {
+      await prisma.message.upsert({
+        where: { id: msg.id },
+        update: msg,
+        create: {
+          ...msg,
+          conversationId: conversation.id,
+        },
+      })
+    }
+    console.log("Created demo messages")
   }
 
   console.log("\n✅ Demo data seeded successfully!")

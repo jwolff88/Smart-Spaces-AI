@@ -17,12 +17,25 @@ export async function GET() {
         stripeAccountId: true,
         stripeAccountStatus: true,
         stripeOnboardingComplete: true,
+        createdAt: true, // For trial calculation
       },
     })
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
+
+    // Calculate trial period info
+    const threeMonthsAgo = new Date()
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
+    const isInTrialPeriod = user.createdAt > threeMonthsAgo
+
+    // Calculate days remaining in trial
+    const trialEndDate = new Date(user.createdAt)
+    trialEndDate.setMonth(trialEndDate.getMonth() + 3)
+    const daysRemaining = isInTrialPeriod
+      ? Math.ceil((trialEndDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      : 0
 
     // If they have a Stripe account, check its current status
     if (user.stripeAccountId && stripe) {
@@ -52,6 +65,11 @@ export async function GET() {
           isComplete,
           payoutsEnabled: account.payouts_enabled,
           detailsSubmitted: account.details_submitted,
+          trial: {
+            isActive: isInTrialPeriod,
+            daysRemaining,
+            endsAt: trialEndDate.toISOString(),
+          },
         })
       } catch (error) {
         console.error("Error fetching Stripe account:", error)
@@ -63,6 +81,11 @@ export async function GET() {
       accountId: null,
       status: null,
       isComplete: false,
+      trial: {
+        isActive: isInTrialPeriod,
+        daysRemaining,
+        endsAt: trialEndDate.toISOString(),
+      },
     })
   } catch (error) {
     console.error("GET /api/stripe/connect error:", error)

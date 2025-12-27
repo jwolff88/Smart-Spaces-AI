@@ -46,6 +46,7 @@ export async function POST(req: Request) {
                 id: true,
                 stripeAccountId: true,
                 stripeOnboardingComplete: true,
+                createdAt: true, // For trial period calculation
               },
             },
           },
@@ -125,8 +126,16 @@ export async function POST(req: Request) {
 
     // If host has connected Stripe, use Connect to split payments
     if (hostStripeAccountId && hostOnboardingComplete) {
-      // Calculate platform fee (10% of total)
-      const applicationFeeAmount = Math.round(pricing.totalPriceCents * (PLATFORM_FEE_PERCENT / 100))
+      // Check if host is within 3-month free trial period
+      const hostCreatedAt = booking.listing.host?.createdAt
+      const threeMonthsAgo = new Date()
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
+      const isInTrialPeriod = hostCreatedAt && new Date(hostCreatedAt) > threeMonthsAgo
+
+      // Calculate platform fee (10% of total) - waived during trial
+      const applicationFeeAmount = isInTrialPeriod
+        ? 0
+        : Math.round(pricing.totalPriceCents * (PLATFORM_FEE_PERCENT / 100))
 
       checkoutOptions.payment_intent_data = {
         // This automatically transfers funds to the host minus our fee

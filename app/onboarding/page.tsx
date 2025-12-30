@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Sparkles, Briefcase, Heart, Users, Plane, Mountain, DollarSign, Home, Wifi, ChevronRight, ChevronLeft, Check, X } from "lucide-react"
+import { Sparkles, Briefcase, Heart, Users, Plane, Mountain, DollarSign, Home, Wifi, ChevronRight, ChevronLeft, Check, X, Monitor, Armchair, UsersRound } from "lucide-react"
 import Link from "next/link"
 
 const TRAVEL_INTENTS = [
@@ -30,10 +30,10 @@ const VIBES = [
 
 const WORK_NEEDS = [
   { id: "fast_wifi", label: "Fast WiFi (50+ Mbps)", icon: Wifi },
-  { id: "dedicated_desk", label: "Dedicated Desk" },
-  { id: "monitor", label: "External Monitor" },
-  { id: "ergonomic_chair", label: "Ergonomic Chair" },
-  { id: "meeting_space", label: "Meeting Space" },
+  { id: "dedicated_desk", label: "Dedicated Desk", icon: Briefcase },
+  { id: "monitor", label: "External Monitor", icon: Monitor },
+  { id: "ergonomic_chair", label: "Ergonomic Chair", icon: Armchair },
+  { id: "meeting_space", label: "Meeting Space", icon: UsersRound },
 ]
 
 const AMENITIES = [
@@ -237,9 +237,9 @@ export default function OnboardingPage() {
                       : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
                   }`}
                 >
-                  <need.icon className={`h-5 w-5 ${
+                  {need.icon && <need.icon className={`h-5 w-5 ${
                     profile.workNeeds.includes(need.id) ? "text-blue-400" : "text-slate-400"
-                  }`} />
+                  }`} />}
                   <span className="font-medium text-white">{need.label}</span>
                   {profile.workNeeds.includes(need.id) && (
                     <Check className="h-5 w-5 text-blue-400 ml-auto" />

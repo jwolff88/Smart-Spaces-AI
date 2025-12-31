@@ -34,6 +34,14 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  // Optional: Allow admins to view feedback later
-  return NextResponse.json({ message: "Feedback endpoint" })
+  try {
+    const feedback = await db.feedback.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 10, // Show latest 10 feedback entries
+    })
+    return NextResponse.json(feedback)
+  } catch (error) {
+    console.error("Error fetching feedback:", error)
+    return NextResponse.json([], { status: 500 })
+  }
 }

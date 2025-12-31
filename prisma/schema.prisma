@@ -369,3 +369,16 @@ model Message {
   @@index([conversationId])
   @@index([senderId])
 }
+
+// --- DEMO FEEDBACK ---
+
+model Feedback {
+  id        String   @id @default(cuid())
+  email     String?
+  name      String?
+  message   String   @db.Text
+  rating    Int?     // 1-5 stars (optional)
+  type      String   @default("general") // general, bug, feature, other
+
+  createdAt DateTime @default(now())
+}

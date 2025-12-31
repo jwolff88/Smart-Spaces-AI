@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Building2, Plane, UserPlus, Sparkles, Brain, DollarSign, Heart } from "lucide-react"
 import { Metadata } from "next"
+import { FeedbackBox } from "@/components/FeedbackBox"
 
 export const metadata: Metadata = {
   title: "Smart Spaces | AI-Powered Vacation Rentals",
@@ -106,6 +107,11 @@ export default function LandingPage() {
             <h3 className="font-bold text-lg mb-2 text-white">AI-Generated Listings</h3>
             <p className="text-slate-400">Hosts just enter an address &mdash; our AI writes compelling titles, descriptions, and suggests optimal pricing.</p>
           </div>
+        </div>
+
+        {/* Feedback Section */}
+        <div className="mt-24 px-4">
+          <FeedbackBox />
         </div>
       </main>
 

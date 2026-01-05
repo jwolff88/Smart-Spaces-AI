@@ -6,12 +6,12 @@ import { Plus, LogOut } from "lucide-react"
 
 /*
   HOST DASHBOARD LAYOUT
-  Philosophy: Editorial navigation, not admin panel
+  Philosophy: Neon Futuristic Holographic
 
-  - Horizontal top nav instead of sidebar
-  - Content-first approach
-  - Typography-led navigation
-  - Breathing room
+  - Dark background with cyan grid
+  - Glowing navigation elements
+  - Glass morphism header
+  - Neon accent colors
 */
 
 const navItems = [
@@ -29,23 +29,27 @@ export default function HostLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background bg-grid relative">
+      {/* Ambient glow */}
+      <div className="fixed top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="fixed bottom-1/4 left-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+
       {/* --- TOP NAVIGATION --- */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+      <header className="sticky top-0 z-50 glass-neon">
         <div className="max-w-6xl mx-auto px-6">
           {/* Top bar */}
           <div className="h-16 flex items-center justify-between">
             <Link
               href="/"
-              className="text-lg font-medium tracking-tight text-foreground"
+              className="text-lg font-bold tracking-wider text-foreground text-glow-cyan"
             >
-              Smart Spaces
+              SMART SPACES
             </Link>
 
             {/* Desktop: Secondary actions */}
             <div className="hidden md:flex items-center gap-3">
               <Link href="/host-dashboard/add-property">
-                <Button>
+                <Button className="bg-primary hover:bg-primary/80 glow-cyan hover:shadow-[0_0_25px_rgba(0,255,255,0.5)] transition-all">
                   <Plus className="mr-2 h-4 w-4" /> Add Property
                 </Button>
               </Link>
@@ -55,7 +59,7 @@ export default function HostLayout({
                   await signOut()
                 }}
               >
-                <Button variant="outline" type="submit">
+                <Button variant="outline" type="submit" className="border-border/50 hover:border-secondary/50 hover:glow-magenta transition-all">
                   <LogOut className="mr-2 h-4 w-4" /> Sign Out
                 </Button>
               </form>
@@ -73,7 +77,7 @@ export default function HostLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className="px-4 py-3 text-sm text-muted-foreground hover:text-foreground border-b-2 border-transparent hover:border-foreground/20 transition-all duration-200"
+                className="px-4 py-3 text-sm text-muted-foreground hover:text-primary border-b-2 border-transparent hover:border-primary/50 transition-all duration-200"
               >
                 {item.label}
               </Link>
@@ -83,15 +87,15 @@ export default function HostLayout({
       </header>
 
       {/* --- MAIN CONTENT AREA --- */}
-      <main className="max-w-6xl mx-auto px-6 py-8 md:py-12">
+      <main className="max-w-6xl mx-auto px-6 py-8 md:py-12 relative z-10">
         {children}
       </main>
 
       {/* --- FOOTER --- */}
-      <footer className="border-t border-border mt-auto">
+      <footer className="border-t border-border/50 mt-auto glass-neon">
         <div className="max-w-6xl mx-auto px-6 py-8">
           <p className="text-sm text-muted-foreground">
-            © 2025 Smart Spaces
+            © 2025 <span className="text-primary">Smart Spaces</span>
           </p>
         </div>
       </footer>

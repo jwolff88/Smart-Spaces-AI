@@ -8,12 +8,12 @@ import { ArrowRight } from "lucide-react"
 
 /*
   HOST DASHBOARD PAGE
-  Philosophy: Editorial content flow, not admin panel
+  Philosophy: Neon Futuristic Holographic
 
-  - Stats integrated into content, not isolated cards
-  - Breathing room between sections
+  - Glowing status indicators
+  - Neon accent colors
+  - Glass morphism cards
   - Typography-driven hierarchy
-  - Minimal chrome, maximum content
 */
 
 function formatDate(date: Date) {
@@ -25,9 +25,9 @@ function formatDate(date: Date) {
 
 function getStatusIndicator(status: string) {
   const styles = {
-    confirmed: "bg-success",
-    pending: "bg-warning",
-    cancelled: "bg-destructive",
+    confirmed: "bg-accent glow-lime",
+    pending: "bg-warning glow-cyan",
+    cancelled: "bg-destructive glow-magenta",
     completed: "bg-muted-foreground",
   }
   return (
@@ -88,19 +88,19 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-16">
-      {/* Welcome Section - Editorial, not admin */}
+      {/* Welcome Section */}
       <section>
-        <p className="text-overline uppercase text-muted-foreground tracking-widest mb-2">
+        <p className="text-overline uppercase text-primary tracking-widest mb-2 text-glow-cyan">
           Overview
         </p>
         <h1 className="text-title text-foreground mb-4">
           Welcome back, {firstName}
         </h1>
 
-        {/* Stats as inline text, not cards */}
+        {/* Stats as inline text */}
         <p className="text-body-lg text-muted-foreground max-w-2xl">
           You have{" "}
-          <span className="text-foreground font-medium">{listings.length} {listings.length === 1 ? "property" : "properties"}</span>
+          <span className="text-primary font-medium">{listings.length} {listings.length === 1 ? "property" : "properties"}</span>
           {pendingBookings.length > 0 && (
             <>
               {" "}with{" "}
@@ -112,7 +112,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           {confirmedBookings.length > 0 && (
             <>
               {" "}and{" "}
-              <span className="text-success font-medium">
+              <span className="text-accent font-medium">
                 {confirmedBookings.length} confirmed
               </span>
             </>
@@ -121,7 +121,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           {totalRevenue > 0 && (
             <>
               {" "}You&apos;ve earned{" "}
-              <span className="text-foreground font-medium">${totalRevenue.toFixed(0)}</span>
+              <span className="text-secondary font-medium text-glow-magenta">${totalRevenue.toFixed(0)}</span>
               {" "}so far.
             </>
           )}
@@ -131,11 +131,11 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       {/* Recent Activity */}
       <section>
         <div className="flex items-baseline justify-between mb-6">
-          <h2 className="text-headline text-foreground">Recent activity</h2>
+          <h2 className="text-headline text-foreground text-glow-cyan">Recent activity</h2>
           {bookings.length > 0 && (
             <Link
               href="/host-dashboard/calendar"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               View all
             </Link>
@@ -143,7 +143,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         </div>
 
         {bookings.length === 0 ? (
-          <div className="py-12 text-center border border-dashed border-border rounded-lg">
+          <div className="py-12 text-center border border-dashed border-primary/30 rounded-lg glass-neon">
             <p className="text-muted-foreground mb-1">No bookings yet</p>
             <p className="text-sm text-muted-foreground/70">
               When guests book your properties, they&apos;ll appear here.
@@ -187,23 +187,23 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       {/* Properties Section */}
       <section>
         <div className="flex items-baseline justify-between mb-6">
-          <h2 className="text-headline text-foreground">Your properties</h2>
+          <h2 className="text-headline text-foreground text-glow-magenta">Your properties</h2>
           <Link
             href="/host-dashboard/add-property"
-            className="text-sm text-primary hover:text-primary/80 transition-colors"
+            className="text-sm text-secondary hover:text-secondary/80 transition-colors"
           >
             Add property
           </Link>
         </div>
 
         {listings.length === 0 ? (
-          <div className="py-16 text-center border border-dashed border-border rounded-lg">
+          <div className="py-16 text-center border border-dashed border-secondary/30 rounded-lg glass-magenta">
             <p className="text-muted-foreground mb-2">No properties yet</p>
             <p className="text-sm text-muted-foreground/70 mb-6 max-w-sm mx-auto">
               List your first property. Our AI will help write the perfect description.
             </p>
             <Link href="/host-dashboard/add-property">
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Button className="bg-primary hover:bg-primary/80 text-primary-foreground glow-cyan hover:shadow-[0_0_25px_rgba(0,255,255,0.5)] transition-all">
                 Add your first property
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>

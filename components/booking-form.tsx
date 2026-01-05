@@ -2,12 +2,12 @@
 
 /*
   BOOKING FORM
-  Philosophy: Clean, functional, no visual noise
+  Philosophy: Neon Futuristic Holographic
 
-  - No gradient buttons
-  - No decorative badges
-  - Restrained styling
-  - Clear information hierarchy
+  - Glass morphism container
+  - Glowing inputs and buttons
+  - Neon accent colors
+  - Dark theme integration
 */
 
 import { useState, useEffect } from "react"
@@ -144,17 +144,17 @@ export function BookingForm({
   }
 
   return (
-    <div className="border border-border rounded-md p-6 bg-card space-y-5">
+    <div className="glass-neon rounded-lg p-6 space-y-5">
       {/* Price Header */}
       <div>
-        <span className="text-xl font-medium text-foreground">${price}</span>
+        <span className="text-xl font-medium text-primary text-glow-cyan">${price}</span>
         <span className="text-muted-foreground">/night</span>
       </div>
 
       {/* Date Selection */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <Label htmlFor="checkin" className="text-xs text-muted-foreground mb-1.5 block">
+          <Label htmlFor="checkin" className="text-xs text-muted-foreground uppercase tracking-wider mb-1.5 block">
             Check-in
           </Label>
           <Input
@@ -163,11 +163,11 @@ export function BookingForm({
             value={checkIn}
             min={today}
             onChange={(e) => setCheckIn(e.target.value)}
-            className="bg-background"
+            className="bg-background/50 border-border/50 focus:border-primary focus:glow-cyan transition-all"
           />
         </div>
         <div>
-          <Label htmlFor="checkout" className="text-xs text-muted-foreground mb-1.5 block">
+          <Label htmlFor="checkout" className="text-xs text-muted-foreground uppercase tracking-wider mb-1.5 block">
             Check-out
           </Label>
           <Input
@@ -176,19 +176,19 @@ export function BookingForm({
             value={checkOut}
             min={checkIn || today}
             onChange={(e) => setCheckOut(e.target.value)}
-            className="bg-background"
+            className="bg-background/50 border-border/50 focus:border-primary focus:glow-cyan transition-all"
           />
         </div>
       </div>
 
       {/* Guest Selection */}
       <div>
-        <Label className="text-xs text-muted-foreground mb-1.5 block">Guests</Label>
+        <Label className="text-xs text-muted-foreground uppercase tracking-wider mb-1.5 block">Guests</Label>
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="w-full justify-between bg-background"
+              className="w-full justify-between bg-background/50 border-border/50 hover:border-primary/50 transition-all"
             >
               <span className="text-foreground">
                 {guests} {guests === 1 ? "guest" : "guests"}
@@ -196,7 +196,7 @@ export function BookingForm({
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-64">
+          <PopoverContent className="w-64 glass-neon border-primary/30">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-foreground">Guests</p>
@@ -208,17 +208,17 @@ export function BookingForm({
                   size="sm"
                   onClick={() => setGuests(Math.max(1, guests - 1))}
                   disabled={guests <= 1}
-                  className="h-8 w-8 p-0"
+                  className="h-8 w-8 p-0 border-border/50 hover:border-primary/50"
                 >
                   <Minus className="h-3 w-3" />
                 </Button>
-                <span className="w-6 text-center text-sm">{guests}</span>
+                <span className="w-6 text-center text-sm text-primary">{guests}</span>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setGuests(Math.min(maxGuests, guests + 1))}
                   disabled={guests >= maxGuests}
-                  className="h-8 w-8 p-0"
+                  className="h-8 w-8 p-0 border-border/50 hover:border-primary/50"
                 >
                   <Plus className="h-3 w-3" />
                 </Button>
@@ -230,7 +230,7 @@ export function BookingForm({
 
       {/* Error Message */}
       {error && (
-        <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+        <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md border border-destructive/30">
           {error}
         </div>
       )}
@@ -239,7 +239,7 @@ export function BookingForm({
       <Button
         onClick={handleReserve}
         disabled={loading}
-        className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+        className="w-full h-11 bg-primary hover:bg-primary/80 text-primary-foreground font-semibold tracking-wide glow-cyan hover:shadow-[0_0_30px_rgba(0,255,255,0.6)] transition-all"
       >
         {loading ? (
           <>
@@ -259,7 +259,7 @@ export function BookingForm({
 
       {/* Price Breakdown */}
       {nights > 0 && (
-        <div className="space-y-3 pt-3 border-t border-border">
+        <div className="space-y-3 pt-3 border-t border-border/50">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">
               ${price} × {nights} {nights === 1 ? "night" : "nights"}
@@ -268,7 +268,7 @@ export function BookingForm({
           </div>
           <div className="flex justify-between text-sm font-medium">
             <span className="text-foreground">Total</span>
-            <span className="text-foreground">${total.toFixed(0)}</span>
+            <span className="text-primary text-glow-cyan">${total.toFixed(0)}</span>
           </div>
         </div>
       )}

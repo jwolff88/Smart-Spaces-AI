@@ -93,36 +93,36 @@ export function ChatWindow({ conversationId, currentUserId, onBack }: ChatWindow
 
   if (loading) {
     return (
-      <Card className="bg-slate-800 border-slate-700 h-full flex flex-col">
+      <Card className="glass-neon border-primary/30 h-full flex flex-col">
         <CardContent className="flex-1 flex items-center justify-center">
-          <p className="text-slate-400">Loading messages...</p>
+          <p className="text-muted-foreground">Loading messages...</p>
         </CardContent>
       </Card>
     )
   }
 
   return (
-    <Card className="bg-slate-800 border-slate-700 h-full flex flex-col">
-      <CardHeader className="border-b border-slate-700 py-3">
+    <Card className="glass-neon border-primary/30 h-full flex flex-col">
+      <CardHeader className="border-b border-border/50 py-3">
         <div className="flex items-center gap-3">
           {onBack && (
             <Button
               variant="ghost"
               size="icon"
               onClick={onBack}
-              className="text-slate-400 hover:text-white"
+              className="text-muted-foreground hover:text-primary transition-colors"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
           )}
-          <CardTitle className="text-white text-lg">Conversation</CardTitle>
+          <CardTitle className="text-foreground text-lg text-glow-cyan">Conversation</CardTitle>
         </div>
       </CardHeader>
 
       {/* Messages Area */}
       <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
-          <p className="text-slate-400 text-center py-8">
+          <p className="text-muted-foreground text-center py-8">
             No messages yet. Start the conversation!
           </p>
         ) : (
@@ -136,19 +136,19 @@ export function ChatWindow({ conversationId, currentUserId, onBack }: ChatWindow
                 <div
                   className={`max-w-[75%] rounded-lg px-4 py-2 ${
                     isOwn
-                      ? "bg-blue-600 text-white"
-                      : "bg-slate-700 text-white"
+                      ? "bg-primary/30 text-foreground border border-primary/50"
+                      : "bg-secondary/20 text-foreground border border-secondary/30"
                   }`}
                 >
                   {!isOwn && (
-                    <p className="text-xs text-slate-300 mb-1">
+                    <p className="text-xs text-secondary mb-1">
                       {msg.sender.name || "User"}
                     </p>
                   )}
                   <p className="whitespace-pre-wrap break-words">{msg.content}</p>
                   <p
                     className={`text-xs mt-1 ${
-                      isOwn ? "text-blue-200" : "text-slate-400"
+                      isOwn ? "text-primary/70" : "text-muted-foreground"
                     }`}
                   >
                     {new Date(msg.createdAt).toLocaleTimeString([], {
@@ -165,20 +165,20 @@ export function ChatWindow({ conversationId, currentUserId, onBack }: ChatWindow
       </CardContent>
 
       {/* Input Area */}
-      <div className="border-t border-slate-700 p-4">
+      <div className="border-t border-border/50 p-4">
         <div className="flex gap-2">
           <Textarea
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 min-h-[44px] max-h-[120px] resize-none"
+            className="bg-background/50 border-border/50 text-foreground placeholder:text-muted-foreground min-h-[44px] max-h-[120px] resize-none focus:border-primary focus:glow-cyan transition-all"
             rows={1}
           />
           <Button
             onClick={handleSend}
             disabled={!newMessage.trim() || sending}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4"
+            className="bg-primary hover:bg-primary/80 text-primary-foreground px-4 glow-cyan hover:shadow-[0_0_20px_rgba(0,255,255,0.5)] transition-all"
           >
             <Send className="h-4 w-4" />
           </Button>

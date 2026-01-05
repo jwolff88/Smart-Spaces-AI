@@ -12,13 +12,12 @@ import { Metadata } from "next"
 
 /*
   LISTING DETAIL PAGE
-  Philosophy: Editorial property presentation
+  Philosophy: Neon Futuristic Holographic
 
-  - Clean hero image, no overlays
-  - Typography-driven information hierarchy
-  - Breathing room between sections
-  - Warm, inviting aesthetics
-  - Content flows naturally
+  - Dark background with cyan grid
+  - Glowing elements and glass morphism
+  - Neon accent colors
+  - Holographic effects on hover
 */
 
 interface PageProps {
@@ -113,36 +112,40 @@ export default async function ListingDetailsPage(props: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="min-h-screen bg-background pb-24 lg:pb-0">
-        {/* Header - Minimal */}
-        <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+      <div className="min-h-screen bg-background bg-grid pb-24 lg:pb-0 relative">
+        {/* Ambient glow */}
+        <div className="fixed top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="fixed bottom-1/4 right-1/3 w-96 h-96 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Header - Glass morphism */}
+        <header className="sticky top-0 z-50 glass-neon">
           <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
             <Link
               href="/search"
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               <span className="hidden sm:inline">Back</span>
             </Link>
-            <Link href="/" className="text-sm font-medium text-foreground">
-              Smart Spaces
+            <Link href="/" className="text-sm font-bold tracking-wider text-foreground text-glow-cyan">
+              SMART SPACES
             </Link>
           </div>
         </header>
 
-        <main className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+        <main className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 relative z-10">
 
           {/* Left Column: Content */}
           <div className="lg:col-span-2 space-y-12">
 
-            {/* Hero Image - Clean, no overlays */}
-            <div className="aspect-[4/3] sm:aspect-video bg-secondary rounded-md overflow-hidden relative">
+            {/* Hero Image - With subtle glow on hover */}
+            <div className="aspect-[4/3] sm:aspect-video bg-secondary rounded-md overflow-hidden relative group">
               {listing.imageSrc ? (
                 <Image
                   src={listing.imageSrc}
                   alt={listing.title || "Property"}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                   priority
                 />
               ) : (
@@ -150,11 +153,12 @@ export default async function ListingDetailsPage(props: PageProps) {
                   <span className="text-6xl">⌂</span>
                 </div>
               )}
+              <div className="absolute inset-0 border border-primary/20 rounded-md pointer-events-none group-hover:border-primary/40 transition-colors" />
             </div>
 
             {/* Title & Key Info */}
             <div>
-              <p className="text-overline uppercase text-muted-foreground tracking-widest mb-3">
+              <p className="text-overline uppercase text-primary tracking-widest mb-3 text-glow-cyan">
                 {listing.type || "Property"} in {listing.location}
               </p>
               <h1 className="text-title text-foreground mb-4">{listing.title}</h1>
@@ -164,22 +168,22 @@ export default async function ListingDetailsPage(props: PageProps) {
               </p>
             </div>
 
-            {/* Host Info - Warm, not blue */}
+            {/* Host Info */}
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 bg-secondary rounded-full flex items-center justify-center text-foreground font-medium text-lg">
+              <div className="h-12 w-12 bg-secondary rounded-full flex items-center justify-center text-primary font-medium text-lg border border-primary/30">
                 {listing.host?.name?.[0]?.toUpperCase() || "H"}
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">
                   Hosted by {listing.host?.name || "Host"}
                 </p>
-                <p className="text-sm text-muted-foreground">Verified host</p>
+                <p className="text-sm text-primary">Verified host</p>
               </div>
             </div>
 
             {/* Description */}
             <section>
-              <h2 className="text-headline text-foreground mb-4">About this space</h2>
+              <h2 className="text-headline text-foreground mb-4 text-glow-cyan">About this space</h2>
               <div className="prose-width">
                 <p className="text-body text-muted-foreground leading-relaxed whitespace-pre-line">
                   {listing.description}
@@ -187,13 +191,14 @@ export default async function ListingDetailsPage(props: PageProps) {
               </div>
             </section>
 
-            {/* Amenities - Clean list, no bullet icons */}
+            {/* Amenities */}
             <section>
-              <h2 className="text-headline text-foreground mb-4">What&apos;s included</h2>
+              <h2 className="text-headline text-foreground mb-4 text-glow-magenta">What&apos;s included</h2>
               {listing.amenities && listing.amenities.length > 0 ? (
                 <div className="grid grid-cols-2 gap-x-8 gap-y-3">
                   {listing.amenities.map((item, i) => (
-                    <p key={i} className="text-body text-muted-foreground">
+                    <p key={i} className="text-body text-muted-foreground flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-primary rounded-full" />
                       {item}
                     </p>
                   ))}
@@ -207,7 +212,7 @@ export default async function ListingDetailsPage(props: PageProps) {
 
             {/* Reviews Section */}
             <section>
-              <h2 className="text-headline text-foreground mb-4">Reviews</h2>
+              <h2 className="text-headline text-foreground mb-4 text-glow-cyan">Reviews</h2>
               <ReviewsDisplay listingId={listing.id} />
             </section>
           </div>
@@ -232,11 +237,11 @@ export default async function ListingDetailsPage(props: PageProps) {
           </div>
         </main>
 
-        {/* Mobile Sticky Footer - Lighter */}
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 lg:hidden z-30">
+        {/* Mobile Sticky Footer - Glass morphism */}
+        <div className="fixed bottom-0 left-0 right-0 glass-neon p-4 lg:hidden z-30">
           <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
             <div>
-              <span className="text-lg font-medium text-foreground">${listing.price}</span>
+              <span className="text-lg font-medium text-primary text-glow-cyan">${listing.price}</span>
               <span className="text-muted-foreground text-sm">/night</span>
             </div>
             <div className="flex gap-2">
@@ -249,7 +254,7 @@ export default async function ListingDetailsPage(props: PageProps) {
                 variant="mobile"
               />
               <Link href={session?.user ? `#booking` : "/login?role=traveler"}>
-                <Button className="px-6 bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Button className="px-6 bg-primary hover:bg-primary/80 text-primary-foreground glow-cyan hover:shadow-[0_0_25px_rgba(0,255,255,0.5)] transition-all">
                   {session?.user ? "Book now" : "Sign in"}
                 </Button>
               </Link>

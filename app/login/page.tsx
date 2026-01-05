@@ -4,12 +4,12 @@ import { useState, Suspense } from "react"
 
 /*
   LOGIN PAGE
-  Philosophy: Editorial simplicity, not card-in-box
+  Philosophy: Neon Futuristic Holographic
 
-  - Typography-led hierarchy
-  - Minimal chrome
-  - Form flows naturally
-  - No decorative elements
+  - Dark background with glowing elements
+  - Cyan and magenta neon accents
+  - Glass morphism form container
+  - Glowing buttons and inputs
 */
 
 import { useSearchParams } from "next/navigation"
@@ -56,7 +56,6 @@ function GitHubIcon({ className }: { className?: string }) {
 function AuthContent() {
   const searchParams = useSearchParams()
 
-  // Determine initial mode from URL params
   const mode = searchParams.get("mode")
   const roleParam = searchParams.get("role")
 
@@ -104,8 +103,8 @@ function AuthContent() {
   }
 
   const getTitle = () => {
-    if (isRegister) return "Create your account"
-    return "Sign in"
+    if (isRegister) return "Create Account"
+    return "Sign In"
   }
 
   const getSubtitle = () => {
@@ -116,33 +115,37 @@ function AuthContent() {
     }
     if (roleParam === "host") return "Access your host dashboard"
     if (roleParam === "traveler") return "Manage your trips"
-    return "Welcome back to Smart Spaces"
+    return "Welcome back to the future"
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background bg-grid flex flex-col relative overflow-hidden">
+      {/* Ambient glow effects */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
+
       {/* Header */}
-      <header className="px-6 py-6">
+      <header className="px-6 py-6 relative z-10">
         <div className="max-w-sm mx-auto flex items-center justify-between">
           <Link
             href="/"
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Link>
-          <Link href="/" className="text-sm font-medium text-foreground">
-            Smart Spaces
+          <Link href="/" className="text-sm font-bold tracking-wider text-foreground text-glow-cyan">
+            SMART SPACES
           </Link>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="flex-1 flex items-center justify-center px-6 pb-12">
-        <div className="w-full max-w-sm">
+      <main className="flex-1 flex items-center justify-center px-6 pb-12 relative z-10">
+        <div className="w-full max-w-sm glass-neon rounded-lg p-8">
           {/* Title */}
-          <div className="mb-8">
-            <h1 className="text-title text-foreground mb-2">
+          <div className="mb-8 text-center">
+            <h1 className="text-title text-foreground mb-2 text-glow-cyan">
               {getTitle()}
             </h1>
             <p className="text-body text-muted-foreground">
@@ -156,7 +159,7 @@ function AuthContent() {
               type="button"
               onClick={() => signIn("google", { callbackUrl: roleParam === "host" ? "/host-dashboard" : "/guest-dashboard" })}
               disabled={isLoading}
-              className="w-full h-11 px-4 inline-flex items-center justify-center rounded-md border border-border bg-background text-sm font-medium text-foreground hover:bg-secondary transition-colors disabled:opacity-50"
+              className="w-full h-11 px-4 inline-flex items-center justify-center rounded-md border border-border/50 bg-background/50 text-sm font-medium text-foreground hover:border-primary/50 hover:glow-cyan transition-all disabled:opacity-50"
             >
               <GoogleIcon className="mr-3 h-4 w-4" />
               Continue with Google
@@ -165,7 +168,7 @@ function AuthContent() {
               type="button"
               onClick={() => signIn("github", { callbackUrl: roleParam === "host" ? "/host-dashboard" : "/guest-dashboard" })}
               disabled={isLoading}
-              className="w-full h-11 px-4 inline-flex items-center justify-center rounded-md border border-border bg-background text-sm font-medium text-foreground hover:bg-secondary transition-colors disabled:opacity-50"
+              className="w-full h-11 px-4 inline-flex items-center justify-center rounded-md border border-border/50 bg-background/50 text-sm font-medium text-foreground hover:border-secondary/50 hover:glow-magenta transition-all disabled:opacity-50"
             >
               <GitHubIcon className="mr-3 h-4 w-4" />
               Continue with GitHub
@@ -175,10 +178,10 @@ function AuthContent() {
           {/* Divider */}
           <div className="relative mb-8">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
+              <span className="w-full border-t border-border/50" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-background px-3 text-xs text-muted-foreground uppercase tracking-wider">
+              <span className="bg-card px-3 text-xs text-muted-foreground uppercase tracking-widest">
                 or
               </span>
             </div>
@@ -189,15 +192,15 @@ function AuthContent() {
             {/* Role Selection - Registration only */}
             {isRegister && (
               <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">I want to</Label>
+                <Label className="text-sm text-muted-foreground uppercase tracking-wider">I want to</Label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
                     onClick={() => setSelectedRole("traveler")}
                     className={`h-11 rounded-md border text-sm font-medium transition-all ${
                       selectedRole === "traveler"
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "border-border text-muted-foreground hover:border-foreground/30"
+                        ? "border-primary bg-primary/10 text-primary glow-cyan"
+                        : "border-border/50 text-muted-foreground hover:border-primary/50"
                     }`}
                   >
                     Find a place
@@ -207,8 +210,8 @@ function AuthContent() {
                     onClick={() => setSelectedRole("host")}
                     className={`h-11 rounded-md border text-sm font-medium transition-all ${
                       selectedRole === "host"
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "border-border text-muted-foreground hover:border-foreground/30"
+                        ? "border-secondary bg-secondary/10 text-secondary glow-magenta"
+                        : "border-border/50 text-muted-foreground hover:border-secondary/50"
                     }`}
                   >
                     List my property
@@ -220,7 +223,7 @@ function AuthContent() {
             {/* Name - Registration only */}
             {isRegister && (
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm text-muted-foreground">
+                <Label htmlFor="name" className="text-sm text-muted-foreground uppercase tracking-wider">
                   Name
                 </Label>
                 <Input
@@ -228,13 +231,13 @@ function AuthContent() {
                   name="name"
                   placeholder="Your name"
                   required
-                  className="h-11 bg-background"
+                  className="h-11 bg-background/50 border-border/50 focus:border-primary focus:glow-cyan transition-all"
                 />
               </div>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm text-muted-foreground">
+              <Label htmlFor="email" className="text-sm text-muted-foreground uppercase tracking-wider">
                 Email
               </Label>
               <Input
@@ -243,12 +246,12 @@ function AuthContent() {
                 type="email"
                 placeholder="you@example.com"
                 required
-                className="h-11 bg-background"
+                className="h-11 bg-background/50 border-border/50 focus:border-primary focus:glow-cyan transition-all"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm text-muted-foreground">
+              <Label htmlFor="password" className="text-sm text-muted-foreground uppercase tracking-wider">
                 Password
               </Label>
               <Input
@@ -257,23 +260,23 @@ function AuthContent() {
                 type="password"
                 placeholder={isRegister ? "Create a password" : "Enter your password"}
                 required
-                className="h-11 bg-background"
+                className="h-11 bg-background/50 border-border/50 focus:border-primary focus:glow-cyan transition-all"
               />
             </div>
 
             {error && (
-              <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
+              <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/30">
                 {error}
               </div>
             )}
 
             <Button
               type="submit"
-              className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+              className="w-full h-11 bg-primary hover:bg-primary/80 text-primary-foreground font-semibold tracking-wide glow-cyan hover:shadow-[0_0_30px_rgba(0,255,255,0.6)] transition-all"
               disabled={isLoading}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isRegister ? "Create account" : "Sign in"}
+              {isRegister ? "Create Account" : "Sign In"}
             </Button>
           </form>
 
@@ -288,7 +291,7 @@ function AuthContent() {
                     setIsRegister(false)
                     setError(null)
                   }}
-                  className="text-foreground hover:text-primary transition-colors"
+                  className="text-primary hover:text-glow-cyan transition-all"
                 >
                   Sign in
                 </button>
@@ -302,7 +305,7 @@ function AuthContent() {
                     setIsRegister(true)
                     setError(null)
                   }}
-                  className="text-foreground hover:text-primary transition-colors"
+                  className="text-primary hover:text-glow-cyan transition-all"
                 >
                   Sign up
                 </button>
@@ -318,8 +321,8 @@ function AuthContent() {
 export default function AuthPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div className="flex min-h-screen items-center justify-center bg-background bg-grid">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
       </div>
     }>
       <AuthContent />

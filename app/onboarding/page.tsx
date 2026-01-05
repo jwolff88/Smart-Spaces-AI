@@ -142,23 +142,27 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl bg-slate-900/80 border-slate-700 relative">
+    <div className="min-h-screen bg-background bg-grid flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Ambient glow */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-3xl pointer-events-none" />
+
+      <Card className="w-full max-w-2xl glass-neon border-primary/30 relative z-10">
         {/* Close/Back button */}
         <Link
           href="/guest-dashboard"
-          className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors p-2 rounded-full hover:bg-slate-800"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/10"
         >
           <X className="h-5 w-5" />
           <span className="sr-only">Close</span>
         </Link>
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Sparkles className="h-6 w-6 text-blue-400" />
-            <span className="text-blue-400 font-semibold">Smart Matching</span>
+            <Sparkles className="h-6 w-6 text-primary" />
+            <span className="text-primary font-semibold text-glow-cyan">Smart Matching</span>
           </div>
-          <CardTitle className="text-2xl text-white">Tell us about your travel style</CardTitle>
-          <CardDescription className="text-slate-400">
+          <CardTitle className="text-2xl text-foreground">Tell us about your travel style</CardTitle>
+          <CardDescription className="text-muted-foreground">
             Step {step} of {totalSteps} - {step === 1 ? "Travel Intent" : step === 2 ? "Preferred Vibes" : step === 3 ? "Work Needs" : step === 4 ? "Must-Have Amenities" : "Budget & Property Type"}
           </CardDescription>
 
@@ -168,7 +172,7 @@ export default function OnboardingPage() {
               <div
                 key={i}
                 className={`h-1 flex-1 rounded-full transition-colors ${
-                  i < step ? "bg-blue-500" : "bg-slate-700"
+                  i < step ? "bg-primary glow-cyan" : "bg-border"
                 }`}
               />
             ))}
@@ -185,15 +189,15 @@ export default function OnboardingPage() {
                   onClick={() => setProfile({ ...profile, travelIntent: intent.id })}
                   className={`p-4 rounded-xl border-2 transition-all text-left ${
                     profile.travelIntent === intent.id
-                      ? "border-blue-500 bg-blue-500/20"
-                      : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
+                      ? "border-primary bg-primary/20 glow-cyan"
+                      : "border-border bg-card/50 hover:border-primary/50"
                   }`}
                 >
                   <intent.icon className={`h-6 w-6 mb-2 ${
-                    profile.travelIntent === intent.id ? "text-blue-400" : "text-slate-400"
+                    profile.travelIntent === intent.id ? "text-primary" : "text-muted-foreground"
                   }`} />
-                  <p className="font-medium text-white">{intent.label}</p>
-                  <p className="text-xs text-slate-400 mt-1">{intent.description}</p>
+                  <p className="font-medium text-foreground">{intent.label}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{intent.description}</p>
                 </button>
               ))}
             </div>
@@ -208,13 +212,13 @@ export default function OnboardingPage() {
                   onClick={() => toggleArrayItem("preferredVibes", vibe.id)}
                   className={`p-3 rounded-xl border-2 transition-all ${
                     profile.preferredVibes.includes(vibe.id)
-                      ? "border-blue-500 bg-blue-500/20"
-                      : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
+                      ? "border-primary bg-primary/20 glow-cyan"
+                      : "border-border bg-card/50 hover:border-primary/50"
                   }`}
                 >
-                  <p className="font-medium text-white text-sm">{vibe.label}</p>
+                  <p className="font-medium text-foreground text-sm">{vibe.label}</p>
                   {profile.preferredVibes.includes(vibe.id) && (
-                    <Check className="h-4 w-4 text-blue-400 mt-1 mx-auto" />
+                    <Check className="h-4 w-4 text-primary mt-1 mx-auto" />
                   )}
                 </button>
               ))}
@@ -224,7 +228,7 @@ export default function OnboardingPage() {
           {/* Step 3: Work Needs (only for remote workers) */}
           {step === 3 && showWorkStep && (
             <div className="space-y-3">
-              <p className="text-slate-300 text-sm mb-4">
+              <p className="text-muted-foreground text-sm mb-4">
                 As a remote worker, what do you need to stay productive?
               </p>
               {WORK_NEEDS.map((need) => (
@@ -233,16 +237,16 @@ export default function OnboardingPage() {
                   onClick={() => toggleArrayItem("workNeeds", need.id)}
                   className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-3 ${
                     profile.workNeeds.includes(need.id)
-                      ? "border-blue-500 bg-blue-500/20"
-                      : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
+                      ? "border-primary bg-primary/20 glow-cyan"
+                      : "border-border bg-card/50 hover:border-primary/50"
                   }`}
                 >
                   {need.icon && <need.icon className={`h-5 w-5 ${
-                    profile.workNeeds.includes(need.id) ? "text-blue-400" : "text-slate-400"
+                    profile.workNeeds.includes(need.id) ? "text-primary" : "text-muted-foreground"
                   }`} />}
-                  <span className="font-medium text-white">{need.label}</span>
+                  <span className="font-medium text-foreground">{need.label}</span>
                   {profile.workNeeds.includes(need.id) && (
-                    <Check className="h-5 w-5 text-blue-400 ml-auto" />
+                    <Check className="h-5 w-5 text-primary ml-auto" />
                   )}
                 </button>
               ))}
@@ -258,13 +262,13 @@ export default function OnboardingPage() {
                   onClick={() => toggleArrayItem("mustHaveAmenities", amenity.id)}
                   className={`p-3 rounded-xl border-2 transition-all ${
                     profile.mustHaveAmenities.includes(amenity.id)
-                      ? "border-green-500 bg-green-500/20"
-                      : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
+                      ? "border-accent bg-accent/20 glow-lime"
+                      : "border-border bg-card/50 hover:border-accent/50"
                   }`}
                 >
-                  <p className="font-medium text-white text-sm">{amenity.label}</p>
+                  <p className="font-medium text-foreground text-sm">{amenity.label}</p>
                   {profile.mustHaveAmenities.includes(amenity.id) && (
-                    <Check className="h-4 w-4 text-green-400 mt-1 mx-auto" />
+                    <Check className="h-4 w-4 text-accent mt-1 mx-auto" />
                   )}
                 </button>
               ))}
@@ -275,7 +279,7 @@ export default function OnboardingPage() {
           {step === 5 && (
             <div className="space-y-6">
               <div>
-                <p className="text-slate-300 text-sm mb-3">What's your budget range?</p>
+                <p className="text-muted-foreground text-sm mb-3">What's your budget range?</p>
                 <div className="grid grid-cols-3 gap-3">
                   {BUDGET_RANGES.map((range) => (
                     <button
@@ -283,19 +287,19 @@ export default function OnboardingPage() {
                       onClick={() => setProfile({ ...profile, budgetRange: range.id })}
                       className={`p-4 rounded-xl border-2 transition-all ${
                         profile.budgetRange === range.id
-                          ? "border-purple-500 bg-purple-500/20"
-                          : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
+                          ? "border-secondary bg-secondary/20 glow-magenta"
+                          : "border-border bg-card/50 hover:border-secondary/50"
                       }`}
                     >
-                      <p className="font-medium text-white">{range.label}</p>
-                      <p className="text-xs text-slate-400 mt-1">{range.description}</p>
+                      <p className="font-medium text-foreground">{range.label}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{range.description}</p>
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <p className="text-slate-300 text-sm mb-3">What types of properties do you prefer?</p>
+                <p className="text-muted-foreground text-sm mb-3">What types of properties do you prefer?</p>
                 <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                   {PROPERTY_TYPES.map((type) => (
                     <button
@@ -303,14 +307,14 @@ export default function OnboardingPage() {
                       onClick={() => toggleArrayItem("preferredTypes", type.id)}
                       className={`p-3 rounded-xl border-2 transition-all ${
                         profile.preferredTypes.includes(type.id)
-                          ? "border-purple-500 bg-purple-500/20"
-                          : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
+                          ? "border-secondary bg-secondary/20 glow-magenta"
+                          : "border-border bg-card/50 hover:border-secondary/50"
                       }`}
                     >
                       <Home className={`h-5 w-5 mx-auto mb-1 ${
-                        profile.preferredTypes.includes(type.id) ? "text-purple-400" : "text-slate-400"
+                        profile.preferredTypes.includes(type.id) ? "text-secondary" : "text-muted-foreground"
                       }`} />
-                      <p className="font-medium text-white text-sm">{type.label}</p>
+                      <p className="font-medium text-foreground text-sm">{type.label}</p>
                     </button>
                   ))}
                 </div>
@@ -324,7 +328,7 @@ export default function OnboardingPage() {
               variant="outline"
               onClick={prevStep}
               disabled={step === 1}
-              className="border-slate-600 text-slate-300 hover:bg-slate-800"
+              className="border-border/50 text-muted-foreground hover:bg-primary/10 hover:border-primary/50 transition-all"
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
               Back
@@ -334,7 +338,7 @@ export default function OnboardingPage() {
               <Button
                 onClick={nextStep}
                 disabled={!canProceed()}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-primary hover:bg-primary/80 glow-cyan hover:shadow-[0_0_25px_rgba(0,255,255,0.5)] transition-all"
               >
                 Continue
                 <ChevronRight className="h-4 w-4 ml-1" />
@@ -343,7 +347,7 @@ export default function OnboardingPage() {
               <Button
                 onClick={handleSubmit}
                 disabled={!canProceed() || isSubmitting}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="bg-gradient-to-r from-primary to-secondary hover:from-primary/80 hover:to-secondary/80 glow-cyan hover:shadow-[0_0_30px_rgba(0,255,255,0.6)] transition-all"
               >
                 {isSubmitting ? "Saving..." : "Find My Perfect Stay"}
                 <Sparkles className="h-4 w-4 ml-2" />

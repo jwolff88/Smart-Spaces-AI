@@ -9,13 +9,12 @@ import { Metadata } from "next"
 
 /*
   SEARCH PAGE
-  Philosophy: Editorial listing grid, not e-commerce cards
+  Philosophy: Neon Futuristic Holographic
 
-  - Typography-driven information hierarchy
-  - No badge clutter on images
-  - Match score as subtle context, not shouting badge
-  - Cards as content, not containers
-  - Warm, calm visual environment
+  - Dark background with cyan grid
+  - Glowing cards on hover
+  - Neon accent colors
+  - Glass morphism header
 */
 
 export const dynamic = 'force-dynamic'
@@ -186,32 +185,36 @@ export default async function SearchPage({
   }).sort((a, b) => b.matchScore - a.matchScore)
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header - Minimal, editorial */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+    <div className="min-h-screen bg-background bg-grid relative">
+      {/* Ambient glow */}
+      <div className="fixed top-0 right-1/3 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="fixed bottom-1/3 left-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Header */}
+      <header className="sticky top-0 z-50 glass-neon">
         <div className="max-w-6xl mx-auto px-6">
           <div className="h-16 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link href="/">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="hover:glow-cyan transition-all">
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
               </Link>
-              <span className="text-lg font-medium tracking-tight text-foreground">
-                Explore Stays
+              <span className="text-lg font-bold tracking-wider text-foreground text-glow-cyan">
+                EXPLORE
               </span>
             </div>
             <div className="flex items-center gap-3">
               {session?.user ? (
                 <>
                   <Link href="/onboarding">
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" className="hover:text-primary transition-all">
                       <Settings className="h-4 w-4 mr-1" />
                       Preferences
                     </Button>
                   </Link>
                   <Link href="/guest-dashboard">
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="border-primary/50 hover:glow-cyan transition-all">
                       <User className="h-4 w-4 mr-1" />
                       {session.user.name || "Dashboard"}
                     </Button>
@@ -219,7 +222,7 @@ export default async function SearchPage({
                 </>
               ) : (
                 <Link href="/login?role=traveler">
-                  <Button variant="outline">Sign In</Button>
+                  <Button className="bg-primary hover:bg-primary/80 glow-cyan transition-all">Sign In</Button>
                 </Link>
               )}
             </div>

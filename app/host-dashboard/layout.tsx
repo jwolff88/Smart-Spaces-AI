@@ -1,5 +1,8 @@
 import Link from "next/link"
+import { signOut } from "@/auth"
+import { Button } from "@/components/ui/button"
 import { MobileNav } from "@/components/mobile-nav"
+import { Plus, LogOut } from "lucide-react"
 
 /*
   HOST DASHBOARD LAYOUT
@@ -40,20 +43,22 @@ export default function HostLayout({
             </Link>
 
             {/* Desktop: Secondary actions */}
-            <div className="hidden md:flex items-center gap-4">
-              <Link
-                href="/host-dashboard/add-property"
-                className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-              >
-                Add property
+            <div className="hidden md:flex items-center gap-3">
+              <Link href="/host-dashboard/add-property">
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" /> Add Property
+                </Button>
               </Link>
-              <span className="w-px h-4 bg-border" />
-              <Link
-                href="/"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              <form
+                action={async () => {
+                  "use server"
+                  await signOut()
+                }}
               >
-                Sign out
-              </Link>
+                <Button variant="outline" type="submit">
+                  <LogOut className="mr-2 h-4 w-4" /> Sign Out
+                </Button>
+              </form>
             </div>
 
             {/* Mobile: Hamburger */}

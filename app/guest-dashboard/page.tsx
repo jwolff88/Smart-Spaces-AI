@@ -158,11 +158,10 @@ export default async function GuestDashboard() {
               : "No upcoming trips. Ready for your next adventure?"}
           </p>
           {upcomingBookings.length === 0 && (
-            <Link
-              href="/search"
-              className="inline-flex items-center gap-2 mt-6 text-primary hover:text-primary/80 transition-colors"
-            >
-              Browse properties <ArrowRight className="h-4 w-4" />
+            <Link href="/search" className="inline-block mt-6">
+              <Button>
+                Browse properties <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </Link>
           )}
         </section>
@@ -218,12 +217,11 @@ export default async function GuestDashboard() {
                         <p className="text-sm font-medium text-foreground">
                           ${booking.totalPrice.toFixed(0)} total
                         </p>
-                        <div className="flex gap-3">
-                          <Link
-                            href={`/listings/${booking.listing.id}`}
-                            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            View listing
+                        <div className="flex gap-2">
+                          <Link href={`/listings/${booking.listing.id}`}>
+                            <Button size="sm" variant="outline">
+                              View Listing
+                            </Button>
                           </Link>
                           {booking.status !== "cancelled" && (
                             <CancelBookingButton
@@ -325,11 +323,10 @@ export default async function GuestDashboard() {
             <p className="text-sm text-muted-foreground/70 mb-6">
               When you book a stay, it will appear here.
             </p>
-            <Link
-              href="/search"
-              className="text-sm text-primary hover:text-primary/80 transition-colors"
-            >
-              Start exploring
+            <Link href="/search">
+              <Button variant="link">
+                Start exploring
+              </Button>
             </Link>
           </section>
         )}

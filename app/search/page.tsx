@@ -2,6 +2,8 @@ import { db } from "@/lib/db"
 import { auth } from "@/auth"
 import Link from "next/link"
 import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft, Settings, User } from "lucide-react"
 import { SearchFilters } from "./search-filters"
 import { Metadata } from "next"
 
@@ -189,36 +191,35 @@ export default async function SearchPage({
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="max-w-6xl mx-auto px-6">
           <div className="h-16 flex items-center justify-between">
-            <Link
-              href="/"
-              className="text-lg font-medium tracking-tight text-foreground"
-            >
-              Smart Spaces
-            </Link>
             <div className="flex items-center gap-4">
+              <Link href="/">
+                <Button variant="ghost" size="icon">
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+              </Link>
+              <span className="text-lg font-medium tracking-tight text-foreground">
+                Explore Stays
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
               {session?.user ? (
                 <>
-                  {!travelerProfile && (
-                    <Link
-                      href="/onboarding"
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block"
-                    >
-                      Set preferences
-                    </Link>
-                  )}
-                  <Link
-                    href="/guest-dashboard"
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {session.user.name?.split(" ")[0] || "Account"}
+                  <Link href="/onboarding">
+                    <Button variant="ghost" size="sm">
+                      <Settings className="h-4 w-4 mr-1" />
+                      Preferences
+                    </Button>
+                  </Link>
+                  <Link href="/guest-dashboard">
+                    <Button variant="outline" size="sm">
+                      <User className="h-4 w-4 mr-1" />
+                      {session.user.name || "Dashboard"}
+                    </Button>
                   </Link>
                 </>
               ) : (
-                <Link
-                  href="/login?role=traveler"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Sign in
+                <Link href="/login?role=traveler">
+                  <Button variant="outline">Sign In</Button>
                 </Link>
               )}
             </div>

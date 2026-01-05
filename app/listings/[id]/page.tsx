@@ -3,13 +3,23 @@ import { auth } from "@/auth"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { MapPin, BedDouble, Home, Share, ArrowLeft, Star, Users } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { BookingForm } from "@/components/booking-form"
 import { ReviewsDisplay } from "@/components/reviews-display"
 import { ContactHostButton } from "@/components/contact-host-button"
 import { Metadata } from "next"
+
+/*
+  LISTING DETAIL PAGE
+  Philosophy: Editorial property presentation
+
+  - Clean hero image, no overlays
+  - Typography-driven information hierarchy
+  - Breathing room between sections
+  - Warm, inviting aesthetics
+  - Content flows naturally
+*/
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -103,176 +113,160 @@ export default async function ListingDetailsPage(props: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-    <div className="min-h-screen bg-white pb-24 lg:pb-0">
-      {/* Navbar */}
-      <div className="border-b sticky top-0 bg-white z-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <Link href="/search" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors -ml-2 px-2 py-1.5 rounded-md hover:bg-gray-100">
-            <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">Back to Search</span>
-          </Link>
-          <div className="flex gap-2">
-            <Button variant="outline" size="icon" className="h-9 w-9">
-              <Share className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <main className="max-w-6xl mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10">
-        
-        {/* Left Column: Photos & Info */}
-        <div className="lg:col-span-2 space-y-8">
-          
-          {/* UPDATED HERO IMAGE AREA */}
-          <div className="aspect-video bg-gray-100 rounded-2xl relative overflow-hidden flex items-center justify-center group">
-            {listing.imageSrc ? (
-              <Image 
-                src={listing.imageSrc} 
-                alt={listing.title || "Listing Image"}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <Home className="h-20 w-20 text-gray-300" />
-            )}
-            
-            <div className="absolute bottom-4 left-4">
-              <Badge className="bg-white/90 text-black hover:bg-white backdrop-blur">
-                {listing.type || "Home"}
-              </Badge>
-            </div>
-          </div>
-
-          {/* Title & Stats */}
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">{listing.title}</h1>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-gray-500 text-sm">
-              <span className="flex items-center gap-1">
-                <MapPin className="h-4 w-4 flex-shrink-0" /> {listing.location}
-              </span>
-              <span className="hidden sm:inline text-gray-300">•</span>
-              <span className="flex items-center gap-1">
-                <BedDouble className="h-4 w-4 flex-shrink-0" /> {listing.bedrooms} Bed
-              </span>
-              <span className="hidden sm:inline text-gray-300">•</span>
-              <span className="flex items-center gap-1">
-                <Users className="h-4 w-4 flex-shrink-0" /> {listing.maxGuests} Guests
-              </span>
-              <span className="hidden sm:inline text-gray-300">•</span>
-              <span className="flex items-center gap-1">
-                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 flex-shrink-0" /> New
-              </span>
-            </div>
-          </div>
-
-          <div className="h-px bg-gray-100" />
-
-          {/* Host Info */}
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-lg">
-              {listing.host?.name?.[0] || "H"}
-            </div>
-            <div>
-              <p className="font-semibold text-gray-900">Hosted by {listing.host?.name || "Host"}</p>
-              <p className="text-sm text-gray-500">Verified Host</p>
-            </div>
-          </div>
-
-          <div className="h-px bg-gray-100" />
-
-          {/* AI Description */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4">About this space</h2>
-            <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-              {listing.description}
-            </p>
-          </div>
-
-          <div className="h-px bg-gray-100" />
-
-          {/* Amenities */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4">What this place offers</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {listing.amenities && listing.amenities.length > 0 ? (
-                listing.amenities.map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 text-gray-600">
-                    <div className="h-2 w-2 bg-blue-500 rounded-full" />
-                    {item}
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500 italic">No specific amenities listed.</p>
-              )}
-            </div>
-          </div>
-
-          <div className="h-px bg-gray-100" />
-
-          {/* Reviews Section */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Guest Reviews</h2>
-            <ReviewsDisplay listingId={listing.id} />
-          </div>
-        </div>
-
-        {/* Right Column: Booking Card (Sticky on Desktop) */}
-        <div className="hidden lg:block relative">
-          <div className="sticky top-20 space-y-4">
-            <BookingForm
-              listingId={listing.id}
-              price={listing.price}
-              maxGuests={listing.maxGuests}
-              isAuthenticated={!!session?.user}
-            />
-            <ContactHostButton
-              hostId={listing.hostId}
-              hostName={listing.host?.name || "Host"}
-              listingId={listing.id}
-              listingTitle={listing.title}
-              isAuthenticated={!!session?.user}
-            />
-          </div>
-        </div>
-
-      </main>
-
-      {/* Mobile Sticky Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 lg:hidden z-30">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-          <div>
-            <span className="text-xl font-bold">${listing.price}</span>
-            <span className="text-gray-500 text-sm"> / night</span>
-          </div>
-          <div className="flex gap-2">
-            <ContactHostButton
-              hostId={listing.hostId}
-              hostName={listing.host?.name || "Host"}
-              listingId={listing.id}
-              listingTitle={listing.title}
-              isAuthenticated={!!session?.user}
-              variant="mobile"
-            />
-            <Link href={session?.user ? `#booking` : "/login?role=traveler"}>
-              <Button className="px-6">
-                {session?.user ? "Book Now" : "Sign in to Book"}
-              </Button>
+      <div className="min-h-screen bg-background pb-24 lg:pb-0">
+        {/* Header - Minimal */}
+        <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+          <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+            <Link
+              href="/search"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Back</span>
+            </Link>
+            <Link href="/" className="text-sm font-medium text-foreground">
+              Smart Spaces
             </Link>
           </div>
+        </header>
+
+        <main className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+
+          {/* Left Column: Content */}
+          <div className="lg:col-span-2 space-y-12">
+
+            {/* Hero Image - Clean, no overlays */}
+            <div className="aspect-[4/3] sm:aspect-video bg-secondary rounded-md overflow-hidden relative">
+              {listing.imageSrc ? (
+                <Image
+                  src={listing.imageSrc}
+                  alt={listing.title || "Property"}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/30">
+                  <span className="text-6xl">⌂</span>
+                </div>
+              )}
+            </div>
+
+            {/* Title & Key Info */}
+            <div>
+              <p className="text-overline uppercase text-muted-foreground tracking-widest mb-3">
+                {listing.type || "Property"} in {listing.location}
+              </p>
+              <h1 className="text-title text-foreground mb-4">{listing.title}</h1>
+              <p className="text-body text-muted-foreground">
+                {listing.bedrooms} {parseInt(listing.bedrooms) === 1 ? "bedroom" : "bedrooms"} ·
+                Up to {listing.maxGuests} {listing.maxGuests === 1 ? "guest" : "guests"}
+              </p>
+            </div>
+
+            {/* Host Info - Warm, not blue */}
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 bg-secondary rounded-full flex items-center justify-center text-foreground font-medium text-lg">
+                {listing.host?.name?.[0]?.toUpperCase() || "H"}
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  Hosted by {listing.host?.name || "Host"}
+                </p>
+                <p className="text-sm text-muted-foreground">Verified host</p>
+              </div>
+            </div>
+
+            {/* Description */}
+            <section>
+              <h2 className="text-headline text-foreground mb-4">About this space</h2>
+              <div className="prose-width">
+                <p className="text-body text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {listing.description}
+                </p>
+              </div>
+            </section>
+
+            {/* Amenities - Clean list, no bullet icons */}
+            <section>
+              <h2 className="text-headline text-foreground mb-4">What&apos;s included</h2>
+              {listing.amenities && listing.amenities.length > 0 ? (
+                <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+                  {listing.amenities.map((item, i) => (
+                    <p key={i} className="text-body text-muted-foreground">
+                      {item}
+                    </p>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-body text-muted-foreground">
+                  Contact the host for amenity details.
+                </p>
+              )}
+            </section>
+
+            {/* Reviews Section */}
+            <section>
+              <h2 className="text-headline text-foreground mb-4">Reviews</h2>
+              <ReviewsDisplay listingId={listing.id} />
+            </section>
+          </div>
+
+          {/* Right Column: Booking (Sticky on Desktop) */}
+          <div className="hidden lg:block relative">
+            <div className="sticky top-20 space-y-4">
+              <BookingForm
+                listingId={listing.id}
+                price={listing.price}
+                maxGuests={listing.maxGuests}
+                isAuthenticated={!!session?.user}
+              />
+              <ContactHostButton
+                hostId={listing.hostId}
+                hostName={listing.host?.name || "Host"}
+                listingId={listing.id}
+                listingTitle={listing.title}
+                isAuthenticated={!!session?.user}
+              />
+            </div>
+          </div>
+        </main>
+
+        {/* Mobile Sticky Footer - Lighter */}
+        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 lg:hidden z-30">
+          <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+            <div>
+              <span className="text-lg font-medium text-foreground">${listing.price}</span>
+              <span className="text-muted-foreground text-sm">/night</span>
+            </div>
+            <div className="flex gap-2">
+              <ContactHostButton
+                hostId={listing.hostId}
+                hostName={listing.host?.name || "Host"}
+                listingId={listing.id}
+                listingTitle={listing.title}
+                isAuthenticated={!!session?.user}
+                variant="mobile"
+              />
+              <Link href={session?.user ? `#booking` : "/login?role=traveler"}>
+                <Button className="px-6 bg-primary hover:bg-primary/90 text-primary-foreground">
+                  {session?.user ? "Book now" : "Sign in"}
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Booking Form (In-page) */}
+        <div className="lg:hidden max-w-6xl mx-auto px-6 pb-8" id="booking">
+          <BookingForm
+            listingId={listing.id}
+            price={listing.price}
+            maxGuests={listing.maxGuests}
+            isAuthenticated={!!session?.user}
+          />
         </div>
       </div>
-
-      {/* Mobile Booking Form (In-page) */}
-      <div className="lg:hidden max-w-6xl mx-auto p-4 sm:p-6" id="booking">
-        <BookingForm
-          listingId={listing.id}
-          price={listing.price}
-          maxGuests={listing.maxGuests}
-          isAuthenticated={!!session?.user}
-        />
-      </div>
-    </div>
     </>
   )
 }

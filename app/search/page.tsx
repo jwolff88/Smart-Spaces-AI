@@ -1,13 +1,20 @@
 import { db } from "@/lib/db"
 import { auth } from "@/auth"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { MapPin, Home, BedDouble, ArrowLeft, Sparkles, Briefcase, Wifi, Heart, User, Settings } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { SearchFilters } from "./search-filters"
 import { Metadata } from "next"
+
+/*
+  SEARCH PAGE
+  Philosophy: Editorial listing grid, not e-commerce cards
+
+  - Typography-driven information hierarchy
+  - No badge clutter on images
+  - Match score as subtle context, not shouting badge
+  - Cards as content, not containers
+  - Warm, calm visual environment
+*/
 
 export const dynamic = 'force-dynamic'
 
@@ -177,46 +184,51 @@ export default async function SearchPage({
   }).sort((a, b) => b.matchScore - a.matchScore)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
+    <div className="min-h-screen bg-background">
+      {/* Header - Minimal, editorial */}
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="h-16 flex items-center justify-between">
+            <Link
+              href="/"
+              className="text-lg font-medium tracking-tight text-foreground"
+            >
+              Smart Spaces
             </Link>
-            <h1 className="font-bold text-xl">Explore Stays</h1>
-          </div>
-          <div className="flex items-center gap-3">
-            {session?.user ? (
-              <>
-                <Link href="/onboarding">
-                  <Button variant="ghost" size="sm" className="text-gray-600">
-                    <Settings className="h-4 w-4 mr-1" />
-                    Preferences
-                  </Button>
+            <div className="flex items-center gap-4">
+              {session?.user ? (
+                <>
+                  {!travelerProfile && (
+                    <Link
+                      href="/onboarding"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block"
+                    >
+                      Set preferences
+                    </Link>
+                  )}
+                  <Link
+                    href="/guest-dashboard"
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {session.user.name?.split(" ")[0] || "Account"}
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  href="/login?role=traveler"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Sign in
                 </Link>
-                <Link href="/guest-dashboard">
-                  <Button variant="outline" size="sm">
-                    <User className="h-4 w-4 mr-1" />
-                    {session.user.name || "Dashboard"}
-                  </Button>
-                </Link>
-              </>
-            ) : (
-              <Link href="/login?role=traveler">
-                <Button variant="outline">Sign In</Button>
-              </Link>
-            )}
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Search Filters */}
-      <div className="bg-white border-b py-4">
-        <div className="max-w-7xl mx-auto px-6">
+      <div className="border-b border-border bg-background">
+        <div className="max-w-6xl mx-auto px-6 py-4">
           <SearchFilters
             initialLocation={params.location}
             initialType={params.type}
@@ -229,156 +241,96 @@ export default async function SearchPage({
         </div>
       </div>
 
-      {/* Smart Matching Banner */}
-      {session?.user && !travelerProfile && (
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3">
-          <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Sparkles className="h-5 w-5" />
-              <span className="text-sm font-medium">
-                Complete your travel profile for personalized matches
-              </span>
-            </div>
-            <Link href="/onboarding">
-              <Button size="sm" variant="secondary" className="bg-white text-blue-600 hover:bg-blue-50">
-                Set Up Profile
-              </Button>
+      <main className="max-w-6xl mx-auto px-6 py-8">
+        {/* Results header */}
+        <div className="mb-8">
+          <h1 className="text-title text-foreground mb-2">
+            {params.location ? `Stays in ${params.location}` : "All stays"}
+          </h1>
+          <p className="text-body text-muted-foreground">
+            {listings.length} {listings.length === 1 ? "property" : "properties"}
+            {travelerProfile && " · Sorted by match"}
+          </p>
+        </div>
+
+        {/* Listings Grid - Editorial cards */}
+        {listings.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {listings.map((listing) => (
+              <Link
+                key={listing.id}
+                href={`/listings/${listing.id}`}
+                className="group block"
+              >
+                <article>
+                  {/* Image - Clean, no overlays */}
+                  <div className="aspect-[4/3] bg-secondary rounded-md overflow-hidden mb-4 relative">
+                    {listing.imageSrc ? (
+                      <Image
+                        src={listing.imageSrc}
+                        alt={listing.title || "Property"}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/30">
+                        <span className="text-4xl">⌂</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content - Typography-driven */}
+                  <div className="space-y-2">
+                    {/* Title and price on same line */}
+                    <div className="flex items-baseline justify-between gap-2">
+                      <h2 className="text-base font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                        {listing.title}
+                      </h2>
+                      <span className="text-sm font-medium text-foreground flex-shrink-0">
+                        ${listing.currentPrice || listing.price}
+                        <span className="text-muted-foreground font-normal">/night</span>
+                      </span>
+                    </div>
+
+                    {/* Location */}
+                    <p className="text-sm text-muted-foreground">
+                      {listing.location}
+                    </p>
+
+                    {/* Details line */}
+                    <p className="text-sm text-muted-foreground">
+                      {listing.bedrooms} {listing.bedrooms === 1 ? "bedroom" : "bedrooms"} · {listing.type}
+                      {listing.workFriendly && " · Work-friendly"}
+                    </p>
+
+                    {/* Match score - Subtle, contextual */}
+                    {listing.matchScore >= 70 && (
+                      <p className="text-sm text-primary">
+                        {listing.matchScore}% match
+                        {listing.matchReasons?.[0] && (
+                          <span className="text-muted-foreground"> · {listing.matchReasons[0]}</span>
+                        )}
+                      </p>
+                    )}
+                  </div>
+                </article>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="py-24 text-center">
+            <p className="text-muted-foreground mb-2">No properties found</p>
+            <p className="text-sm text-muted-foreground/70 mb-6">
+              Try adjusting your filters or search in a different area.
+            </p>
+            <Link
+              href="/search"
+              className="text-sm text-primary hover:text-primary/80 transition-colors"
+            >
+              Clear all filters
             </Link>
           </div>
-        </div>
-      )}
-
-      {/* Active Matching Indicator */}
-      {travelerProfile && (
-        <div className="bg-green-50 border-b border-green-100 py-2">
-          <div className="max-w-7xl mx-auto px-6 flex items-center gap-2 text-green-700 text-sm">
-            <Sparkles className="h-4 w-4" />
-            <span>
-              AI Matching Active - Showing best matches for{" "}
-              <strong className="font-medium">{travelerProfile.travelIntent?.replace("_", " ") || "your preferences"}</strong>
-            </span>
-          </div>
-        </div>
-      )}
-
-      <main className="max-w-7xl mx-auto p-6">
-        {/* Results count */}
-        <div className="mb-4 flex items-center justify-between">
-          <span className="text-sm text-gray-500">
-            {listings.length} {listings.length === 1 ? "property" : "properties"} found
-            {params.location && ` in "${params.location}"`}
-          </span>
-          {travelerProfile && (
-            <span className="text-xs text-gray-400">Sorted by match score</span>
-          )}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {listings.map((listing) => (
-            <Card key={listing.id} className="group cursor-pointer hover:shadow-xl transition-all duration-300 border-transparent hover:border-gray-200">
-              
-              {/* IMAGE SECTION - UPDATED */}
-              <div className="aspect-[4/3] bg-gray-200 relative overflow-hidden rounded-t-xl">
-                {listing.imageSrc ? (
-                  <Image
-                    src={listing.imageSrc}
-                    alt={listing.title || "Listing Image"}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-400 bg-gray-100 group-hover:scale-105 transition-transform duration-500">
-                    <Home className="h-12 w-12 opacity-20" />
-                  </div>
-                )}
-
-                {/* Match Score Badge */}
-                <div className="absolute top-3 left-3">
-                  <Badge
-                    className={`font-bold backdrop-blur-sm shadow-sm ${
-                      listing.matchScore >= 90
-                        ? "bg-green-500 text-white"
-                        : listing.matchScore >= 75
-                        ? "bg-blue-500 text-white"
-                        : "bg-white/90 text-gray-700"
-                    }`}
-                  >
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    {listing.matchScore}% Match
-                  </Badge>
-                </div>
-
-                <div className="absolute top-3 right-3">
-                  <Badge variant="secondary" className="font-bold bg-white/90 backdrop-blur-sm shadow-sm">
-                    ${listing.currentPrice || listing.price} <span className="font-normal text-xs ml-1 text-gray-500">/ night</span>
-                  </Badge>
-                </div>
-              </div>
-
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-lg line-clamp-1 group-hover:text-blue-600 transition-colors">
-                    {listing.title}
-                  </h3>
-                </div>
-                
-                <div className="flex items-center text-gray-500 text-sm mb-3">
-                  <MapPin className="h-3 w-3 mr-1" />
-                  <span className="line-clamp-1">{listing.location}</span>
-                </div>
-
-                <div className="flex flex-wrap gap-2 text-xs text-gray-500">
-                  <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md">
-                    <BedDouble className="h-3 w-3" />
-                    {listing.bedrooms} Beds
-                  </div>
-                  <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md">
-                    <Home className="h-3 w-3" />
-                    {listing.type}
-                  </div>
-                  {listing.workFriendly && (
-                    <div className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-md">
-                      <Briefcase className="h-3 w-3" />
-                      Work-Friendly
-                    </div>
-                  )}
-                  {listing.wifiSpeed && listing.wifiSpeed >= 50 && (
-                    <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-md">
-                      <Wifi className="h-3 w-3" />
-                      {listing.wifiSpeed}Mbps
-                    </div>
-                  )}
-                </div>
-
-                {/* Match Reasons */}
-                {listing.matchReasons && listing.matchReasons.length > 0 && listing.matchScore >= 70 && (
-                  <div className="mt-3 pt-3 border-t border-gray-100">
-                    <p className="text-xs text-gray-500 line-clamp-2">
-                      {listing.matchReasons.slice(0, 2).join(" • ")}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-
-              <CardFooter className="p-4 pt-0">
-                <Button asChild className="w-full bg-slate-900 group-hover:bg-blue-600 transition-colors">
-                  <Link href={`/listings/${listing.id}`}>
-                    View Details
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-
-          {listings.length === 0 && (
-            <div className="col-span-full text-center py-20">
-              <h3 className="text-xl font-medium text-gray-900">No listings found</h3>
-              <p className="text-gray-500 mt-2">Be the first to host a property!</p>
-              <Link href="/host-dashboard/add-property" className="mt-6 inline-block">
-                <Button>Create Listing</Button>
-              </Link>
-            </div>
-          )}
-        </div>
+        )}
       </main>
     </div>
   )

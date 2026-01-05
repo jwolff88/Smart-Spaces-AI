@@ -1,14 +1,22 @@
 "use client"
 
+/*
+  BOOKING FORM
+  Philosophy: Clean, functional, no visual noise
+
+  - No gradient buttons
+  - No decorative badges
+  - Restrained styling
+  - Clear information hierarchy
+*/
+
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { ChevronDown, Minus, Plus, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
 
 interface BookingFormProps {
   listingId: string
@@ -91,19 +99,44 @@ export function BookingForm({
         throw new Error(bookingData.error || "Failed to create booking")
       }
 
-      // Demo mode: Skip payment and confirm booking directly
-      const confirmRes = await fetch(`/api/bookings/${bookingData.booking.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "confirmed" }),
-      })
+      // Check if payments are enabled (production) or demo mode
+      const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true"
 
-      if (!confirmRes.ok) {
-        console.warn("Could not auto-confirm booking")
+      if (DEMO_MODE) {
+        // Demo mode: Skip payment and confirm booking directly
+        const confirmRes = await fetch(`/api/bookings/${bookingData.booking.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "confirmed" }),
+        })
+
+        if (!confirmRes.ok) {
+          console.warn("Could not auto-confirm booking")
+        }
+
+        // Redirect to success page
+        router.push(`/booking/success?booking_id=${bookingData.booking.id}&demo=true`)
+      } else {
+        // Production: Redirect to Stripe checkout
+        const checkoutRes = await fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bookingId: bookingData.booking.id }),
+        })
+
+        const checkoutData = await checkoutRes.json()
+
+        if (!checkoutRes.ok) {
+          throw new Error(checkoutData.error || "Failed to create checkout session")
+        }
+
+        // Redirect to Stripe Checkout
+        if (checkoutData.checkoutUrl) {
+          window.location.href = checkoutData.checkoutUrl
+        } else {
+          throw new Error("No checkout URL received")
+        }
       }
-
-      // Redirect to success page
-      router.push(`/booking/success?booking_id=${bookingData.booking.id}&demo=true`)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")
       setLoading(false)
@@ -111,142 +144,134 @@ export function BookingForm({
   }
 
   return (
-    <Card className="shadow-lg border-gray-200">
-      <CardContent className="p-6 space-y-5">
-        {/* Price Header */}
-        <div className="flex justify-between items-end">
-          <div>
-            <span className="text-2xl font-bold">${price}</span>
-            <span className="text-gray-500"> / night</span>
-          </div>
-          <div className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded">
-            Smart Price Active
-          </div>
-        </div>
+    <div className="border border-border rounded-md p-6 bg-card space-y-5">
+      {/* Price Header */}
+      <div>
+        <span className="text-xl font-medium text-foreground">${price}</span>
+        <span className="text-muted-foreground">/night</span>
+      </div>
 
-        {/* Date Selection */}
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <Label htmlFor="checkin" className="text-xs font-medium uppercase">
-              Check-in
-            </Label>
-            <Input
-              id="checkin"
-              type="date"
-              value={checkIn}
-              min={today}
-              onChange={(e) => setCheckIn(e.target.value)}
-              className="mt-1"
-            />
-          </div>
-          <div>
-            <Label htmlFor="checkout" className="text-xs font-medium uppercase">
-              Check-out
-            </Label>
-            <Input
-              id="checkout"
-              type="date"
-              value={checkOut}
-              min={checkIn || today}
-              onChange={(e) => setCheckOut(e.target.value)}
-              className="mt-1"
-            />
-          </div>
-        </div>
-
-        {/* Guest Selection */}
+      {/* Date Selection */}
+      <div className="grid grid-cols-2 gap-3">
         <div>
-          <Label className="text-xs font-medium uppercase">Guests</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-between mt-1 bg-transparent"
-              >
-                <span>
-                  {guests} guest{guests !== 1 ? "s" : ""}
-                </span>
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-64">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-medium">Guests</div>
-                  <div className="text-sm text-muted-foreground">
-                    Max {maxGuests}
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setGuests(Math.max(1, guests - 1))}
-                    disabled={guests <= 1}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <span className="w-8 text-center">{guests}</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setGuests(Math.min(maxGuests, guests + 1))}
-                    disabled={guests >= maxGuests}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+          <Label htmlFor="checkin" className="text-xs text-muted-foreground mb-1.5 block">
+            Check-in
+          </Label>
+          <Input
+            id="checkin"
+            type="date"
+            value={checkIn}
+            min={today}
+            onChange={(e) => setCheckIn(e.target.value)}
+            className="bg-background"
+          />
         </div>
+        <div>
+          <Label htmlFor="checkout" className="text-xs text-muted-foreground mb-1.5 block">
+            Check-out
+          </Label>
+          <Input
+            id="checkout"
+            type="date"
+            value={checkOut}
+            min={checkIn || today}
+            onChange={(e) => setCheckOut(e.target.value)}
+            className="bg-background"
+          />
+        </div>
+      </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
-            {error}
-          </div>
-        )}
-
-        {/* Reserve Button */}
-        <Button
-          onClick={handleReserve}
-          disabled={loading}
-          className="w-full h-12 text-lg bg-gradient-to-r from-blue-600 to-indigo-600"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Processing...
-            </>
-          ) : !isAuthenticated ? (
-            "Sign in to Reserve"
-          ) : (
-            "Reserve"
-          )}
-        </Button>
-
-        <p className="text-center text-xs text-gray-400">
-          You won&apos;t be charged yet
-        </p>
-
-        {/* Price Breakdown */}
-        {nights > 0 && (
-          <div className="space-y-2 pt-2">
-            <div className="flex justify-between text-sm text-gray-600">
-              <span className="underline">
-                ${price} x {nights} night{nights > 1 ? "s" : ""}
+      {/* Guest Selection */}
+      <div>
+        <Label className="text-xs text-muted-foreground mb-1.5 block">Guests</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-between bg-background"
+            >
+              <span className="text-foreground">
+                {guests} {guests === 1 ? "guest" : "guests"}
               </span>
-              <span>${subtotal.toFixed(2)}</span>
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-foreground">Guests</p>
+                <p className="text-xs text-muted-foreground">Max {maxGuests}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setGuests(Math.max(1, guests - 1))}
+                  disabled={guests <= 1}
+                  className="h-8 w-8 p-0"
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <span className="w-6 text-center text-sm">{guests}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setGuests(Math.min(maxGuests, guests + 1))}
+                  disabled={guests >= maxGuests}
+                  className="h-8 w-8 p-0"
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
-            <Separator className="my-2" />
-            <div className="flex justify-between font-bold text-gray-900">
-              <span>Total</span>
-              <span>${total.toFixed(2)}</span>
-            </div>
-          </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+          {error}
+        </div>
+      )}
+
+      {/* Reserve Button */}
+      <Button
+        onClick={handleReserve}
+        disabled={loading}
+        className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+      >
+        {loading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Processing...
+          </>
+        ) : !isAuthenticated ? (
+          "Sign in to reserve"
+        ) : (
+          "Reserve"
         )}
-      </CardContent>
-    </Card>
+      </Button>
+
+      <p className="text-center text-xs text-muted-foreground">
+        You won&apos;t be charged yet
+      </p>
+
+      {/* Price Breakdown */}
+      {nights > 0 && (
+        <div className="space-y-3 pt-3 border-t border-border">
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">
+              ${price} × {nights} {nights === 1 ? "night" : "nights"}
+            </span>
+            <span className="text-foreground">${subtotal.toFixed(0)}</span>
+          </div>
+          <div className="flex justify-between text-sm font-medium">
+            <span className="text-foreground">Total</span>
+            <span className="text-foreground">${total.toFixed(0)}</span>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

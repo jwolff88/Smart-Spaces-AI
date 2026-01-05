@@ -2,68 +2,116 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * SMART SPACES DESIGN SYSTEM
+ * Philosophy: Architectural Calm
+ *
+ * Color Palette: Warm minimalism with forest accent
+ * Typography: DM Sans - geometric warmth
+ * Spacing: 8px base unit
+ * Motion: 200ms ease-out default
+ */
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    
+    /* === FOUNDATION COLORS === */
+    /* Warm stone palette - not cold grays */
+    --background: 40 20% 99%;           /* Warm off-white #FDFCFB */
+    --foreground: 30 10% 12%;           /* Warm charcoal #211F1D */
+
+    /* Surface hierarchy */
+    --card: 40 15% 98%;                 /* Subtle warm surface */
+    --card-foreground: 30 10% 12%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    
-    /* Primary Brand Color: A sophisticated deep blue/indigo */
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    
-    --radius: 0.5rem;
+    --popover-foreground: 30 10% 12%;
+
+    /* === BRAND COLORS === */
+    /* Primary: Deep forest green - sophisticated, grounding */
+    --primary: 160 35% 18%;             /* #1A3A2F - forest */
+    --primary-foreground: 40 20% 98%;
+
+    /* Secondary: Warm stone */
+    --secondary: 35 15% 93%;            /* #EDE9E3 - warm gray */
+    --secondary-foreground: 30 10% 20%;
+
+    /* Muted: For subtle text and borders */
+    --muted: 35 10% 95%;
+    --muted-foreground: 30 5% 45%;
+
+    /* Accent: Terracotta warmth for highlights */
+    --accent: 20 60% 55%;               /* #C97B5D - terracotta */
+    --accent-foreground: 0 0% 100%;
+
+    /* === SEMANTIC COLORS === */
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 145 45% 35%;             /* Muted green */
+    --success-foreground: 0 0% 100%;
+
+    --warning: 35 85% 55%;              /* Warm amber */
+    --warning-foreground: 30 10% 12%;
+
+    /* === STRUCTURE === */
+    --border: 35 10% 88%;               /* Warm border */
+    --input: 35 10% 90%;
+    --ring: 160 35% 18%;                /* Matches primary */
+
+    --radius: 0.375rem;                 /* 6px - subtle, not bubbly */
+
+    /* === SPACING RHYTHM === */
+    --space-xs: 0.25rem;                /* 4px */
+    --space-sm: 0.5rem;                 /* 8px */
+    --space-md: 1rem;                   /* 16px */
+    --space-lg: 1.5rem;                 /* 24px */
+    --space-xl: 2rem;                   /* 32px */
+    --space-2xl: 3rem;                  /* 48px */
+    --space-3xl: 4rem;                  /* 64px */
+    --space-4xl: 6rem;                  /* 96px */
+
+    /* === MOTION === */
+    --transition-fast: 150ms;
+    --transition-base: 200ms;
+    --transition-slow: 300ms;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --background: 30 10% 8%;            /* Warm dark */
+    --foreground: 40 15% 92%;
+
+    --card: 30 10% 10%;
+    --card-foreground: 40 15% 92%;
+
+    --popover: 30 10% 10%;
+    --popover-foreground: 40 15% 92%;
+
+    --primary: 155 40% 45%;             /* Lighter forest for dark mode */
+    --primary-foreground: 30 10% 8%;
+
+    --secondary: 30 8% 18%;
+    --secondary-foreground: 40 15% 92%;
+
+    --muted: 30 8% 15%;
+    --muted-foreground: 35 10% 55%;
+
+    --accent: 20 55% 60%;
+    --accent-foreground: 30 10% 8%;
+
+    --destructive: 0 55% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 145 40% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 35 75% 50%;
+    --warning-foreground: 30 10% 8%;
+
+    --border: 30 8% 20%;
+    --input: 30 8% 18%;
+    --ring: 155 40% 45%;
   }
 }
 
@@ -71,7 +119,114 @@
   * {
     @apply border-border;
   }
+
+  html {
+    /* Smooth scrolling with reduced motion respect */
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "ss02", "cv01";
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Typography scale with tight tracking for headlines */
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+
+  h1 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+    line-height: 1.1;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl;
+    line-height: 1.2;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl;
+    line-height: 1.25;
+  }
+
+  /* Body text with generous line height */
+  p {
+    line-height: 1.65;
+  }
+
+  /* Focus states - visible but not intrusive */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Selection color */
+  ::selection {
+    background: hsl(var(--primary) / 0.15);
+    color: hsl(var(--foreground));
+  }
+}
+
+/* === UTILITY CLASSES === */
+@layer utilities {
+  /* Smooth transitions for interactive elements */
+  .transition-smooth {
+    transition-property: color, background-color, border-color, transform, opacity, box-shadow;
+    transition-duration: var(--transition-base);
+    transition-timing-function: var(--ease-out);
+  }
+
+  /* Text balance for headlines */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Container with comfortable reading width */
+  .prose-width {
+    max-width: 65ch;
+  }
+
+  /* Subtle hover lift */
+  .hover-lift {
+    transition: transform var(--transition-base) var(--ease-out);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Editorial spacing */
+  .space-editorial {
+    padding-top: var(--space-3xl);
+    padding-bottom: var(--space-3xl);
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

@@ -1,13 +1,20 @@
-import { auth, signOut } from "@/auth"
+import { auth } from "@/auth"
 import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Plus, Home, LogOut, Calendar, DollarSign, Users, Clock } from "lucide-react"
-// import { StripeConnectCard } from "@/components/stripe-connect-card" // Disabled for demo
+import { ArrowRight } from "lucide-react"
+
+/*
+  HOST DASHBOARD PAGE
+  Philosophy: Editorial content flow, not admin panel
+
+  - Stats integrated into content, not isolated cards
+  - Breathing room between sections
+  - Typography-driven hierarchy
+  - Minimal chrome, maximum content
+*/
 
 function formatDate(date: Date) {
   return date.toLocaleDateString("en-US", {
@@ -16,19 +23,18 @@ function formatDate(date: Date) {
   })
 }
 
-function getStatusBadge(status: string) {
-  switch (status) {
-    case "confirmed":
-      return <Badge className="bg-green-600">Confirmed</Badge>
-    case "pending":
-      return <Badge className="bg-yellow-500">Pending</Badge>
-    case "cancelled":
-      return <Badge variant="destructive">Cancelled</Badge>
-    case "completed":
-      return <Badge variant="secondary">Completed</Badge>
-    default:
-      return <Badge variant="outline">{status}</Badge>
+function getStatusIndicator(status: string) {
+  const styles = {
+    confirmed: "bg-success",
+    pending: "bg-warning",
+    cancelled: "bg-destructive",
+    completed: "bg-muted-foreground",
   }
+  return (
+    <span
+      className={`inline-block w-2 h-2 rounded-full ${styles[status as keyof typeof styles] || "bg-muted-foreground"}`}
+    />
+  )
 }
 
 interface PageProps {
@@ -36,8 +42,7 @@ interface PageProps {
 }
 
 export default async function DashboardPage({ searchParams }: PageProps) {
-  const params = await searchParams
-  const connectStatus = params.connect as "success" | "refresh" | undefined
+  await searchParams
 
   const session = await auth()
 
@@ -69,7 +74,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       guest: { select: { name: true, email: true } },
     },
     orderBy: { createdAt: "desc" },
-    take: 10,
+    take: 5,
   })
 
   // Calculate stats
@@ -79,193 +84,179 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     .filter((b) => b.status === "confirmed" || b.status === "completed")
     .reduce((sum, b) => sum + (b.totalPrice - b.serviceFee), 0)
 
+  const firstName = session.user.name?.split(" ")[0] || "there"
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Host Dashboard</h1>
-          <p className="text-gray-500">Welcome back, {session.user.name || "Host"}!</p>
-        </div>
-        <div className="flex gap-3">
-          <form
-            action={async () => {
-              "use server"
-              await signOut()
-            }}
-          >
-            <Button variant="outline" type="submit">
-              <LogOut className="mr-2 h-4 w-4" /> Sign Out
-            </Button>
-          </form>
-          <Link href="/host-dashboard/add-property">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Add Property
-            </Button>
-          </Link>
-        </div>
-      </div>
+    <div className="space-y-16">
+      {/* Welcome Section - Editorial, not admin */}
+      <section>
+        <p className="text-overline uppercase text-muted-foreground tracking-widest mb-2">
+          Overview
+        </p>
+        <h1 className="text-title text-foreground mb-4">
+          Welcome back, {firstName}
+        </h1>
 
-      {/* Stripe Connect Card - Disabled for demo */}
-      {/* <StripeConnectCard initialStatus={connectStatus} /> */}
-
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Listings</CardTitle>
-            <Home className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{listings.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Pending Bookings</CardTitle>
-            <Clock className="h-4 w-4 text-yellow-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{pendingBookings.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Confirmed</CardTitle>
-            <Users className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{confirmedBookings.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">After platform fees</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Bookings */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Bookings</CardTitle>
-          <CardDescription>
-            Reservations for your properties
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {bookings.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Calendar className="h-12 w-12 mx-auto mb-4 opacity-20" />
-              <p>No bookings yet.</p>
-              <p className="text-sm">When guests book your properties, they'll appear here.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {bookings.map((booking) => {
-                const nights = Math.ceil(
-                  (booking.checkOut.getTime() - booking.checkIn.getTime()) / (1000 * 60 * 60 * 24)
-                )
-                return (
-                  <div
-                    key={booking.id}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-4"
-                  >
-                    <div className="space-y-1">
-                      <div className="font-medium">{booking.listing.title}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {booking.guest.name || booking.guest.email} • {booking.guests} guest{booking.guests > 1 ? "s" : ""}
-                      </div>
-                      <div className="text-sm text-muted-foreground flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {formatDate(booking.checkIn)} - {formatDate(booking.checkOut)} ({nights} nights)
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <div className="font-semibold">${(booking.totalPrice - booking.serviceFee).toFixed(2)}</div>
-                        <div className="text-xs text-muted-foreground">Your earnings</div>
-                      </div>
-                      {getStatusBadge(booking.status)}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+        {/* Stats as inline text, not cards */}
+        <p className="text-body-lg text-muted-foreground max-w-2xl">
+          You have{" "}
+          <span className="text-foreground font-medium">{listings.length} {listings.length === 1 ? "property" : "properties"}</span>
+          {pendingBookings.length > 0 && (
+            <>
+              {" "}with{" "}
+              <span className="text-warning font-medium">
+                {pendingBookings.length} pending {pendingBookings.length === 1 ? "booking" : "bookings"}
+              </span>
+            </>
           )}
-        </CardContent>
-      </Card>
+          {confirmedBookings.length > 0 && (
+            <>
+              {" "}and{" "}
+              <span className="text-success font-medium">
+                {confirmedBookings.length} confirmed
+              </span>
+            </>
+          )}
+          .
+          {totalRevenue > 0 && (
+            <>
+              {" "}You&apos;ve earned{" "}
+              <span className="text-foreground font-medium">${totalRevenue.toFixed(0)}</span>
+              {" "}so far.
+            </>
+          )}
+        </p>
+      </section>
 
-      {/* Listings Grid */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">Your Properties</h2>
-        {listings.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-xl border border-dashed">
-            <Home className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900">No properties yet</h3>
-            <p className="text-gray-500 mb-6">Create your first AI-optimized listing today.</p>
-            <Link href="/host-dashboard/add-property">
-              <Button>Create Listing</Button>
+      {/* Recent Activity */}
+      <section>
+        <div className="flex items-baseline justify-between mb-6">
+          <h2 className="text-headline text-foreground">Recent activity</h2>
+          {bookings.length > 0 && (
+            <Link
+              href="/host-dashboard/calendar"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              View all
             </Link>
+          )}
+        </div>
+
+        {bookings.length === 0 ? (
+          <div className="py-12 text-center border border-dashed border-border rounded-lg">
+            <p className="text-muted-foreground mb-1">No bookings yet</p>
+            <p className="text-sm text-muted-foreground/70">
+              When guests book your properties, they&apos;ll appear here.
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {listings.map((listing) => {
-              const imageUrl = listing.images?.[0] || listing.imageSrc
+          <div className="divide-y divide-border">
+            {bookings.map((booking) => {
+              const nights = Math.ceil(
+                (booking.checkOut.getTime() - booking.checkIn.getTime()) / (1000 * 60 * 60 * 24)
+              )
               return (
-                <Card key={listing.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="h-48 bg-gray-200 relative">
-                    {imageUrl ? (
-                      <Image
-                        src={imageUrl}
-                        alt={listing.title}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                        <Home className="h-12 w-12" />
-                      </div>
-                    )}
-                    <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded-full text-xs font-bold shadow-sm">
-                      ${listing.price}/night
+                <div
+                  key={booking.id}
+                  className="py-5 first:pt-0 last:pb-0 flex items-start justify-between gap-4"
+                >
+                  <div className="flex items-start gap-3">
+                    {getStatusIndicator(booking.status)}
+                    <div>
+                      <p className="text-sm font-medium text-foreground">
+                        {booking.guest.name || booking.guest.email?.split("@")[0]}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {booking.listing.title} · {formatDate(booking.checkIn)}–{formatDate(booking.checkOut)}
+                      </p>
+                      <p className="text-xs text-muted-foreground/70 mt-0.5">
+                        {nights} {nights === 1 ? "night" : "nights"} · {booking.guests} {booking.guests === 1 ? "guest" : "guests"}
+                      </p>
                     </div>
-                    {listing._count.bookings > 0 && (
-                      <div className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-bold shadow-sm">
-                        {listing._count.bookings} booking{listing._count.bookings > 1 ? "s" : ""}
-                      </div>
-                    )}
                   </div>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="line-clamp-1 text-lg">{listing.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pb-2">
-                    <p className="text-gray-500 text-sm line-clamp-2 mb-2">
-                      {listing.description}
-                    </p>
-                    <div className="flex gap-2 text-xs text-gray-400">
-                      <span>{listing.bedrooms} Beds</span> •
-                      <span>{listing.type}</span>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="border-t bg-gray-50/50 p-4">
-                    <Link href={`/listings/${listing.id}`} className="w-full">
-                      <Button variant="outline" className="w-full h-8 text-xs">
-                        View Listing
-                      </Button>
-                    </Link>
-                  </CardFooter>
-                </Card>
+                  <p className="text-sm font-medium text-foreground">
+                    ${(booking.totalPrice - booking.serviceFee).toFixed(0)}
+                  </p>
+                </div>
               )
             })}
           </div>
         )}
-      </div>
+      </section>
+
+      {/* Properties Section */}
+      <section>
+        <div className="flex items-baseline justify-between mb-6">
+          <h2 className="text-headline text-foreground">Your properties</h2>
+          <Link
+            href="/host-dashboard/add-property"
+            className="text-sm text-primary hover:text-primary/80 transition-colors"
+          >
+            Add property
+          </Link>
+        </div>
+
+        {listings.length === 0 ? (
+          <div className="py-16 text-center border border-dashed border-border rounded-lg">
+            <p className="text-muted-foreground mb-2">No properties yet</p>
+            <p className="text-sm text-muted-foreground/70 mb-6 max-w-sm mx-auto">
+              List your first property. Our AI will help write the perfect description.
+            </p>
+            <Link href="/host-dashboard/add-property">
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                Add your first property
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {listings.map((listing) => {
+              const imageUrl = listing.images?.[0] || listing.imageSrc
+              return (
+                <Link
+                  key={listing.id}
+                  href={`/listings/${listing.id}`}
+                  className="group block"
+                >
+                  <article className="flex gap-4">
+                    {/* Thumbnail */}
+                    <div className="w-28 h-20 bg-secondary rounded-md overflow-hidden flex-shrink-0 relative">
+                      {imageUrl ? (
+                        <Image
+                          src={imageUrl}
+                          alt={listing.title}
+                          fill
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/30">
+                          <span className="text-2xl">⌂</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                        {listing.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        ${listing.price}/night · {listing.bedrooms} {listing.bedrooms === 1 ? "bed" : "beds"}
+                      </p>
+                      {listing._count.bookings > 0 && (
+                        <p className="text-xs text-muted-foreground/70 mt-1">
+                          {listing._count.bookings} {listing._count.bookings === 1 ? "booking" : "bookings"}
+                        </p>
+                      )}
+                    </div>
+                  </article>
+                </Link>
+              )
+            })}
+          </div>
+        )}
+      </section>
     </div>
   )
 }

@@ -2,19 +2,25 @@
 
 import { useState, Suspense } from "react"
 
-// Note: Metadata must be in a separate file for client components
-// See app/login/layout.tsx for SEO metadata
-import { useSearchParams, useRouter } from "next/navigation"
+/*
+  LOGIN PAGE
+  Philosophy: Editorial simplicity, not card-in-box
+
+  - Typography-led hierarchy
+  - Minimal chrome
+  - Form flows naturally
+  - No decorative elements
+*/
+
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { registerUser } from "@/app/actions/register"
 import { login } from "@/app/actions/login"
 import { signIn } from "next-auth/react"
-import { Loader2, Building2, Plane, Sparkles, ArrowLeft } from "lucide-react"
+import { Loader2, ArrowLeft } from "lucide-react"
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -49,11 +55,10 @@ function GitHubIcon({ className }: { className?: string }) {
 
 function AuthContent() {
   const searchParams = useSearchParams()
-  const router = useRouter()
 
   // Determine initial mode from URL params
-  const mode = searchParams.get("mode") // "register" or null (login)
-  const roleParam = searchParams.get("role") // "host" or "traveler"
+  const mode = searchParams.get("mode")
+  const roleParam = searchParams.get("role")
 
   const [isRegister, setIsRegister] = useState(mode === "register")
   const [selectedRole, setSelectedRole] = useState<"host" | "traveler">(
@@ -70,7 +75,6 @@ function AuthContent() {
     const formData = new FormData(event.currentTarget)
 
     if (isRegister) {
-      // Add role to form data for registration
       formData.set("role", selectedRole)
 
       const result = await registerUser(formData)
@@ -78,16 +82,13 @@ function AuthContent() {
         setError(result.error)
         setIsLoading(false)
       } else {
-        // Auto-login after registration
         const loginResult = await login(formData)
         if (loginResult?.error) {
           setError(loginResult.error)
           setIsLoading(false)
         }
-        // Redirect handled by login action based on role
       }
     } else {
-      // Login - pass the intended role for redirect
       formData.set("intendedRole", roleParam || "")
 
       try {
@@ -95,162 +96,221 @@ function AuthContent() {
         if (result?.error) {
           setError(result.error)
         }
-      } catch (e) {
+      } catch {
         // Redirects throw in Next.js, ignore
       }
       setIsLoading(false)
     }
   }
 
-  // Determine the title and description based on context
   const getTitle = () => {
-    if (isRegister) return "Create an account"
-    if (roleParam === "host") return "Host Sign In"
-    if (roleParam === "traveler") return "Traveler Sign In"
-    return "Welcome back"
+    if (isRegister) return "Create your account"
+    return "Sign in"
   }
 
-  const getDescription = () => {
-    if (isRegister) return "Choose your role and create your account"
-    if (roleParam === "host") return "Sign in to access your host dashboard"
-    if (roleParam === "traveler") return "Sign in to manage your trips"
-    return "Enter your email to sign in"
+  const getSubtitle = () => {
+    if (isRegister) {
+      return selectedRole === "host"
+        ? "Start listing your properties"
+        : "Find your perfect stay"
+    }
+    if (roleParam === "host") return "Access your host dashboard"
+    if (roleParam === "traveler") return "Manage your trips"
+    return "Welcome back to Smart Spaces"
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <Link
-        href="/"
-        className="absolute left-4 top-4 inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary md:left-8 md:top-8"
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Home
-      </Link>
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header */}
+      <header className="px-6 py-6">
+        <div className="max-w-sm mx-auto flex items-center justify-between">
+          <Link
+            href="/"
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Link>
+          <Link href="/" className="text-sm font-medium text-foreground">
+            Smart Spaces
+          </Link>
+        </div>
+      </header>
 
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <div className="flex justify-center mb-4">
-            <div className="flex items-center gap-2 text-primary">
-              <Sparkles className="h-6 w-6" />
-              <span className="font-bold text-xl">Smart Spaces</span>
-            </div>
+      {/* Main content */}
+      <main className="flex-1 flex items-center justify-center px-6 pb-12">
+        <div className="w-full max-w-sm">
+          {/* Title */}
+          <div className="mb-8">
+            <h1 className="text-title text-foreground mb-2">
+              {getTitle()}
+            </h1>
+            <p className="text-body text-muted-foreground">
+              {getSubtitle()}
+            </p>
           </div>
-          <CardTitle className="text-2xl font-bold text-center">
-            {getTitle()}
-          </CardTitle>
-          <CardDescription className="text-center">
-            {getDescription()}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {/* Social Login Buttons */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <Button
+
+          {/* Social Login */}
+          <div className="space-y-3 mb-8">
+            <button
               type="button"
-              variant="outline"
               onClick={() => signIn("google", { callbackUrl: roleParam === "host" ? "/host-dashboard" : "/guest-dashboard" })}
               disabled={isLoading}
+              className="w-full h-11 px-4 inline-flex items-center justify-center rounded-md border border-border bg-background text-sm font-medium text-foreground hover:bg-secondary transition-colors disabled:opacity-50"
             >
-              <GoogleIcon className="mr-2 h-4 w-4" />
-              Google
-            </Button>
-            <Button
+              <GoogleIcon className="mr-3 h-4 w-4" />
+              Continue with Google
+            </button>
+            <button
               type="button"
-              variant="outline"
               onClick={() => signIn("github", { callbackUrl: roleParam === "host" ? "/host-dashboard" : "/guest-dashboard" })}
               disabled={isLoading}
+              className="w-full h-11 px-4 inline-flex items-center justify-center rounded-md border border-border bg-background text-sm font-medium text-foreground hover:bg-secondary transition-colors disabled:opacity-50"
             >
-              <GitHubIcon className="mr-2 h-4 w-4" />
-              GitHub
-            </Button>
+              <GitHubIcon className="mr-3 h-4 w-4" />
+              Continue with GitHub
+            </button>
           </div>
 
-          <div className="relative mb-4">
+          {/* Divider */}
+          <div className="relative mb-8">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+              <span className="w-full border-t border-border" />
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with email
+            <div className="relative flex justify-center">
+              <span className="bg-background px-3 text-xs text-muted-foreground uppercase tracking-wider">
+                or
               </span>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-
-            {/* Role Selection - Only show for registration */}
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Role Selection - Registration only */}
             {isRegister && (
               <div className="space-y-2">
-                <Label>I am a...</Label>
-                <Tabs
-                  value={selectedRole}
-                  onValueChange={(v) => setSelectedRole(v as "host" | "traveler")}
-                  className="w-full"
-                >
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="host" className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4" />
-                      Host
-                    </TabsTrigger>
-                    <TabsTrigger value="traveler" className="flex items-center gap-2">
-                      <Plane className="h-4 w-4" />
-                      Traveler
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-                <p className="text-xs text-muted-foreground text-center mt-2">
-                  {selectedRole === "host"
-                    ? "List your properties and manage bookings"
-                    : "Browse listings and book your perfect stay"}
-                </p>
+                <Label className="text-sm text-muted-foreground">I want to</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedRole("traveler")}
+                    className={`h-11 rounded-md border text-sm font-medium transition-all ${
+                      selectedRole === "traveler"
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-border text-muted-foreground hover:border-foreground/30"
+                    }`}
+                  >
+                    Find a place
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedRole("host")}
+                    className={`h-11 rounded-md border text-sm font-medium transition-all ${
+                      selectedRole === "host"
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-border text-muted-foreground hover:border-foreground/30"
+                    }`}
+                  >
+                    List my property
+                  </button>
+                </div>
               </div>
             )}
 
-            {/* Name - Only for registration */}
+            {/* Name - Registration only */}
             {isRegister && (
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input id="name" name="name" placeholder="John Doe" required />
+                <Label htmlFor="name" className="text-sm text-muted-foreground">
+                  Name
+                </Label>
+                <Input
+                  id="name"
+                  name="name"
+                  placeholder="Your name"
+                  required
+                  className="h-11 bg-background"
+                />
               </div>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" placeholder="m@example.com" required />
+              <Label htmlFor="email" className="text-sm text-muted-foreground">
+                Email
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+                className="h-11 bg-background"
+              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" type="password" required />
+              <Label htmlFor="password" className="text-sm text-muted-foreground">
+                Password
+              </Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder={isRegister ? "Create a password" : "Enter your password"}
+                required
+                className="h-11 bg-background"
+              />
             </div>
 
             {error && (
-              <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+              <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
                 {error}
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+              disabled={isLoading}
+            >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isRegister ? "Create Account" : "Sign In"}
+              {isRegister ? "Create account" : "Sign in"}
             </Button>
           </form>
-        </CardContent>
-        <CardFooter>
-          <Button
-            variant="link"
-            className="w-full"
-            onClick={() => {
-              setIsRegister(!isRegister)
-              setError(null)
-            }}
-          >
-            {isRegister
-              ? "Already have an account? Sign in"
-              : "Don't have an account? Sign up"}
-          </Button>
-        </CardFooter>
-      </Card>
+
+          {/* Toggle */}
+          <p className="mt-8 text-center text-sm text-muted-foreground">
+            {isRegister ? (
+              <>
+                Already have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsRegister(false)
+                    setError(null)
+                  }}
+                  className="text-foreground hover:text-primary transition-colors"
+                >
+                  Sign in
+                </button>
+              </>
+            ) : (
+              <>
+                Don&apos;t have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsRegister(true)
+                    setError(null)
+                  }}
+                  className="text-foreground hover:text-primary transition-colors"
+                >
+                  Sign up
+                </button>
+              </>
+            )}
+          </p>
+        </div>
+      </main>
     </div>
   )
 }
@@ -258,8 +318,8 @@ function AuthContent() {
 export default function AuthPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     }>
       <AuthContent />

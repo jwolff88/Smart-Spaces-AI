@@ -4,22 +4,20 @@ import { redirect } from "next/navigation"
 import { auth, signOut } from "@/auth"
 import { db } from "@/lib/db"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MobileNav } from "@/components/mobile-nav"
-import {
-  Calendar,
-  MapPin,
-  Sparkles,
-  ArrowRight,
-  MessageSquare,
-  LogOut,
-  Home,
-  Star,
-} from "lucide-react"
+import { ArrowRight, Star } from "lucide-react"
 import { ReviewButton } from "./review-button"
 import { CancelBookingButton } from "./cancel-booking-button"
+
+/*
+  GUEST DASHBOARD
+  Philosophy: Editorial trip list, not admin panel
+
+  - Typography-driven hierarchy
+  - Status as colored dots, not badges
+  - Clean navigation
+  - Breathing room between sections
+  - Content flows naturally
+*/
 
 function formatDate(date: Date) {
   return date.toLocaleDateString("en-US", {
@@ -28,19 +26,28 @@ function formatDate(date: Date) {
   })
 }
 
-function getStatusBadge(status: string) {
-  switch (status) {
-    case "confirmed":
-      return <Badge className="bg-green-600">Confirmed</Badge>
-    case "pending":
-      return <Badge className="bg-yellow-500">Pending Payment</Badge>
-    case "cancelled":
-      return <Badge variant="destructive">Cancelled</Badge>
-    case "completed":
-      return <Badge variant="secondary">Completed</Badge>
-    default:
-      return <Badge variant="outline">{status}</Badge>
+function getStatusIndicator(status: string) {
+  const styles: Record<string, string> = {
+    confirmed: "bg-success",
+    pending: "bg-warning",
+    cancelled: "bg-destructive",
+    completed: "bg-muted-foreground",
   }
+  return (
+    <span
+      className={`inline-block w-2 h-2 rounded-full ${styles[status] || "bg-muted-foreground"}`}
+    />
+  )
+}
+
+function getStatusText(status: string) {
+  const texts: Record<string, string> = {
+    confirmed: "Confirmed",
+    pending: "Pending",
+    cancelled: "Cancelled",
+    completed: "Completed",
+  }
+  return texts[status] || status
 }
 
 function getNights(checkIn: Date, checkOut: Date) {
@@ -82,271 +89,250 @@ export default async function GuestDashboard() {
   )
 
   return (
-    <div className="min-h-screen bg-muted/40">
-      {/* --- TOP NAVIGATION --- */}
-      <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6 shadow-sm">
-        {/* Mobile Menu */}
-        <MobileNav variant="guest" userName={session.user.name || undefined} />
+    <div className="min-h-screen bg-background">
+      {/* Header - Minimal, editorial */}
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="h-16 flex items-center justify-between">
+            <Link
+              href="/"
+              className="text-lg font-medium tracking-tight text-foreground"
+            >
+              Smart Spaces
+            </Link>
 
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-semibold">
-          <Sparkles className="h-5 w-5 text-primary" />
-          <span className="hidden sm:inline">Smart Spaces</span>
-        </Link>
+            {/* Navigation - Typography only */}
+            <nav className="hidden md:flex items-center gap-8">
+              <Link
+                href="/search"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Explore
+              </Link>
+              <Link
+                href="/guest-dashboard"
+                className="text-sm text-foreground font-medium"
+              >
+                Trips
+              </Link>
+              <Link
+                href="/messages"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Messages
+              </Link>
+              <Link
+                href="/onboarding"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Preferences
+              </Link>
+            </nav>
 
-        {/* Desktop Navigation */}
-        <nav className="ml-auto hidden md:flex items-center gap-6 text-sm font-medium">
-          <Link href="/search" className="text-muted-foreground hover:text-foreground transition-colors">
-            Explore
-          </Link>
-          <Link href="/guest-dashboard" className="text-primary font-semibold">
-            Trips
-          </Link>
-          <Link href="/messages" className="text-muted-foreground hover:text-foreground transition-colors">
-            Messages
-          </Link>
-          <Link href="/onboarding" className="text-muted-foreground hover:text-foreground transition-colors">
-            Preferences
-          </Link>
-          <form
-            action={async () => {
-              "use server"
-              await signOut()
-            }}
-          >
-            <Button variant="ghost" size="sm" className="gap-2" type="submit">
-              <LogOut className="h-4 w-4" />
-              <span className="hidden lg:inline">Sign Out</span>
-            </Button>
-          </form>
-        </nav>
-
-        {/* Mobile Sign Out */}
-        <form
-          className="md:hidden ml-auto"
-          action={async () => {
-            "use server"
-            await signOut()
-          }}
-        >
-          <Button variant="ghost" size="icon" className="h-9 w-9" type="submit">
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </form>
+            <form
+              action={async () => {
+                "use server"
+                await signOut()
+              }}
+            >
+              <Button variant="ghost" size="sm" type="submit" className="text-muted-foreground hover:text-foreground">
+                Sign Out
+              </Button>
+            </form>
+          </div>
+        </div>
       </header>
 
-      <main className="container grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-8 md:gap-8">
-        {/* --- WELCOME --- */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <div className="col-span-2">
-            <h1 className="text-2xl font-bold tracking-tight">
-              Welcome back, {session.user.name || "Guest"}!
-            </h1>
-            <p className="text-muted-foreground">
-              {upcomingBookings.length > 0
-                ? `You have ${upcomingBookings.length} upcoming trip${upcomingBookings.length > 1 ? "s" : ""}.`
-                : "You have no upcoming trips. Start exploring!"}
-            </p>
-          </div>
+      <main className="max-w-5xl mx-auto px-6 py-12 space-y-16">
+        {/* Welcome Section */}
+        <section>
+          <p className="text-overline uppercase text-muted-foreground tracking-widest mb-3">
+            Your trips
+          </p>
+          <h1 className="text-title text-foreground mb-4">
+            Welcome back, {session.user.name?.split(" ")[0] || "Guest"}
+          </h1>
+          <p className="text-body text-muted-foreground max-w-xl">
+            {upcomingBookings.length > 0
+              ? `You have ${upcomingBookings.length} upcoming ${upcomingBookings.length === 1 ? "trip" : "trips"} planned.`
+              : "No upcoming trips. Ready for your next adventure?"}
+          </p>
+          {upcomingBookings.length === 0 && (
+            <Link
+              href="/search"
+              className="inline-flex items-center gap-2 mt-6 text-primary hover:text-primary/80 transition-colors"
+            >
+              Browse properties <ArrowRight className="h-4 w-4" />
+            </Link>
+          )}
+        </section>
 
-          {/* CTA CARD */}
-          <Card className="bg-primary/5 border-primary/20 shadow-sm">
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-2 text-primary">
-                <Sparkles className="h-4 w-4" />
-                <CardTitle className="text-sm font-medium">Find Your Next Stay</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Browse AI-optimized listings and discover your perfect vacation rental.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Link href="/search" className="w-full">
-                <Button size="sm" variant="ghost" className="w-full text-primary hover:text-primary hover:bg-primary/10">
-                  Browse Listings <ArrowRight className="ml-2 h-3 w-3" />
-                </Button>
-              </Link>
-            </CardFooter>
-          </Card>
-        </div>
+        {/* Upcoming Trips */}
+        {upcomingBookings.length > 0 && (
+          <section>
+            <h2 className="text-headline text-foreground mb-8">Upcoming</h2>
+            <div className="space-y-6">
+              {upcomingBookings.map((booking) => {
+                const nights = getNights(booking.checkIn, booking.checkOut)
+                const imageUrl = booking.listing.images?.[0] || booking.listing.imageSrc
 
-        <Tabs defaultValue="upcoming" className="grid gap-4">
-          <div className="flex items-center">
-            <TabsList>
-              <TabsTrigger value="upcoming">
-                Upcoming ({upcomingBookings.length})
-              </TabsTrigger>
-              <TabsTrigger value="past">
-                Past ({pastBookings.length})
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          {/* --- UPCOMING TRIPS --- */}
-          <TabsContent value="upcoming">
-            <Card>
-              <CardHeader>
-                <CardTitle>Upcoming Trips</CardTitle>
-                <CardDescription>
-                  Manage your bookings and view check-in details.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-6">
-                {upcomingBookings.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
-                    <Home className="h-12 w-12 mb-4 opacity-20" />
-                    <p>No upcoming trips.</p>
-                    <Link href="/search">
-                      <Button variant="link" className="mt-2">
-                        Start exploring
-                      </Button>
-                    </Link>
-                  </div>
-                ) : (
-                  upcomingBookings.map((booking) => {
-                    const nights = getNights(booking.checkIn, booking.checkOut)
-                    const imageUrl = booking.listing.images?.[0] || booking.listing.imageSrc
-
-                    return (
-                      <div
-                        key={booking.id}
-                        className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center"
-                      >
-                        <div className="h-24 w-24 rounded-md bg-slate-200 sm:h-20 sm:w-20 relative overflow-hidden flex-shrink-0">
-                          {imageUrl ? (
-                            <Image
-                              src={imageUrl}
-                              alt={booking.listing.title}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="flex items-center justify-center h-full">
-                              <Home className="h-8 w-8 text-gray-400" />
-                            </div>
-                          )}
+                return (
+                  <article
+                    key={booking.id}
+                    className="flex flex-col sm:flex-row gap-6 py-6 border-b border-border last:border-0"
+                  >
+                    {/* Image */}
+                    <div className="w-full sm:w-40 h-32 sm:h-28 bg-secondary rounded-md overflow-hidden relative flex-shrink-0">
+                      {imageUrl ? (
+                        <Image
+                          src={imageUrl}
+                          alt={booking.listing.title}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/30">
+                          <span className="text-3xl">⌂</span>
                         </div>
-                        <div className="grid gap-1 flex-1">
-                          <h3 className="font-semibold">{booking.listing.title}</h3>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <MapPin className="h-3 w-3" />
-                            {booking.listing.location}
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Calendar className="h-3 w-3" />
-                            {formatDate(booking.checkIn)} - {formatDate(booking.checkOut)} ({nights} night{nights > 1 ? "s" : ""})
-                          </div>
-                          <div className="text-sm font-medium">
-                            ${booking.totalPrice.toFixed(2)} total
-                          </div>
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-4 mb-2">
+                        <div>
+                          <h3 className="font-medium text-foreground">{booking.listing.title}</h3>
+                          <p className="text-sm text-muted-foreground">{booking.listing.location}</p>
                         </div>
-                        <div className="flex flex-col gap-2 sm:items-end">
-                          {getStatusBadge(booking.status)}
-                          <div className="flex gap-2">
-                            <Link href={`/listings/${booking.listing.id}`}>
-                              <Button size="sm" variant="outline">
-                                View Listing
-                              </Button>
-                            </Link>
-                            {booking.status !== "cancelled" && (
-                              <CancelBookingButton
-                                bookingId={booking.id}
-                                listingTitle={booking.listing.title}
-                              />
-                            )}
-                          </div>
+                        <div className="flex items-center gap-2 text-sm flex-shrink-0">
+                          {getStatusIndicator(booking.status)}
+                          <span className="text-muted-foreground">{getStatusText(booking.status)}</span>
                         </div>
                       </div>
-                    )
-                  })
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
 
-          {/* --- PAST TRIPS --- */}
-          <TabsContent value="past">
-            <Card>
-              <CardHeader>
-                <CardTitle>Past Stays</CardTitle>
-                <CardDescription>View your previous trips.</CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-6">
-                {pastBookings.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-center text-muted-foreground">
-                    <p>No past trips found.</p>
-                    <Link href="/search">
-                      <Button variant="link" className="mt-2">
-                        Start exploring
-                      </Button>
-                    </Link>
-                  </div>
-                ) : (
-                  pastBookings.map((booking) => {
-                    const nights = getNights(booking.checkIn, booking.checkOut)
-                    const imageUrl = booking.listing.images?.[0] || booking.listing.imageSrc
-                    const canReview = !booking.review && booking.status !== "cancelled"
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {formatDate(booking.checkIn)} – {formatDate(booking.checkOut)} · {nights} {nights === 1 ? "night" : "nights"}
+                      </p>
 
-                    return (
-                      <div
-                        key={booking.id}
-                        className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center"
-                      >
-                        <div className="h-24 w-24 rounded-md bg-slate-200 sm:h-20 sm:w-20 relative overflow-hidden flex-shrink-0">
-                          {imageUrl ? (
-                            <Image
-                              src={imageUrl}
-                              alt={booking.listing.title}
-                              fill
-                              className="object-cover"
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-foreground">
+                          ${booking.totalPrice.toFixed(0)} total
+                        </p>
+                        <div className="flex gap-3">
+                          <Link
+                            href={`/listings/${booking.listing.id}`}
+                            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            View listing
+                          </Link>
+                          {booking.status !== "cancelled" && (
+                            <CancelBookingButton
+                              bookingId={booking.id}
+                              listingTitle={booking.listing.title}
                             />
-                          ) : (
-                            <div className="flex items-center justify-center h-full">
-                              <Home className="h-8 w-8 text-gray-400" />
-                            </div>
                           )}
                         </div>
-                        <div className="grid gap-1 flex-1">
-                          <h3 className="font-semibold">{booking.listing.title}</h3>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <MapPin className="h-3 w-3" />
-                            {booking.listing.location}
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Calendar className="h-3 w-3" />
-                            {formatDate(booking.checkIn)} - {formatDate(booking.checkOut)} ({nights} nights)
-                          </div>
-                          {booking.review && (
-                            <div className="flex items-center gap-1 text-sm text-yellow-600">
-                              <Star className="h-3 w-3 fill-yellow-500" />
-                              <span>You rated this {booking.review.rating}/5</span>
-                            </div>
-                          )}
+                      </div>
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Past Trips */}
+        {pastBookings.length > 0 && (
+          <section>
+            <h2 className="text-headline text-foreground mb-8">Past stays</h2>
+            <div className="space-y-6">
+              {pastBookings.map((booking) => {
+                const nights = getNights(booking.checkIn, booking.checkOut)
+                const imageUrl = booking.listing.images?.[0] || booking.listing.imageSrc
+                const canReview = !booking.review && booking.status !== "cancelled"
+
+                return (
+                  <article
+                    key={booking.id}
+                    className="flex flex-col sm:flex-row gap-6 py-6 border-b border-border last:border-0"
+                  >
+                    {/* Image */}
+                    <div className="w-full sm:w-40 h-32 sm:h-28 bg-secondary rounded-md overflow-hidden relative flex-shrink-0">
+                      {imageUrl ? (
+                        <Image
+                          src={imageUrl}
+                          alt={booking.listing.title}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/30">
+                          <span className="text-3xl">⌂</span>
                         </div>
-                        <div className="flex flex-col gap-2 sm:items-end">
-                          {getStatusBadge(booking.status)}
-                          {canReview ? (
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-4 mb-2">
+                        <div>
+                          <h3 className="font-medium text-foreground">{booking.listing.title}</h3>
+                          <p className="text-sm text-muted-foreground">{booking.listing.location}</p>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm flex-shrink-0">
+                          {getStatusIndicator(booking.status)}
+                          <span className="text-muted-foreground">{getStatusText(booking.status)}</span>
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {formatDate(booking.checkIn)} – {formatDate(booking.checkOut)} · {nights} {nights === 1 ? "night" : "nights"}
+                      </p>
+
+                      {/* Review status or action */}
+                      <div className="flex items-center justify-between">
+                        {booking.review ? (
+                          <div className="flex items-center gap-1.5 text-sm">
+                            <Star className="h-3.5 w-3.5 fill-primary text-primary" />
+                            <span className="text-muted-foreground">
+                              You rated this {booking.review.rating}/5
+                            </span>
+                          </div>
+                        ) : (
+                          <span />
+                        )}
+                        <div className="flex gap-3">
+                          {canReview && (
                             <ReviewButton
                               bookingId={booking.id}
                               listingTitle={booking.listing.title}
                             />
-                          ) : booking.review ? (
-                            <Badge variant="outline" className="text-green-600 border-green-600">
-                              <Star className="h-3 w-3 mr-1 fill-green-600" />
-                              Reviewed
-                            </Badge>
-                          ) : null}
+                          )}
                         </div>
                       </div>
-                    )
-                  })
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Empty state for no bookings at all */}
+        {bookings.length === 0 && (
+          <section className="py-16 text-center">
+            <p className="text-muted-foreground mb-2">No trips yet</p>
+            <p className="text-sm text-muted-foreground/70 mb-6">
+              When you book a stay, it will appear here.
+            </p>
+            <Link
+              href="/search"
+              className="text-sm text-primary hover:text-primary/80 transition-colors"
+            >
+              Start exploring
+            </Link>
+          </section>
+        )}
       </main>
     </div>
   )

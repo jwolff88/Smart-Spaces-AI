@@ -1,17 +1,24 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { MobileNav } from "@/components/mobile-nav"
-import {
-  LayoutDashboard,
-  Home,
-  MessageSquare,
-  Calendar,
-  Wrench,
-  LogOut,
-  Bell,
-  BarChart3,
-  Sparkles
-} from "lucide-react"
+
+/*
+  HOST DASHBOARD LAYOUT
+  Philosophy: Editorial navigation, not admin panel
+
+  - Horizontal top nav instead of sidebar
+  - Content-first approach
+  - Typography-led navigation
+  - Breathing room
+*/
+
+const navItems = [
+  { href: "/host-dashboard", label: "Overview" },
+  { href: "/host-dashboard/listings", label: "Properties" },
+  { href: "/host-dashboard/inbox", label: "Messages" },
+  { href: "/host-dashboard/calendar", label: "Calendar" },
+  { href: "/host-dashboard/analytics", label: "Analytics" },
+  { href: "/host-dashboard/maintenance", label: "Maintenance" },
+]
 
 export default function HostLayout({
   children,
@@ -19,107 +26,70 @@ export default function HostLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-
-      {/* --- SIDEBAR (Desktop) --- */}
-      <div className="hidden border-r bg-muted/40 md:block">
-        <div className="flex h-full max-h-screen flex-col gap-2">
-
-          {/* Logo Area */}
-          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            <Link href="/" className="flex items-center gap-2 font-semibold">
-              <Sparkles className="h-5 w-5 text-primary" />
-              <span>Smart Spaces</span>
-              <span className="text-xs font-normal text-muted-foreground bg-primary/10 text-primary px-2 py-0.5 rounded-full">Host</span>
+    <div className="min-h-screen bg-background">
+      {/* --- TOP NAVIGATION --- */}
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div className="max-w-6xl mx-auto px-6">
+          {/* Top bar */}
+          <div className="h-16 flex items-center justify-between">
+            <Link
+              href="/"
+              className="text-lg font-medium tracking-tight text-foreground"
+            >
+              Smart Spaces
             </Link>
-            <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
-              <Bell className="h-4 w-4" />
-              <span className="sr-only">Toggle notifications</span>
-            </Button>
-          </div>
 
-          {/* Navigation Links */}
-          <div className="flex-1">
-            <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+            {/* Desktop: Secondary actions */}
+            <div className="hidden md:flex items-center gap-4">
               <Link
-                href="/host-dashboard"
-                className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
+                href="/host-dashboard/add-property"
+                className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
               >
-                <LayoutDashboard className="h-4 w-4" />
-                Overview
+                Add property
               </Link>
+              <span className="w-px h-4 bg-border" />
               <Link
-                href="/host-dashboard/listings"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-              >
-                <Home className="h-4 w-4" />
-                Listings
-              </Link>
-              <Link
-                href="/host-dashboard/inbox"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-              >
-                <MessageSquare className="h-4 w-4" />
-                Inbox
-              </Link>
-              <Link
-                href="/host-dashboard/calendar"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-              >
-                <Calendar className="h-4 w-4" />
-                Calendar
-              </Link>
-              <Link
-                href="/host-dashboard/analytics"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-              >
-                <BarChart3 className="h-4 w-4" />
-                Analytics
-              </Link>
-              <Link
-                href="/host-dashboard/maintenance"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-              >
-                <Wrench className="h-4 w-4" />
-                Maintenance
-              </Link>
-            </nav>
-          </div>
-
-          {/* Bottom Actions */}
-          <div className="mt-auto p-4">
-             <nav className="grid items-start gap-2 text-sm font-medium">
-               <Link
                 href="/"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-destructive"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                <LogOut className="h-4 w-4" />
-                Sign Out
+                Sign out
               </Link>
-             </nav>
+            </div>
+
+            {/* Mobile: Hamburger */}
+            <div className="md:hidden">
+              <MobileNav variant="host" />
+            </div>
           </div>
+
+          {/* Navigation tabs - Desktop only */}
+          <nav className="hidden md:flex items-center gap-1 -mb-px">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="px-4 py-3 text-sm text-muted-foreground hover:text-foreground border-b-2 border-transparent hover:border-foreground/20 transition-all duration-200"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
         </div>
-      </div>
+      </header>
 
       {/* --- MAIN CONTENT AREA --- */}
-      <div className="flex flex-col">
-        {/* Mobile Header */}
-        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 md:hidden">
-          <MobileNav variant="host" />
-          <div className="flex items-center gap-2 font-semibold flex-1">
-            <Sparkles className="h-5 w-5 text-primary" />
-            Smart Spaces
-          </div>
-          <Button variant="outline" size="icon" className="h-9 w-9">
-            <Bell className="h-4 w-4" />
-          </Button>
-        </header>
+      <main className="max-w-6xl mx-auto px-6 py-8 md:py-12">
+        {children}
+      </main>
 
-        {/* Dynamic Page Content */}
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-          {children}
-        </main>
-      </div>
+      {/* --- FOOTER --- */}
+      <footer className="border-t border-border mt-auto">
+        <div className="max-w-6xl mx-auto px-6 py-8">
+          <p className="text-sm text-muted-foreground">
+            © 2025 Smart Spaces
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }

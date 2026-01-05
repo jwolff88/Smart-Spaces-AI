@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Building2, Plane, UserPlus, Sparkles, Brain, DollarSign, Heart } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Metadata } from "next"
 import { FeedbackBox } from "@/components/FeedbackBox"
 
@@ -34,93 +34,171 @@ export default function LandingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col text-white">
 
-      {/* Navbar */}
-      <header className="px-6 h-20 flex items-center justify-center border-b border-white/10 bg-slate-950/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="font-bold text-3xl flex items-center gap-3">
-          <Sparkles className="h-8 w-8 text-blue-500" />
-          Smart Spaces
-        </div>
-      </header>
+      {/*
+        DESIGN PHILOSOPHY: Architectural Calm
+        - Light, warm palette replacing dark gradients
+        - Editorial layout with asymmetric flow
+        - Typography carries hierarchy
+        - White space is a feature
+        - One clear action, not competing CTAs
+      */}
+      <div className="min-h-screen bg-background">
 
-      {/* Hero Section */}
-      <main className="flex-1 flex flex-col items-center justify-center text-center px-4 py-20">
-        <div className="bg-blue-900/30 text-blue-300 border border-blue-500/30 px-4 py-1.5 rounded-full text-sm font-medium mb-6 inline-flex items-center gap-2">
-          <Sparkles className="h-4 w-4" />
-          AI-Powered Vacation Rentals
-        </div>
-
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 max-w-4xl text-white">
-          Smarter Stays.<br className="hidden md:block" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
-            Intelligent Living.
-          </span>
-        </h1>
-
-        <p className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-          Where Smart Travel Meets Smart Hosting.
-        </p>
-
-        {/* 3 Main Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 w-full max-w-xl mx-auto">
-          <Link href="/login?mode=register" className="flex-1">
-            <Button size="lg" className="w-full h-14 text-base bg-white text-slate-950 hover:bg-slate-200 border-0">
-              <UserPlus className="mr-2 h-5 w-5" />
-              Sign Up
-            </Button>
-          </Link>
-          <Link href="/login?role=host" className="flex-1">
-            <Button size="lg" variant="outline" className="w-full h-14 text-base border-blue-500 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300">
-              <Building2 className="mr-2 h-5 w-5" />
-              I&apos;m a Host
-            </Button>
-          </Link>
-          <Link href="/login?role=traveler" className="flex-1">
-            <Button size="lg" variant="outline" className="w-full h-14 text-base border-purple-500 text-purple-400 hover:bg-purple-500/20 hover:text-purple-300">
-              <Plane className="mr-2 h-5 w-5" />
-              I&apos;m a Traveler
-            </Button>
-          </Link>
-        </div>
-
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-3 gap-8 mt-24 max-w-5xl text-left">
-          <div className="bg-slate-900/50 p-6 rounded-2xl border border-white/10 hover:border-purple-500/50 transition-all">
-            <div className="h-10 w-10 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
-              <Heart className="h-5 w-5 text-purple-400" />
+        {/* Navigation - Minimal, typography-led */}
+        <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm">
+          <nav className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <Link href="/" className="text-xl font-medium tracking-tight text-foreground">
+              Smart Spaces
+            </Link>
+            <div className="flex items-center gap-6">
+              <Link
+                href="/login"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+              >
+                Sign in
+              </Link>
+              <Link href="/login?mode=register">
+                <Button
+                  size="sm"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200"
+                >
+                  Get started
+                </Button>
+              </Link>
             </div>
-            <h3 className="font-bold text-lg mb-2 text-white">AI Matching</h3>
-            <p className="text-slate-400">Tell us your vibe &mdash; remote work, honeymoon, family trip &mdash; and we&apos;ll show you spaces with match scores tailored to you.</p>
-          </div>
-          <div className="bg-slate-900/50 p-6 rounded-2xl border border-white/10 hover:border-green-500/50 transition-all">
-            <div className="h-10 w-10 bg-green-500/20 rounded-lg flex items-center justify-center mb-4">
-              <DollarSign className="h-5 w-5 text-green-400" />
-            </div>
-            <h3 className="font-bold text-lg mb-2 text-white">Smart Pricing</h3>
-            <p className="text-slate-400">Hosts get AI-powered price suggestions based on demand, season, and occupancy. Maximize earnings automatically.</p>
-          </div>
-          <div className="bg-slate-900/50 p-6 rounded-2xl border border-white/10 hover:border-blue-500/50 transition-all">
-            <div className="h-10 w-10 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
-              <Brain className="h-5 w-5 text-blue-400" />
-            </div>
-            <h3 className="font-bold text-lg mb-2 text-white">AI-Generated Listings</h3>
-            <p className="text-slate-400">Hosts just enter an address &mdash; our AI writes compelling titles, descriptions, and suggests optimal pricing.</p>
-          </div>
-        </div>
+          </nav>
+        </header>
 
-        {/* Feedback Section */}
-        <div className="mt-24 px-4">
-          <FeedbackBox />
-        </div>
-      </main>
+        {/* Hero Section - Editorial, breathing room */}
+        <main>
+          <section className="pt-32 pb-24 px-6">
+            <div className="max-w-4xl mx-auto">
+              {/* Overline - subtle context */}
+              <p className="text-overline uppercase text-muted-foreground mb-6 tracking-widest">
+                Vacation rentals, reimagined
+              </p>
 
-      {/* Footer */}
-      <footer className="py-8 text-center text-slate-500 text-sm border-t border-white/10">
-        <p className="mb-2">Founder and CEO: <span className="text-slate-300">Jason Wolff</span></p>
-        <p>© 2025 Smart Spaces. All rights reserved.</p>
-      </footer>
-    </div>
+              {/* Primary headline - typography carries weight */}
+              <h1 className="text-display text-foreground mb-8 max-w-3xl text-balance">
+                Find spaces that
+                <span className="text-primary"> understand</span> how you travel
+              </h1>
+
+              {/* Supporting text - restrained, not overselling */}
+              <p className="text-body-lg text-muted-foreground max-w-xl mb-12 leading-relaxed">
+                Tell us what matters to you. Our AI matches you with homes that fit
+                your style, your work, your way of being away.
+              </p>
+
+              {/* Single clear CTA - no competing buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 items-start">
+                <Link href="/login?mode=register">
+                  <Button
+                    size="lg"
+                    className="h-12 px-8 bg-primary hover:bg-primary/90 text-primary-foreground text-base font-medium transition-all duration-200 group"
+                  >
+                    Start exploring
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+                  </Button>
+                </Link>
+                <Link
+                  href="/login?role=host"
+                  className="h-12 px-8 inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+                >
+                  I want to list my property
+                </Link>
+              </div>
+            </div>
+          </section>
+
+          {/* Value Props - Not cards, editorial flow */}
+          <section className="py-24 px-6 border-t border-border">
+            <div className="max-w-4xl mx-auto">
+              <div className="grid md:grid-cols-2 gap-16">
+                {/* For Travelers */}
+                <div>
+                  <p className="text-overline uppercase text-muted-foreground mb-4 tracking-widest">
+                    For travelers
+                  </p>
+                  <h2 className="text-title text-foreground mb-6">
+                    Beyond filters. Beyond guesswork.
+                  </h2>
+                  <div className="space-y-6 text-body text-muted-foreground">
+                    <p>
+                      Describe your trip: working remotely, traveling with kids,
+                      celebrating an anniversary. We show you match scores that
+                      actually mean something.
+                    </p>
+                    <p>
+                      No more scrolling through hundreds of listings hoping one
+                      might work. Every recommendation is intentional.
+                    </p>
+                  </div>
+                </div>
+
+                {/* For Hosts */}
+                <div>
+                  <p className="text-overline uppercase text-muted-foreground mb-4 tracking-widest">
+                    For hosts
+                  </p>
+                  <h2 className="text-title text-foreground mb-6">
+                    Your property. Presented properly.
+                  </h2>
+                  <div className="space-y-6 text-body text-muted-foreground">
+                    <p>
+                      Enter your address. Our AI writes the listing: title, description,
+                      pricing strategy. What takes hours now takes minutes.
+                    </p>
+                    <p>
+                      Smart pricing adjusts to demand. Better guests find you because
+                      the right travelers see you first.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Brand Statement - Quiet confidence */}
+          <section className="py-24 px-6 bg-secondary/30">
+            <div className="max-w-3xl mx-auto text-center">
+              <p className="text-headline text-foreground/80 leading-relaxed text-balance">
+                "We built Smart Spaces because vacation rental platforms forgot
+                what matters: matching people with places that feel like somewhere
+                they want to be."
+              </p>
+              <p className="mt-8 text-caption text-muted-foreground">
+                Jason Wolff, Founder
+              </p>
+            </div>
+          </section>
+
+          {/* Feedback Section */}
+          <section className="py-24 px-6 border-t border-border">
+            <div className="max-w-xl mx-auto">
+              <FeedbackBox />
+            </div>
+          </section>
+        </main>
+
+        {/* Footer - Minimal */}
+        <footer className="py-12 px-6 border-t border-border">
+          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              © 2025 Smart Spaces
+            </p>
+            <div className="flex gap-6">
+              <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Sign in
+              </Link>
+              <Link href="/login?role=host" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                List your property
+              </Link>
+            </div>
+          </div>
+        </footer>
+      </div>
     </>
   )
 }

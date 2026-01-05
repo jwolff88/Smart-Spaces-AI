@@ -135,7 +135,7 @@ export default async function GuestDashboard() {
             <form
               action={async () => {
                 "use server"
-                await signOut()
+                await signOut({ redirectTo: "/" })
               }}
             >
               <Button variant="outline" size="sm" type="submit" className="border-border/50 hover:border-secondary/50 hover:glow-magenta transition-all">

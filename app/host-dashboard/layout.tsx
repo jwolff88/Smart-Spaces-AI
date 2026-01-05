@@ -55,7 +55,7 @@ export default function HostLayout({
               <form
                 action={async () => {
                   "use server"
-                  await signOut()
+                  await signOut({ redirectTo: "/" })
                 }}
               >
                 <Button variant="outline" type="submit" className="border-pink-500/40 text-pink-400 hover:bg-pink-500/10 hover:border-pink-400 transition-all">

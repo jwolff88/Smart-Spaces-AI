@@ -4,6 +4,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import { AuthProvider } from "@/components/auth-provider"
 import { cn } from "@/lib/utils"
+import { Analytics } from "@vercel/analytics/next"
 
 // DM Sans: Geometric warmth with distinctive character
 // Superior to Inter for brand differentiation
@@ -90,6 +91,7 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   )

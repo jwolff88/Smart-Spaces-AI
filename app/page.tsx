@@ -51,19 +51,20 @@ export default function LandingPage() {
             <Link href="/" className="text-xl font-medium tracking-tight text-foreground">
               Smart Spaces
             </Link>
-            <div className="flex items-center gap-6">
-              <Link
-                href="/login"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
-              >
-                Sign in
+            <div className="flex items-center gap-3">
+              <Link href="/login?role=traveler">
+                <Button variant="outline" size="sm">
+                  Traveler
+                </Button>
+              </Link>
+              <Link href="/login?role=host">
+                <Button variant="outline" size="sm">
+                  Host
+                </Button>
               </Link>
               <Link href="/login?mode=register">
-                <Button
-                  size="sm"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200"
-                >
-                  Get started
+                <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                  Sign Up
                 </Button>
               </Link>
             </div>

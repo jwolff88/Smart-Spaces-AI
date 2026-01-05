@@ -29,10 +29,11 @@ export default function HostLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-background relative bg-holo-shimmer">
       {/* Fluid gradient orbs */}
       <div className="orb-purple w-[500px] h-[500px] top-[-100px] right-[-100px] opacity-40" />
       <div className="orb-pink w-[400px] h-[400px] bottom-[20%] left-[-100px] opacity-30" />
+      <div className="orb-green w-[350px] h-[350px] top-[30%] left-[5%] opacity-30" />
       <div className="orb-cyan w-[300px] h-[300px] top-[40%] right-[10%] opacity-25" />
 
       {/* --- TOP NAVIGATION --- */}

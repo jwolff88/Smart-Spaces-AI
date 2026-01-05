@@ -41,13 +41,13 @@ export default function LandingPage() {
         - Iridescent text and glows
         - Chrome/liquid effects
       */}
-      <div className="min-h-screen bg-background relative overflow-hidden">
+      <div className="min-h-screen bg-background relative overflow-hidden bg-holo-shimmer">
         {/* Fluid gradient orbs - like the reference images */}
         <div className="orb-purple w-[600px] h-[600px] top-[-200px] left-[-100px] opacity-60" />
         <div className="orb-pink w-[500px] h-[500px] top-[100px] right-[-150px] opacity-50" />
         <div className="orb-cyan w-[400px] h-[400px] bottom-[200px] left-[10%] opacity-40" />
         <div className="orb-orange w-[350px] h-[350px] bottom-[-100px] right-[20%] opacity-50" />
-        <div className="orb-green w-[300px] h-[300px] top-[40%] right-[5%] opacity-30" />
+        <div className="orb-green w-[300px] h-[300px] top-[40%] right-[5%] opacity-40" />
 
         {/* Navigation */}
         <header className="fixed top-0 left-0 right-0 z-50 glass-dark">

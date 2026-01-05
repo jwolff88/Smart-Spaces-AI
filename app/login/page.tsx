@@ -119,10 +119,11 @@ function AuthContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-background flex flex-col relative overflow-hidden bg-holo-shimmer">
       {/* Fluid gradient orbs */}
       <div className="orb-purple w-[500px] h-[500px] top-[-150px] left-[-100px] opacity-50" />
       <div className="orb-pink w-[400px] h-[400px] bottom-[-100px] right-[-100px] opacity-40" />
+      <div className="orb-green w-[350px] h-[350px] bottom-[30%] left-[10%] opacity-35" />
       <div className="orb-cyan w-[300px] h-[300px] top-[50%] right-[10%] opacity-30" />
 
       {/* Header */}

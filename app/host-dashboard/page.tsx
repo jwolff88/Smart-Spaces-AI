@@ -25,9 +25,9 @@ function formatDate(date: Date) {
 
 function getStatusIndicator(status: string) {
   const styles = {
-    confirmed: "bg-accent glow-lime",
-    pending: "bg-warning glow-cyan",
-    cancelled: "bg-destructive glow-magenta",
+    confirmed: "status-confirmed",
+    pending: "status-pending",
+    cancelled: "status-cancelled",
     completed: "bg-muted-foreground",
   }
   return (
@@ -90,21 +90,21 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     <div className="space-y-16">
       {/* Welcome Section */}
       <section>
-        <p className="text-overline uppercase text-primary tracking-widest mb-2 text-glow-cyan">
+        <p className="text-sm uppercase tracking-[0.2em] text-purple-400 mb-2">
           Overview
         </p>
-        <h1 className="text-title text-foreground mb-4">
+        <h1 className="text-3xl font-bold text-foreground mb-4">
           Welcome back, {firstName}
         </h1>
 
         {/* Stats as inline text */}
-        <p className="text-body-lg text-muted-foreground max-w-2xl">
+        <p className="text-lg text-muted-foreground max-w-2xl">
           You have{" "}
-          <span className="text-primary font-medium">{listings.length} {listings.length === 1 ? "property" : "properties"}</span>
+          <span className="text-purple-400 font-medium">{listings.length} {listings.length === 1 ? "property" : "properties"}</span>
           {pendingBookings.length > 0 && (
             <>
               {" "}with{" "}
-              <span className="text-warning font-medium">
+              <span className="text-amber-400 font-medium">
                 {pendingBookings.length} pending {pendingBookings.length === 1 ? "booking" : "bookings"}
               </span>
             </>
@@ -112,7 +112,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           {confirmedBookings.length > 0 && (
             <>
               {" "}and{" "}
-              <span className="text-accent font-medium">
+              <span className="text-green-400 font-medium">
                 {confirmedBookings.length} confirmed
               </span>
             </>
@@ -121,7 +121,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           {totalRevenue > 0 && (
             <>
               {" "}You&apos;ve earned{" "}
-              <span className="text-secondary font-medium text-glow-magenta">${totalRevenue.toFixed(0)}</span>
+              <span className="text-pink-400 font-medium">${totalRevenue.toFixed(0)}</span>
               {" "}so far.
             </>
           )}
@@ -131,11 +131,11 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       {/* Recent Activity */}
       <section>
         <div className="flex items-baseline justify-between mb-6">
-          <h2 className="text-headline text-foreground text-glow-cyan">Recent activity</h2>
+          <h2 className="text-2xl font-bold text-foreground">Recent activity</h2>
           {bookings.length > 0 && (
             <Link
               href="/host-dashboard/calendar"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              className="text-sm text-muted-foreground hover:text-purple-400 transition-colors"
             >
               View all
             </Link>
@@ -143,7 +143,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         </div>
 
         {bookings.length === 0 ? (
-          <div className="py-12 text-center border border-dashed border-primary/30 rounded-lg glass-neon">
+          <div className="py-12 text-center border border-dashed border-purple-500/30 rounded-xl glass-purple">
             <p className="text-muted-foreground mb-1">No bookings yet</p>
             <p className="text-sm text-muted-foreground/70">
               When guests book your properties, they&apos;ll appear here.
@@ -187,23 +187,23 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       {/* Properties Section */}
       <section>
         <div className="flex items-baseline justify-between mb-6">
-          <h2 className="text-headline text-foreground text-glow-magenta">Your properties</h2>
+          <h2 className="text-2xl font-bold text-foreground">Your properties</h2>
           <Link
             href="/host-dashboard/add-property"
-            className="text-sm text-secondary hover:text-secondary/80 transition-colors"
+            className="text-sm text-pink-400 hover:text-pink-300 transition-colors"
           >
             Add property
           </Link>
         </div>
 
         {listings.length === 0 ? (
-          <div className="py-16 text-center border border-dashed border-secondary/30 rounded-lg glass-magenta">
+          <div className="py-16 text-center border border-dashed border-pink-500/30 rounded-xl glass-pink">
             <p className="text-muted-foreground mb-2">No properties yet</p>
             <p className="text-sm text-muted-foreground/70 mb-6 max-w-sm mx-auto">
               List your first property. Our AI will help write the perfect description.
             </p>
             <Link href="/host-dashboard/add-property">
-              <Button className="bg-primary hover:bg-primary/80 text-primary-foreground glow-cyan hover:shadow-[0_0_25px_rgba(0,255,255,0.5)] transition-all">
+              <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white glow-holo transition-all">
                 Add your first property
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>

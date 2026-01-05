@@ -6,12 +6,12 @@ import { Plus, LogOut } from "lucide-react"
 
 /*
   HOST DASHBOARD LAYOUT
-  Philosophy: Neon Futuristic Holographic
+  Philosophy: Holographic Iridescent Fluid
 
-  - Dark background with cyan grid
-  - Glowing navigation elements
-  - Glass morphism header
-  - Neon accent colors
+  - Pure black with fluid gradient orbs
+  - Multi-color iridescent effects
+  - Glass morphism with purple/pink accents
+  - Smooth gradient navigation
 */
 
 const navItems = [
@@ -29,27 +29,25 @@ export default function HostLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-background bg-grid relative">
-      {/* Ambient glow */}
-      <div className="fixed top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="fixed bottom-1/4 left-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-background relative">
+      {/* Fluid gradient orbs */}
+      <div className="orb-purple w-[500px] h-[500px] top-[-100px] right-[-100px] opacity-40" />
+      <div className="orb-pink w-[400px] h-[400px] bottom-[20%] left-[-100px] opacity-30" />
+      <div className="orb-cyan w-[300px] h-[300px] top-[40%] right-[10%] opacity-25" />
 
       {/* --- TOP NAVIGATION --- */}
-      <header className="sticky top-0 z-50 glass-neon">
+      <header className="sticky top-0 z-50 glass-dark">
         <div className="max-w-6xl mx-auto px-6">
           {/* Top bar */}
           <div className="h-16 flex items-center justify-between">
-            <Link
-              href="/"
-              className="text-lg font-bold tracking-wider text-foreground text-glow-cyan"
-            >
-              SMART SPACES
+            <Link href="/" className="text-lg font-bold tracking-wider">
+              <span className="text-holo">SMART SPACES</span>
             </Link>
 
             {/* Desktop: Secondary actions */}
             <div className="hidden md:flex items-center gap-3">
               <Link href="/host-dashboard/add-property">
-                <Button className="bg-primary hover:bg-primary/80 glow-cyan hover:shadow-[0_0_25px_rgba(0,255,255,0.5)] transition-all">
+                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white glow-holo transition-all">
                   <Plus className="mr-2 h-4 w-4" /> Add Property
                 </Button>
               </Link>
@@ -59,7 +57,7 @@ export default function HostLayout({
                   await signOut()
                 }}
               >
-                <Button variant="outline" type="submit" className="border-border/50 hover:border-secondary/50 hover:glow-magenta transition-all">
+                <Button variant="outline" type="submit" className="border-pink-500/40 text-pink-400 hover:bg-pink-500/10 hover:border-pink-400 transition-all">
                   <LogOut className="mr-2 h-4 w-4" /> Sign Out
                 </Button>
               </form>
@@ -77,7 +75,7 @@ export default function HostLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className="px-4 py-3 text-sm text-muted-foreground hover:text-primary border-b-2 border-transparent hover:border-primary/50 transition-all duration-200"
+                className="px-4 py-3 text-sm text-muted-foreground hover:text-purple-400 border-b-2 border-transparent hover:border-purple-500/50 transition-all duration-200"
               >
                 {item.label}
               </Link>
@@ -92,10 +90,10 @@ export default function HostLayout({
       </main>
 
       {/* --- FOOTER --- */}
-      <footer className="border-t border-border/50 mt-auto glass-neon">
+      <footer className="border-t border-purple-500/20 mt-auto glass-dark">
         <div className="max-w-6xl mx-auto px-6 py-8">
           <p className="text-sm text-muted-foreground">
-            © 2025 <span className="text-primary">Smart Spaces</span>
+            © 2025 <span className="text-holo-static">Smart Spaces</span>
           </p>
         </div>
       </footer>

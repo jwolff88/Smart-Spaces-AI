@@ -19,7 +19,13 @@
       "Bash(powershell:*)",
       "WebFetch(domain:smart-spaces-ai.vercel.app)",
       "Bash(ping:*)",
-      "Bash(npm run seed:*)"
+      "Bash(npm run seed:*)",
+      "Bash(npx prisma studio:*)",
+      "Bash(findstr:*)",
+      "Bash(wc:*)",
+      "Bash(vercel --prod:*)",
+      "Bash(npx vercel:*)",
+      "Bash(dir:*)"
     ]
   }
 }

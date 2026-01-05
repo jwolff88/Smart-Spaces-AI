@@ -9,6 +9,7 @@ interface ListingData {
   title: string
   description: string
   price: number
+  smartPricing?: boolean
   location: string
   type: string
   bedrooms: string
@@ -40,6 +41,7 @@ export async function createListing(data: ListingData) {
         price: data.price,
         basePrice: data.price, // Store original price for dynamic pricing
         currentPrice: data.price, // Initially same as base
+        smartPricing: data.smartPricing ?? true, // Default to true if not specified
         location: data.location,
         type: data.type,
         bedrooms: data.bedrooms,

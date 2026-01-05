@@ -34,6 +34,9 @@ export default function AddPropertyPage() {
     workAmenities: [] as string[],
     wifiSpeed: "",
     idealFor: [] as string[],
+    // Pricing
+    smartPricing: true,
+    manualPrice: "",
   })
 
   const VIBES = [
@@ -154,13 +157,26 @@ export default function AddPropertyPage() {
 
   const handlePublish = async () => {
     if (!aiContent) return
+
+    // Validate manual price if smart pricing is disabled
+    if (!formData.smartPricing && !formData.manualPrice) {
+      alert("Please enter a price for your listing")
+      return
+    }
+
     setIsSaving(true)
+
+    // Use AI price if smart pricing enabled, otherwise use manual price
+    const finalPrice = formData.smartPricing
+      ? aiContent.suggestedPrice
+      : parseInt(formData.manualPrice)
 
     // Prepare final data payload
     const listingData = {
       title: aiContent.title,
       description: aiContent.description,
-      price: aiContent.suggestedPrice,
+      price: finalPrice,
+      smartPricing: formData.smartPricing,
       location: formData.address,
       type: formData.type,
       bedrooms: formData.bedrooms,
@@ -420,6 +436,49 @@ export default function AddPropertyPage() {
                 )}
               </div>
 
+              {/* Pricing Section */}
+              <div className="border-t pt-6 mt-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-green-600 font-bold text-lg">$</span>
+                  <h3 className="font-semibold">Pricing Strategy</h3>
+                </div>
+
+                {/* Smart Pricing Toggle */}
+                <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg mb-4">
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="h-5 w-5 text-green-600" />
+                    <div>
+                      <p className="font-medium">Smart Pricing</p>
+                      <p className="text-xs text-gray-500">AI adjusts your price based on demand & market data</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={formData.smartPricing}
+                    onCheckedChange={(checked) => setFormData({ ...formData, smartPricing: checked })}
+                  />
+                </div>
+
+                {/* Manual Price Input (shown when smart pricing is OFF) */}
+                {!formData.smartPricing && (
+                  <div className="ml-4 border-l-2 border-green-200 pl-4">
+                    <Label className="text-sm">Your Nightly Price</Label>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="text-gray-500 font-medium">$</span>
+                      <Input
+                        type="number"
+                        placeholder="150"
+                        min="1"
+                        className="w-32"
+                        value={formData.manualPrice}
+                        onChange={(e) => setFormData({ ...formData, manualPrice: e.target.value })}
+                      />
+                      <span className="text-sm text-gray-500">/ night</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">This price will be fixed and won&apos;t change automatically</p>
+                  </div>
+                )}
+              </div>
+
               <Button 
                 size="lg" 
                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
@@ -463,21 +522,39 @@ export default function AddPropertyPage() {
                   />
                 </div>
 
-                <div className="flex items-center gap-4 p-4 bg-gray-900 text-white rounded-lg">
-                  <div className="bg-green-500/20 p-2 rounded-full">
-                    <span className="text-green-400 font-bold">$</span>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-400">AI Suggested Price</p>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-bold">${aiContent?.suggestedPrice}</span>
-                      <span className="text-sm text-gray-500">/ night</span>
+                {formData.smartPricing ? (
+                  <div className="flex items-center gap-4 p-4 bg-gray-900 text-white rounded-lg">
+                    <div className="bg-green-500/20 p-2 rounded-full">
+                      <Sparkles className="h-4 w-4 text-green-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-400">Smart Pricing Enabled</p>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-bold">${aiContent?.suggestedPrice}</span>
+                        <span className="text-sm text-gray-500">/ night</span>
+                      </div>
+                    </div>
+                    <div className="ml-auto text-right text-xs text-gray-500">
+                      AI will adjust based on <br/> demand & market trends
                     </div>
                   </div>
-                  <div className="ml-auto text-right text-xs text-gray-500">
-                    Based on 45 comparable <br/> listings in your area.
+                ) : (
+                  <div className="flex items-center gap-4 p-4 bg-gray-900 text-white rounded-lg">
+                    <div className="bg-blue-500/20 p-2 rounded-full">
+                      <span className="text-blue-400 font-bold">$</span>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-400">Your Fixed Price</p>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-bold">${formData.manualPrice || "—"}</span>
+                        <span className="text-sm text-gray-500">/ night</span>
+                      </div>
+                    </div>
+                    <div className="ml-auto text-right text-xs text-gray-500">
+                      This price will remain <br/> constant over time
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               <div className="flex gap-3 pt-4">
